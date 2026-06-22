@@ -131,11 +131,11 @@
             <article class="card visual-card">
               <div class="card-head"><div><span class="step">SPÆNDINGSVEKTORER</span><h3>I som reference</h3></div><div class="legend"><span class="ref">I<sub>ref</sub></span><span class="r">U<sub>R</sub></span><span class="x">U<sub>X</sub></span><span class="u">U</span></div></div>
               <svg id="rlcPhasor" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Vektordiagram for RLC-seriekreds"></svg>
-              <div class="visual-caption"><span id="rlcNature">—</span><strong id="rlcPhiText">φ = —</strong></div>
+              <div class="visual-caption"><span id="rlcNature">—</span><strong id="rlcPhiText">φ<sub>I</sub> = —</strong></div>
             </article>
           </div>
           <div class="result-strip six">
-            <div><span>X<sub>L</sub></span><strong id="rlcXL">—</strong><small>Induktiv reaktans</small></div><div><span>X<sub>C</sub></span><strong id="rlcXC">—</strong><small>Kapacitiv reaktans</small></div><div><span>Impedans Z</span><strong id="rlcZ">—</strong><small>Samlet modstand</small></div><div><span>Strøm I</span><strong id="rlcI">—</strong><small>I = U / Z</small></div><div><span>Fase φ</span><strong id="rlcPhi">—</strong><small>atan(X/R)</small></div><div><span>Effekt P</span><strong id="rlcP">—</strong><small>I² · R</small></div>
+            <div><span>X<sub>L</sub></span><strong id="rlcXL">—</strong><small>Induktiv reaktans</small></div><div><span>X<sub>C</sub></span><strong id="rlcXC">—</strong><small>Kapacitiv reaktans</small></div><div><span>Impedans Z</span><strong id="rlcZ">—</strong><small>Samlet modstand</small></div><div><span>Strøm I</span><strong id="rlcI">—</strong><small>I = U / Z</small></div><div><span>Strømvinkel φ<sub>I</sub></span><strong id="rlcPhi">—</strong><small>φ<sub>I</sub> = −atan(X/R)</small></div><div><span>Effekt P</span><strong id="rlcP">—</strong><small>I² · R</small></div>
           </div>
           <article class="card visual-card series-ui-card">
             <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3>U som reference</h3></div><div class="legend"><span class="u">U</span><span class="i">I</span></div></div>
@@ -158,8 +158,8 @@
               <div class="formula-grid">
                 <div><span>Resulterende reaktans</span><strong>X = X<sub>L</sub> − X<sub>C</sub></strong><small id="impedanceXFormula">—</small></div>
                 <div><span>Impedans</span><strong>Z = √(R² + X²)</strong><small id="impedanceZFormula">—</small></div>
-                <div><span>Fasevinkel</span><strong>φ = tan⁻¹(X/R)</strong><small id="impedancePhiFormula">—</small></div>
-                <div><span>Effektfaktor</span><strong>cos φ = R/Z</strong><small id="impedanceCosFormula">—</small></div>
+                <div><span>Impedansvinkel</span><strong>∠Z = tan⁻¹(X/R)</strong><small id="impedancePhiFormula">—</small></div>
+                <div><span>Effektfaktor</span><strong>cos(∠Z) = R/Z</strong><small id="impedanceCosFormula">—</small></div>
               </div>
               <p class="formula-foot"><b>Kompleks form:</b> Z̲ = R + j(X<sub>L</sub> − X<sub>C</sub>). Et negativt X giver en kapacitiv fasevinkel.</p>
             </article>
