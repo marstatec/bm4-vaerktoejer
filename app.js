@@ -64,25 +64,25 @@ let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView=
 
 function drawAc(){
   const U=num('acU'), I=num('acI'), f=Math.max(.1,num('acF')), phi=clamp(Number($('acPhi').value)||0,-90,90);
-  $('acPhiRange').value=phi; $('acPhiLabel').textContent=`${da(Math.abs(phi),0)}° ${phi>0?'induktiv':phi<0?'kapacitiv':'resistiv'}`;
-  const loadType=phi>0?'inductive':phi<0?'capacitive':'resistive',loadChip=document.querySelector('.load-chip');loadChip.dataset.load=loadType;
+  $('acPhiRange').value=phi; $('acPhiLabel').textContent=`${phi>0?'+':phi<0?'−':''}${da(Math.abs(phi),0)}° · ${phi>0?'kapacitiv':phi<0?'induktiv':'resistiv'}`;
+  const loadType=phi<0?'inductive':phi>0?'capacitive':'resistive',loadChip=document.querySelector('.load-chip');loadChip.dataset.load=loadType;
   if(loadType==='inductive'){$('acLoadTitle').textContent='Induktiv last';$('acLoadExplanation').textContent='Strøm bagefter spænding';$('acSignNote').innerHTML='<strong>Induktiv:</strong> Strømmen er bagefter spændingen.';}
   if(loadType==='capacitive'){$('acLoadTitle').textContent='Kapacitiv last';$('acLoadExplanation').textContent='Strøm foran spænding';$('acSignNote').innerHTML='<strong>Kapacitiv:</strong> Strømmen er foran spændingen.';}
   if(loadType==='resistive'){$('acLoadTitle').textContent='Resistiv last';$('acLoadExplanation').textContent='Strøm og spænding er i fase';$('acSignNote').innerHTML='<strong>Resistiv:</strong> Strøm og spænding følges ad.';}
-  const S=U*I, P=S*Math.cos(rad(phi)), Q=S*Math.sin(rad(phi));
+  const S=U*I, P=S*Math.cos(rad(phi)), Q=-S*Math.sin(rad(phi));
   $('acP').textContent=power(P); $('acQ').textContent=power(Q,true); $('acS').textContent=Math.abs(S)>=1000?unit(S/1000,'kVA',2):unit(S,'VA'); $('acCos').textContent=da(Math.cos(rad(phi)),3);
-  $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'−'+da(phi,0):'+'+da(Math.abs(phi),0)}°`;
+  $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'+'+da(phi,0):'−'+da(Math.abs(phi),0)}°`;
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
-  const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90-phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
+  const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,uAngle,VOLTAGE_COLOR,`U = ${da(U,0)} V`);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,1)} A`);
-  if(phi!==0){const r=42,sweep=phi>0?1:0,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90-phi/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φ ${da(Math.abs(phi),0)}°`,'vector-label','#778791','middle');}
+  if(phi!==0){const r=42,sweep=phi>0?0:1,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+phi/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φI ${phi>0?'+':'−'}${da(Math.abs(phi),0)}°`,'vector-label','#778791','middle');}
   drawWaves(U,I,f,phi);
 }
 function drawWaves(U,I,f,phi){
   const root=$('waveDiagram'); clear(root); const W=850,H=180,mid=90; line(root,20,mid,830,mid,'axis');
   for(let x=20;x<=830;x+=81) line(root,x,15,x,165);
   const path=(phase,amp)=>{let d='';for(let x=20;x<=830;x+=3){const t=(x-20)/810*4*Math.PI;const y=mid-amp*Math.sin(t+rad(phase));d+=(x===20?'M':'L')+` ${x} ${y}`;}return d;};
-  root.append(svg('path',{d:path(0,60),fill:'none',stroke:VOLTAGE_COLOR,'stroke-width':2.2}));root.append(svg('path',{d:path(-phi,42),fill:'none',stroke:CURRENT_COLOR,'stroke-width':2}));
+  root.append(svg('path',{d:path(0,60),fill:'none',stroke:VOLTAGE_COLOR,'stroke-width':2.2}));root.append(svg('path',{d:path(phi,42),fill:'none',stroke:CURRENT_COLOR,'stroke-width':2}));
   text(root,28,27,`û = ${da(U*Math.SQRT2,1)} V`,'vector-label',VOLTAGE_COLOR); text(root,28,44,`î = ${da(I*Math.SQRT2,1)} A`,'vector-label',CURRENT_COLOR); text(root,824,107,`${da(2/f*1000,1)} ms`,'vector-label','#596873','end');
 }
 
@@ -231,19 +231,24 @@ function drawTransformation(){
   drawTransformationDiagram(sourceType,targetType,input,output,sourceLabels,targetLabels);
 }
 function drawTransformationDiagram(rootType,targetType,sourceValues,targetValues,sourceLabels,targetLabels){
-  const root=$('transformationDiagram');clear(root);baseGrid(root,450,165,840,275);
-  drawTransformNetwork(root,235,165,sourceType,sourceValues,sourceLabels);drawTransformNetwork(root,665,165,targetType,targetValues,targetLabels);
-  arrow(root,390,165,120,0,'#55d6a1',transformDirection==='delta-star'?'Δ → Y':'Y → Δ',.75);
-  text(root,235,34,transformDirection==='delta-star'?'INDDATA · Δ':'INDDATA · Y','vector-label','#8fa0aa','middle');text(root,665,34,transformDirection==='delta-star'?'RESULTAT · Y':'RESULTAT · Δ','vector-label',VOLTAGE_COLOR,'middle');
+  const root=$('transformationDiagram');clear(root);
+  root.append(svg('rect',{x:22,y:18,width:856,height:292,rx:14,fill:'#0f1820',stroke:'#263743'}));
+  drawTransformNetwork(root,235,165,rootType,sourceValues,sourceLabels);drawTransformNetwork(root,665,165,targetType,targetValues,targetLabels);
+  arrow(root,402,166,96,0,'#55d6a1',transformDirection==='delta-star'?'Δ → Y':'Y → Δ',.72);
+  text(root,235,42,transformDirection==='delta-star'?'INDDATA · TREKANT':'INDDATA · STJERNE','vector-label','#8fa0aa','middle');text(root,665,42,transformDirection==='delta-star'?'RESULTAT · STJERNE':'RESULTAT · TREKANT','vector-label',VOLTAGE_COLOR,'middle');
 }
 function drawTransformNetwork(root,cx,cy,type,values,labels){
-  const pts=[[cx,70],[cx-105,245],[cx+105,245]],center=[cx,178],colors=[VOLTAGE_COLOR,'#8fb7ff','#9b87f5'];
+  const wire='#c7d2d8',box='#edf4f7',labelColor='#dbe5e9',muted='#8fa0aa';
+  const resistor=(a,b,label,value,normal=1)=>{const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,angle=deg(Math.atan2(b[1]-a[1],b[0]-a[0])),length=Math.hypot(b[0]-a[0],b[1]-a[1]),nx=-(b[1]-a[1])/length,ny=(b[0]-a[0])/length;line(root,a[0],a[1],b[0],b[1],'vector',wire);const g=svg('g',{transform:`translate(${mx} ${my}) rotate(${angle})`});g.append(svg('rect',{x:-22,y:-9,width:44,height:18,rx:2,fill:'#0f1820',stroke:box,'stroke-width':2}));root.append(g);text(root,mx+nx*24*normal,my+ny*24*normal+4,`${label} = ${da(value,2)} Ω`,'vector-label',labelColor,'middle');};
+  const top=[cx,76],left=[cx-92,232],right=[cx+92,232],center=[cx,166];
   if(type==='D'){
-    pts.forEach((p,i)=>{const q=pts[(i+1)%3],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2;line(root,p[0],p[1],q[0],q[1],'vector',colors[i]);root.append(svg('rect',{x:mx-17,y:my-8,width:34,height:16,rx:3,fill:'#101820',stroke:colors[i],transform:`rotate(${i===0?59:i===2?-59:0} ${mx} ${my})`}));text(root,mx+(i===0?18:i===2?-18:0),my+(i===1?27:-10),`${labels[i]} ${da(values[i],2)} Ω`,'vector-label',colors[i],i===0?'start':i===2?'end':'middle');});
+    resistor(top,right,labels[0],values[0],-1);resistor(right,left,labels[1],values[1],-1);resistor(left,top,labels[2],values[2],-1);
+    line(root,top[0],top[1],top[0],52,'vector',wire);line(root,left[0],left[1],left[0]-34,left[1]+24,'vector',wire);line(root,right[0],right[1],right[0]+34,right[1]+24,'vector',wire);
   }else{
-    pts.forEach((p,i)=>{const ex=center[0]+(p[0]-center[0])*.7,ey=center[1]+(p[1]-center[1])*.7,mx=(center[0]+ex)/2,my=(center[1]+ey)/2;line(root,center[0],center[1],ex,ey,'vector',colors[i]);root.append(svg('rect',{x:mx-16,y:my-7,width:32,height:14,rx:3,fill:'#101820',stroke:colors[i],transform:`rotate(${i===0?-90:i===1?-58:58} ${mx} ${my})`}));text(root,ex+(i===0?12:i===1?-12:12),ey+(i===0?-8:16),`${labels[i]} ${da(values[i],2)} Ω`,'vector-label',colors[i],i===1?'end':'start');});root.append(svg('circle',{cx:center[0],cy:center[1],r:5,fill:'#d4dde1'}));text(root,center[0]+11,center[1]+5,'0','vector-label','#8d9aa3');
+    resistor(center,top,labels[0],values[0],-1);resistor(center,right,labels[1],values[1],-1);resistor(center,left,labels[2],values[2],-1);
+    line(root,top[0],top[1],top[0],52,'vector',wire);line(root,left[0],left[1],left[0]-34,left[1]+24,'vector',wire);line(root,right[0],right[1],right[0]+34,right[1]+24,'vector',wire);root.append(svg('circle',{cx:center[0],cy:center[1],r:5,fill:box}));text(root,center[0]+11,center[1]+5,'0','vector-label',muted);
   }
-  pts.forEach((p,i)=>{root.append(svg('circle',{cx:p[0],cy:p[1],r:5,fill:colors[i]}));text(root,p[0],p[1]+(i?20:-12),String(i+1),'vector-label',colors[i],'middle');});
+  [[top[0],48,'1'],[left[0]-40,left[1]+30,'3'],[right[0]+40,right[1]+30,'2']].forEach(([x,y,n])=>text(root,x,y,n,'vector-label',VOLTAGE_COLOR,'middle'));
 }
 
 const targetConfigs={U:[['I','Strøm I','A',10],['R','Resistans R','Ω',23]],I:[['U','Spænding U','V',230],['R','Resistans R','Ω',23]],R:[['U','Spænding U','V',230],['I','Strøm I','A',10]],P:[['U','Spænding U','V',230],['I','Strøm I','A',10]]};
