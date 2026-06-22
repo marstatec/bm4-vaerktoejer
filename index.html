@@ -67,9 +67,9 @@
                 <label><span>Spænding U <em>V</em></span><input id="acU" type="number" value="230" min="0" step="1"></label>
                 <label><span>Strøm I <em>A</em></span><input id="acI" type="number" value="10" min="0" step="0.1"></label>
                 <label><span>Frekvens f <em>Hz</em></span><input id="acF" type="number" value="50" min="0.1" step="1"></label>
-                <label><span>Fasevinkel φ <em>°</em></span><input id="acPhi" type="number" value="35" min="-90" max="90" step="1"></label>
+                <label><span>Strømmens fasevinkel φ<sub>I</sub> <em>°</em></span><input id="acPhi" type="number" value="-35" min="-90" max="90" step="1"></label>
               </div>
-              <label class="range-wrap"><span>Kapacitiv <b id="acPhiLabel">35° induktiv</b> Induktiv</span><input id="acPhiRange" type="range" min="-90" max="90" value="35"></label>
+              <label class="range-wrap"><span>Induktiv <b id="acPhiLabel">−35° · induktiv</b> Kapacitiv</span><input id="acPhiRange" type="range" min="-90" max="90" value="-35"></label>
               <div class="mini-note"><span>i</span><p id="acSignNote"><strong>Induktiv:</strong> Strømmen er bagefter spændingen.</p></div>
             </article>
 
@@ -81,10 +81,10 @@
           </div>
 
           <div class="result-strip">
-            <div><span>Aktiv effekt</span><strong id="acP">—</strong><small>P = U · I · cos φ</small></div>
-            <div><span>Reaktiv effekt</span><strong id="acQ">—</strong><small>Q = U · I · sin φ</small></div>
+            <div><span>Aktiv effekt</span><strong id="acP">—</strong><small>P = U · I · cos φ<sub>I</sub></small></div>
+            <div><span>Reaktiv effekt</span><strong id="acQ">—</strong><small>Q = −U · I · sin φ<sub>I</sub></small></div>
             <div><span>Tilsyneladende</span><strong id="acS">—</strong><small>S = U · I</small></div>
-            <div><span>Effektfaktor</span><strong id="acCos">—</strong><small>cos φ = P / S</small></div>
+            <div><span>Effektfaktor</span><strong id="acCos">—</strong><small>cos φ<sub>I</sub> = P / S</small></div>
           </div>
 
           <article class="card formula-card">
