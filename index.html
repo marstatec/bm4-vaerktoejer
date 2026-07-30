@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
-  <title>VektorLab · AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=ellove-power-1">
+  <title>VektorLab | AC-beregninger</title>
+  <link rel="stylesheet" href="styles.css?v=separator-1">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
       <a class="brand" href="#vekselstroem" aria-label="VektorLab forside">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span><strong>VektorLab</strong><small>AC · 1Φ · 3Φ</small></span>
+        <span><strong>VektorLab</strong><small>AC | 1Φ | 3Φ</small></span>
       </a>
 
       <p class="nav-label">Emner</p>
@@ -32,7 +32,7 @@
         <span class="pulse"></span>
         <p><strong>Live beregning</strong><br><small>Alle diagrammer følger dine tal.</small></p>
       </div>
-      <p class="sidebar-foot">Undervisningsværktøj · Maskinmesterskolen</p>
+      <p class="sidebar-foot">Undervisningsværktøj | Maskinmesterskolen</p>
     </aside>
 
     <main class="main">
@@ -45,7 +45,7 @@
         <div class="top-actions">
           <div class="display-scale" role="group" aria-label="Skalér visningen">
             <button id="scaleDown" title="Gør visningen mindre" aria-label="Gør visningen mindre">A−</button>
-            <button id="scaleAuto" class="scale-readout" title="Brug automatisk skalering">Auto · 100%</button>
+            <button id="scaleAuto" class="scale-readout" title="Brug automatisk skalering">Auto | 100%</button>
             <button id="scaleUp" title="Gør visningen større" aria-label="Gør visningen større">A+</button>
           </div>
           <span class="status"><i></i> Klar</span>
@@ -56,7 +56,7 @@
       <div class="content">
         <section class="page active" id="vekselstroem" data-title="Vekselstrøm">
           <div class="intro-row">
-            <div><span class="chapter">01 · GRUNDLAG</span><h2>Se spænding og strøm som roterende vektorer</h2><p>Justér fasevinklen og se sammenhængen mellem vektordiagram, sinuskurver og effekter. RMS-værdier bruges i beregningerne.</p></div>
+            <div><span class="chapter">01 | GRUNDLAG</span><h2>Se spænding og strøm som roterende vektorer</h2><p>Justér fasevinklen og se sammenhængen mellem vektordiagram, sinuskurver og effekter. RMS-værdier bruges i beregningerne.</p></div>
             <div class="concept-chip load-chip"><span>φ</span><p><strong id="acLoadTitle">Induktiv last</strong><br><span id="acLoadExplanation">Strøm bagefter spænding</span></p></div>
           </div>
 
@@ -69,7 +69,7 @@
                 <label><span>Frekvens f <em>Hz</em></span><input id="acF" type="number" value="50" min="0.1" step="1"></label>
                 <label><span>Strømmens fasevinkel φ<sub>I</sub> <em>°</em></span><input id="acPhi" type="number" value="-35" min="-90" max="90" step="1"></label>
               </div>
-              <label class="range-wrap"><span>Kapacitiv <b id="acPhiLabel">−35° · induktiv</b> Induktiv</span><input id="acPhiRange" type="range" min="-90" max="90" value="-35" dir="rtl"></label>
+              <label class="range-wrap"><span>Kapacitiv <b id="acPhiLabel">−35° — induktiv</b> Induktiv</span><input id="acPhiRange" type="range" min="-90" max="90" value="-35" dir="rtl"></label>
               <div class="mini-note"><span>i</span><p id="acSignNote"><strong>Induktiv:</strong> Strømmen er bagefter spændingen.</p></div>
             </article>
 
@@ -95,7 +95,7 @@
         </section>
 
         <section class="page" id="serie" data-title="1-faset serieforbindelse">
-          <div class="intro-row"><div><span class="chapter">02 · RLC I SERIE</span><h2>Byg impedansen led for led</h2><p>Resistans og reaktans står vinkelret på hinanden. Fortegnet på X afgør, om kredsen er induktiv eller kapacitiv.</p></div><div class="formula-badge">Z = √<span>R² + (X<sub>L</sub> − X<sub>C</sub>)²</span></div></div>
+          <div class="intro-row"><div><span class="chapter">02 | RLC I SERIE</span><h2>Byg impedansen led for led</h2><p>Resistans og reaktans står vinkelret på hinanden. Fortegnet på X afgør, om kredsen er induktiv eller kapacitiv.</p></div><div class="formula-badge">Z = √<span>R² + (X<sub>L</sub> − X<sub>C</sub>)²</span></div></div>
           <article class="card circuit-strip">
             <div><span class="step">KREDSKOBLING</span><h3 id="seriesCircuitTitle">Tre komponenter i vandret serie</h3><p>Den samme strøm I løber gennem alle aktive komponenter.</p></div>
             <svg id="seriesCircuit" class="circuit-svg" viewBox="0 0 520 150" role="img" aria-label="Vandret seriekobling med resistans, induktans og kapacitans"></svg>
@@ -173,7 +173,7 @@
 
         <section class="page" id="parallel" data-title="1-faset parallelforbindelse">
           <div class="intro-row">
-            <div><span class="chapter">03 · RLC I PARALLEL</span><h2>Læg grenstrømmene sammen som vektorer</h2><p>Spændingen er fælles for alle grene. Den ohmske strøm er i fase, den induktive strøm er 90° bagefter, og den kapacitive strøm er 90° foran spændingen.</p></div>
+            <div><span class="chapter">03 | RLC I PARALLEL</span><h2>Læg grenstrømmene sammen som vektorer</h2><p>Spændingen er fælles for alle grene. Den ohmske strøm er i fase, den induktive strøm er 90° bagefter, og den kapacitive strøm er 90° foran spændingen.</p></div>
             <div class="formula-badge" id="parallelMainFormula">I² = I<sub>R</sub>² + (I<sub>L</sub> − I<sub>C</sub>)²</div>
           </div>
           <article class="card circuit-strip">
@@ -195,7 +195,7 @@
                 <div class="component-row" id="parallelComponentRow3"><b>Komponent 3</b><select id="parallelCompType3" aria-label="Type for parallelkomponent 3"><option value="R">Resistiv R</option><option value="L">Induktiv L</option><option value="C" selected>Kapacitiv C</option></select><label class="component-value"><input id="parallelCompValue3" type="number" value="70" min="0.001" step="0.1"><em id="parallelCompUnit3">µF</em></label></div>
               </div>
               <div class="field-grid">
-                <label id="parVoltageField"><span>Spænding U <em>V · reference og effekt</em></span><input id="parU" type="number" value="230" min="0" step="1"></label>
+                <label id="parVoltageField"><span>Spænding U <em>V; reference og effekt</em></span><input id="parU" type="number" value="230" min="0" step="1"></label>
                 <label id="parFrequencyField"><span>Frekvens f <em>Hz</em></span><input id="parF" type="number" value="50" min="0.1" step="1"></label>
               </div>
               <div class="field-grid top-gap input-mode-fields legacy-fields" id="parallelResistanceFields">
@@ -253,12 +253,12 @@
         </section>
 
         <section class="page" id="effekt" data-title="Effekt & faseforskydning">
-          <div class="intro-row"><div><span class="chapter">04 · EFFEKTTREKANTEN</span><h2>Tre effekter, én geometrisk sammenhæng</h2><p>P og Q er vinkelrette komponenter af S. Skift mellem 1- og 3-faset beregning og se trekanten ændre form.</p></div><div class="formula-badge">S² = P² + Q²</div></div>
+          <div class="intro-row"><div><span class="chapter">04 | EFFEKTTREKANTEN</span><h2>Tre effekter, én geometrisk sammenhæng</h2><p>P og Q er vinkelrette komponenter af S. Skift mellem 1- og 3-faset beregning og se trekanten ændre form.</p></div><div class="formula-badge">S² = P² + Q²</div></div>
           <div class="workspace-grid">
             <article class="card controls-card">
               <div class="segmented" id="powerMode"><button class="active" data-mode="1">1-faset</button><button data-mode="3">3-faset</button></div>
               <div class="field-grid top-gap"><label><span>Spænding U <em>V</em></span><input id="powerU" type="number" value="230" min="0"></label><label><span>Strøm I <em>A</em></span><input id="powerI" type="number" value="16" min="0" step="0.1"></label><label class="field-wide"><span>Fortegnet fasefaktor sin φ <em>0 = resistiv</em></span><input id="powerCos" type="number" value="0.57" min="-1" max="1" step="0.01"></label></div>
-              <label class="range-wrap signed-range"><span>Kapacitiv (−1) <b id="powerCosLabel">0,57 · induktiv</b> Induktiv (+1)</span><input id="powerCosRange" type="range" min="-1" max="1" value="0.57" step="0.01"></label>
+              <label class="range-wrap signed-range"><span>Kapacitiv (−1) <b id="powerCosLabel">0,57 — induktiv</b> Induktiv (+1)</span><input id="powerCosRange" type="range" min="-1" max="1" value="0.57" step="0.01"></label>
               <div class="formula-stack"><p id="powerPFormula">P = U · I · cos φ</p><p id="powerQFormula">Q = U · I · sin φ</p><p id="powerSFormula">S = U · I</p></div>
             </article>
             <article class="card visual-card">
@@ -266,7 +266,7 @@
               <svg id="powerTriangle" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Effekttrekant"></svg>
             </article>
           </div>
-          <div class="result-strip"><div><span>Aktiv effekt P</span><strong id="powerP">—</strong><small>Nyttigt arbejde</small></div><div><span>Reaktiv effekt Q</span><strong id="powerQ">—</strong><small>+ induktiv · − kapacitiv</small></div><div><span>Tilsyneladende S</span><strong id="powerS">—</strong><small>Netbelastning</small></div><div><span>Fasevinkel φ</span><strong id="powerAngle">—</strong><small>+ bagefter · − foran</small></div></div>
+          <div class="result-strip"><div><span>Aktiv effekt P</span><strong id="powerP">—</strong><small>Nyttigt arbejde</small></div><div><span>Reaktiv effekt Q</span><strong id="powerQ">—</strong><small>+ induktiv; − kapacitiv</small></div><div><span>Tilsyneladende S</span><strong id="powerS">—</strong><small>Netbelastning</small></div><div><span>Fasevinkel φ</span><strong id="powerAngle">—</strong><small>+ bagefter; − foran</small></div></div>
           <article class="card power-wave-card">
             <div class="card-head"><div><span class="step">ØJEBLIKSEFFEKT</span><h3>Effektkurven p(t) = u(t) · i(t)</h3></div><div class="legend"><span class="u">u(t)</span><span class="i">i(t)</span><span class="ref">p(t)</span></div></div>
             <svg id="powerWave" class="diagram power-wave" viewBox="0 0 900 300" role="img" aria-label="Spændings-, strøm- og effektkurve med markeret negativ effekt"></svg>
@@ -275,21 +275,21 @@
         </section>
 
         <section class="page" id="trefaset" data-title="3-fasede systemer">
-          <div class="intro-row"><div><span class="chapter">05 · SYMMETRISK 3-FASE</span><h2>Tre faser med 120° imellem</h2><p>Vælg stjerne eller trekant. Diagrammet viser fasespændingerne og de tilhørende strømme forskudt med belastningens impedansvinkel.</p></div><div class="concept-chip"><span>√3</span><p><strong>Net ↔ fase</strong><br>Forbindelsen bestemmer omsætningen.</p></div></div>
+          <div class="intro-row"><div><span class="chapter">05 | SYMMETRISK 3-FASE</span><h2>Tre faser med 120° imellem</h2><p>Vælg stjerne eller trekant. Diagrammet viser fasespændingerne og de tilhørende strømme forskudt med belastningens impedansvinkel.</p></div><div class="concept-chip"><span>√3</span><p><strong>Net ↔ fase</strong><br>Forbindelsen bestemmer omsætningen.</p></div></div>
           <article class="card circuit-strip three-circuit-strip">
             <div><span class="step">BELASTNINGSKOBLING</span><h3 id="threeCircuitTitle">Stjernekobling (Y)</h3><p id="threeCircuitNote">Tre ens faseimpedanser er forbundet til et fælles nulpunkt.</p></div>
             <svg id="threeCircuit" class="circuit-svg three-circuit-svg" viewBox="0 0 520 180" role="img" aria-label="Koblingsdiagram for en symmetrisk trefaset belastning"></svg>
           </article>
           <div class="workspace-grid">
             <article class="card controls-card">
-              <div class="segmented" id="threeConnection"><button class="active" data-connection="Y">Y · Stjerne</button><button data-connection="D">Δ · Trekant</button></div>
+              <div class="segmented" id="threeConnection"><button class="active" data-connection="Y">Y: Stjerne</button><button data-connection="D">Δ: Trekant</button></div>
               <div class="segmented voltage-selector" id="threeVoltageType"><button class="active" data-voltage="line">Netspænding U<sub>n</sub></button><button data-voltage="phase">Fasespænding U<sub>f</sub></button></div>
               <div class="segmented current-selector" id="threeCurrentType"><button class="active" data-current="line"><span>Netstrøm I<sub>n</sub></span><strong id="threeLineCurrentButton">—</strong></button><button data-current="phase"><span>Fasestrøm I<sub>f</sub></span><strong id="threePhaseCurrentButton">—</strong></button></div>
               <div class="field-grid top-gap"><label><span id="threeVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeU" type="number" value="400" min="0"></label><label><span>Frekvens f <em>Hz</em></span><input id="threeF" type="number" value="50" min="0.1"></label><label><span>R pr. fase <em>Ω</em></span><input id="threeR" type="number" value="12" min="0"></label><label><span>X pr. fase <em>− = kapacitiv</em></span><input id="threeX" type="number" value="8" step="0.1"></label></div>
               <div class="connection-explainer" id="connectionExplainer"><strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub></p></div>
             </article>
             <article class="card visual-card">
-              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeDiagramTitle">Stjerne · fase- og netvektorer</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
+              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeDiagramTitle">Stjerne: fase- og netvektorer</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
               <svg id="threePhasor" class="diagram" viewBox="0 0 520 320" role="img" aria-label="Trefaset vektordiagram"></svg>
               <div class="visual-caption"><span id="threeDiagramNote">Y: Netstrømmen er lig fasestrømmen.</span><strong id="threeLoadType">—</strong></div>
             </article>
@@ -298,7 +298,7 @@
         </section>
 
         <section class="page" id="kompensering" data-title="Fasekompensering">
-          <div class="intro-row"><div><span class="chapter">06 · KONDENSATORBATTERI</span><h2>Reducer Q—bevar den aktive effekt</h2><p>Beregn nødvendig kondensatoreffekt og kapacitans for at forbedre effektfaktoren. Sammenlign netstrømmen før og efter.</p></div><div class="formula-badge">Q<sub>C</sub> = P · (tan φ₁ − tan φ₂)</div></div>
+          <div class="intro-row"><div><span class="chapter">06 | KONDENSATORBATTERI</span><h2>Reducer Q—bevar den aktive effekt</h2><p>Beregn nødvendig kondensatoreffekt og kapacitans for at forbedre effektfaktoren. Sammenlign netstrømmen før og efter.</p></div><div class="formula-badge">Q<sub>C</sub> = P · (tan φ₁ − tan φ₂)</div></div>
           <div class="workspace-grid">
             <article class="card controls-card">
               <div class="field-grid"><label><span>Aktiv effekt P <em>kW</em></span><input id="compP" type="number" value="45" min="0" step="0.1"></label><label><span><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="compU" type="number" value="400" min="0"></label><label><span>Nuværende cos φ₁</span><input id="compCos1" type="number" value="0.72" min="0.05" max="1" step="0.01"></label><label><span>Ønsket cos φ₂</span><input id="compCos2" type="number" value="0.95" min="0.05" max="1" step="0.01"></label><label class="field-wide"><span>Frekvens f <em>Hz</em></span><input id="compF" type="number" value="50" min="0.1"></label></div>
@@ -327,17 +327,17 @@
         </section>
 
         <section class="page" id="forbindelser-legacy" data-title="Stjerne- og trekantforbindelser" hidden>
-          <div class="intro-row"><div><span class="chapter">07 · Y / Δ</span><h2>Samme impedans—forskellig belastning</h2><p>Sammenlign direkte, hvad en symmetrisk belastning trækker i stjerne og trekant ved samme linjespænding.</p></div><div class="formula-badge">P<sub>Δ</sub> = 3 · P<sub>Y</sub></div></div>
+          <div class="intro-row"><div><span class="chapter">07 | Y / Δ</span><h2>Samme impedans—forskellig belastning</h2><p>Sammenlign direkte, hvad en symmetrisk belastning trækker i stjerne og trekant ved samme linjespænding.</p></div><div class="formula-badge">P<sub>Δ</sub> = 3 · P<sub>Y</sub></div></div>
           <div class="workspace-grid">
             <article class="card controls-card"><div class="card-head"><div><span class="step">FÆLLES INDDATA</span><h3>Sammenlign Y og Δ</h3></div><span class="live-dot">LIVE</span></div><div class="field-grid"><label><span>Linjespænding U<sub>L</sub> <em>V</em></span><input id="connU" type="number" value="400" min="0"></label><label><span>Faseimpedans |Z| <em>Ω</em></span><input id="connZ" type="number" value="20" min="0.01"></label><label class="field-wide"><span>Effektfaktor cos φ</span><input id="connCos" type="number" value="0.85" min="0" max="1" step="0.01"></label></div><div class="mini-note"><span>i</span><p>Ved ens faseimpedans får Δ fuld linjespænding over hver gren.</p></div></article>
-            <article class="card visual-card connections-visual"><div class="connection-pair"><div><span class="connection-title">STJERNE · Y</span><svg id="starDiagram" viewBox="0 0 220 220" role="img" aria-label="Stjerneforbindelse"></svg><strong id="starPhaseU">—</strong><small>over hver fase</small></div><i class="versus">VS</i><div><span class="connection-title">TREKANT · Δ</span><svg id="deltaDiagram" viewBox="0 0 220 220" role="img" aria-label="Trekantforbindelse"></svg><strong id="deltaPhaseU">—</strong><small>over hver fase</small></div></div></article>
+            <article class="card visual-card connections-visual"><div class="connection-pair"><div><span class="connection-title">STJERNE: Y</span><svg id="starDiagram" viewBox="0 0 220 220" role="img" aria-label="Stjerneforbindelse"></svg><strong id="starPhaseU">—</strong><small>over hver fase</small></div><i class="versus">VS</i><div><span class="connection-title">TREKANT: Δ</span><svg id="deltaDiagram" viewBox="0 0 220 220" role="img" aria-label="Trekantforbindelse"></svg><strong id="deltaPhaseU">—</strong><small>over hver fase</small></div></div></article>
           </div>
           <div class="comparison-table"><div class="table-head"><span>Størrelse</span><span>Stjerne (Y)</span><span>Trekant (Δ)</span><span>Forhold Δ/Y</span></div><div><span>Fasespænding</span><strong id="tableUy">—</strong><strong id="tableUd">—</strong><b>√3</b></div><div><span>Linjestrøm</span><strong id="tableIy">—</strong><strong id="tableId">—</strong><b>3</b></div><div><span>Aktiv effekt</span><strong id="tablePy">—</strong><strong id="tablePd">—</strong><b>3</b></div></div>
         </section>
 
         <section class="page" id="forbindelser" data-title="Stjerne- og trekantforbindelser">
           <div class="intro-row">
-            <div><span class="chapter">07 · Y / Δ</span><h2>Se hele sammenhængen mellem stjerne og trekant</h2><p>Sammenlign spændinger, strømme og effekter for en symmetrisk belastning ved samme netspænding og samme faseimpedans.</p></div>
+            <div><span class="chapter">07 | Y / Δ</span><h2>Se hele sammenhængen mellem stjerne og trekant</h2><p>Sammenlign spændinger, strømme og effekter for en symmetrisk belastning ved samme netspænding og samme faseimpedans.</p></div>
             <div class="formula-badge">P<sub>Δ</sub> = 3 · P<sub>Y</sub></div>
           </div>
           <div class="workspace-grid">
@@ -352,9 +352,9 @@
             </article>
             <article class="card visual-card connections-visual">
               <div class="connection-pair">
-                <div><span class="connection-title">STJERNE · Y</span><svg id="starDiagram2" class="diagram connection-diagram" viewBox="0 0 220 220" role="img" aria-label="Stjerneforbindelse"></svg><strong id="starPhaseU2">—</strong><small>fasespænding U<sub>f</sub></small></div>
+                <div><span class="connection-title">STJERNE: Y</span><svg id="starDiagram2" class="diagram connection-diagram" viewBox="0 0 220 220" role="img" aria-label="Stjerneforbindelse"></svg><strong id="starPhaseU2">—</strong><small>fasespænding U<sub>f</sub></small></div>
                 <i class="versus">VS</i>
-                <div><span class="connection-title">TREKANT · Δ</span><svg id="deltaDiagram2" class="diagram connection-diagram" viewBox="0 0 220 220" role="img" aria-label="Trekantforbindelse"></svg><strong id="deltaPhaseU2">—</strong><small>fasespænding U<sub>f</sub></small></div>
+                <div><span class="connection-title">TREKANT: Δ</span><svg id="deltaDiagram2" class="diagram connection-diagram" viewBox="0 0 220 220" role="img" aria-label="Trekantforbindelse"></svg><strong id="deltaPhaseU2">—</strong><small>fasespænding U<sub>f</sub></small></div>
               </div>
             </article>
           </div>
@@ -369,13 +369,13 @@
             <div><span>Tilsyneladende effekt S</span><strong id="connSY">—</strong><strong id="connSD">—</strong><b>3</b></div>
           </div>
           <div class="connection-formulas">
-            <article class="card formula-panel"><span class="step">STJERNE · Y</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub> / √3</p><p>I<sub>n</sub> = I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
-            <article class="card formula-panel"><span class="step">TREKANT · Δ</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub> &nbsp;·&nbsp; I<sub>n</sub> = √3 · I<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
+            <article class="card formula-panel"><span class="step">STJERNE: Y</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub> / √3</p><p>I<sub>n</sub> = I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
+            <article class="card formula-panel"><span class="step">TREKANT: Δ</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub>; I<sub>n</sub> = √3 · I<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
           </div>
         </section>
 
         <section class="page" id="transformation" data-title="Stjerne-trekant transformation">
-          <div class="intro-row"><div><span class="chapter">08 · TRANSFORMATION</span><h2>Skift mellem Δ og Y—uden at ændre det, nettet ser</h2><p>Indtast tre modstande, vælg retning og se den elektrisk ækvivalente kobling. Værktøjet kontrollerer samtidig modstanden mellem klemmerne.</p></div><div class="formula-badge">R<sub>Δ</sub> = 3 · R<sub>Y</sub></div></div>
+          <div class="intro-row"><div><span class="chapter">08 | TRANSFORMATION</span><h2>Skift mellem Δ og Y—uden at ændre det, nettet ser</h2><p>Indtast tre modstande, vælg retning og se den elektrisk ækvivalente kobling. Værktøjet kontrollerer samtidig modstanden mellem klemmerne.</p></div><div class="formula-badge">R<sub>Δ</sub> = 3 · R<sub>Y</sub></div></div>
           <div class="workspace-grid transformation-workspace">
             <article class="card controls-card">
               <div class="card-head"><div><span class="step">INDDATA</span><h3>Vælg transformationsretning</h3></div><span class="live-dot">LIVE</span></div>
@@ -401,7 +401,7 @@
         </section>
 
         <section class="page" id="ellove" data-title="El-love & formelsamling">
-          <div class="intro-row"><div><span class="chapter">09 · REGNEGRUNDLAG</span><h2>De korte veje mellem U, I, R og P</h2><p>Vælg den ukendte størrelse. Værktøjet finder den formel, der kan løses ud fra de to kendte værdier.</p></div><div class="concept-chip"><span>Ω</span><p><strong>Ohms lov</strong><br>U = R · I</p></div></div>
+          <div class="intro-row"><div><span class="chapter">09 | REGNEGRUNDLAG</span><h2>De korte veje mellem U, I, R og P</h2><p>Vælg den ukendte størrelse. Værktøjet finder den formel, der kan løses ud fra de to kendte værdier.</p></div><div class="concept-chip"><span>Ω</span><p><strong>Ohms lov</strong><br>U = R · I</p></div></div>
           <div class="workspace-grid">
             <article class="card controls-card">
               <div class="card-head"><div><span class="step">FORMELLØSER</span><h3>Hvad vil du finde?</h3></div><span class="live-dot">LIVE</span></div>
@@ -415,7 +415,7 @@
             </article>
           </div>
           <div class="formula-library">
-            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R &nbsp;·&nbsp; R = U/I</p></article><article><span>EFFEKT · RESISTIV</span><strong>P = U · I</strong><p>P = I²R &nbsp;·&nbsp; P = U²/R</p></article><article><span>EFFEKT · 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT · 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
+            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R; R = U/I</p></article><article><span>EFFEKT: RESISTIV</span><strong>P = U · I</strong><p>P = I²R; P = U²/R</p></article><article><span>EFFEKT: 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT: 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
           </div>
           <div class="safety-note"><span>⚠</span><p><strong>Til beregning og undervisning.</strong> Værktøjet erstatter ikke gældende regler, fabrikantdata, dimensioneringssoftware eller en faglig risikovurdering.</p></div>
         </section>
@@ -432,6 +432,6 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og mørk baggrund, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=ellove-power-1"></script>
+  <script src="app.js?v=separator-1"></script>
 </body>
 </html>
