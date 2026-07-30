@@ -60,7 +60,7 @@ function drawParallelCircuit(components){
 const defaults = {};
 $$('input').forEach(input => defaults[input.id] = input.value);
 const selectDefaults={};$$('select').forEach(select=>selectDefaults[select.id]=select.value);
-let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', ohmTarget='U', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star';
+let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', ohmTarget='U', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta';
 
 function drawAc(){
   const U=num('acU'), I=num('acI'), f=Math.max(.1,num('acF')), phi=clamp(Number($('acPhi').value)||0,-90,90);
@@ -227,8 +227,16 @@ function drawTransformation(){
   $('transformCheckPill').textContent=ok?'ÆKVIVALENT':'KONTROLLÉR';$('transformCheckPill').classList.toggle('transform-check-ok',ok);$('transformCheckPill').classList.toggle('transform-check-bad',!ok);
   $('transformDiagramTitle').textContent=transformDirection==='delta-star'?'Trekant til stjerne':'Stjerne til trekant';
   $('transformHint').innerHTML=transformDirection==='delta-star'?'Hver Y-modstand er produktet af de to Δ-modstande, der mødes ved klemmen, divideret med summen af alle tre.':'Hver Δ-modstand er summen af de tre parvise produkter divideret med den modstående Y-modstand.';
-  $('trSymDelta').textContent=unit(Math.max(0,num('trSymY'))*3,'Ω',2);
+  drawSymmetricTransformation();
   drawTransformationDiagram(sourceType,targetType,input,output,sourceLabels,targetLabels);
+}
+function drawSymmetricTransformation(){
+  const value=Math.max(0,num('trSymY'));
+  const starToDelta=transformSymDirection==='star-delta';
+  $('trSymInputLabel').innerHTML=starToDelta?'Stjernemodstand R<sub>Y</sub> <em>Ω</em>':'Trekantmodstand R<sub>Δ</sub> <em>Ω</em>';
+  $('trSymEquation').innerHTML=starToDelta?'R<sub>Δ</sub> = 3 · R<sub>Y</sub>':'R<sub>Y</sub> = R<sub>Δ</sub> / 3';
+  $('trSymDelta').textContent=unit(starToDelta?value*3:value/3,'Ω',2);
+  $('trSymHelp').innerHTML=starToDelta?'Samme symmetriske belastning i trekant skal have tre gange så stor modstand.':'Samme symmetriske belastning i stjerne skal have en tredjedel af trekantmodstanden.';
 }
 function drawTransformationDiagram(rootType,targetType,sourceValues,targetValues,sourceLabels,targetLabels){
   const root=$('transformationDiagram');clear(root);
@@ -312,9 +320,10 @@ $$('#threeVoltageType button').forEach(b=>b.addEventListener('click',()=>{const 
 $$('#threeCurrentType button').forEach(b=>b.addEventListener('click',()=>{$$('#threeCurrentType button').forEach(x=>x.classList.remove('active'));b.classList.add('active');threeCurrentView=b.dataset.current;drawThree();}));
 $$('#ohmTarget button').forEach(b=>b.addEventListener('click',()=>{$$('#ohmTarget button').forEach(x=>x.classList.remove('active'));b.classList.add('active');ohmTarget=b.dataset.target;renderOhmInputs();}));
 $$('#transformDirection button').forEach(b=>b.addEventListener('click',()=>{$$('#transformDirection button').forEach(x=>x.classList.remove('active'));b.classList.add('active');transformDirection=b.dataset.transform;drawTransformation();}));
+$$('#trSymDirection button').forEach(b=>b.addEventListener('click',()=>{$$('#trSymDirection button').forEach(x=>x.classList.remove('active'));b.classList.add('active');transformSymDirection=b.dataset.symTransform;drawTransformation();}));
 function activatePage(id,push=true){const page=$(id)||$('vekselstroem');$$('.page').forEach(p=>p.classList.toggle('active',p===page));$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page.id));$('pageTitle').textContent=page.dataset.title;if(push)history.replaceState(null,'',`#${page.id}`);document.body.classList.remove('menu-open');$('menuButton').setAttribute('aria-expanded','false');window.scrollTo({top:0,behavior:'auto'});}
 $$('.nav-item').forEach(b=>b.addEventListener('click',()=>activatePage(b.dataset.page)));$('menuButton').addEventListener('click',()=>{const open=document.body.classList.toggle('menu-open');$('menuButton').setAttribute('aria-expanded',String(open));});
-$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
+$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';transformSymDirection='star-delta';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#trSymDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
 document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const i=Number(e.key)-1;if(i>=0&&i<9)activatePage($$('.nav-item')[i].dataset.page);});
 window.addEventListener('hashchange',()=>activatePage(location.hash.slice(1),false));
 let scaleMode='auto',manualScale=1;
