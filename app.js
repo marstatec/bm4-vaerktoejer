@@ -60,7 +60,7 @@ function drawParallelCircuit(components){
 const defaults = {};
 $$('input').forEach(input => defaults[input.id] = input.value);
 const selectDefaults={};$$('select').forEach(select=>selectDefaults[select.id]=select.value);
-let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', ohmTarget='U', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta';
+let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', ohmTarget='U', ohmPowerMode='simple', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta';
 
 function drawAc(){
   const U=num('acU'), I=num('acI'), f=Math.max(.1,num('acF')), phi=clamp(Number($('acPhi').value)||0,-90,90);
@@ -259,9 +259,33 @@ function drawTransformNetwork(root,cx,cy,type,values,labels){
   [[top[0],48,'1'],[left[0]-40,left[1]+30,'3'],[right[0]+40,right[1]+30,'2']].forEach(([x,y,n])=>text(root,x,y,n,'vector-label',VOLTAGE_COLOR,'middle'));
 }
 
-const targetConfigs={U:[['I','Strøm I','A',10],['R','Resistans R','Ω',23]],I:[['U','Spænding U','V',230],['R','Resistans R','Ω',23]],R:[['U','Spænding U','V',230],['I','Strøm I','A',10]],P:[['U','Spænding U','V',230],['I','Strøm I','A',10]]};
-function renderOhmInputs(){const root=$('ohmInputs');root.innerHTML='';targetConfigs[ohmTarget].forEach(([key,label,u,v])=>{const l=document.createElement('label');l.innerHTML=`<span>${label} <em>${u}</em></span><input id="ohm${key}" type="number" value="${v}" min="0" step="0.1">`;root.append(l);});$$('input',root).forEach(i=>i.addEventListener('input',drawOhm));drawOhm();}
-function drawOhm(){const a=targetConfigs[ohmTarget][0][0],b=targetConfigs[ohmTarget][1][0],av=num('ohm'+a),bv=num('ohm'+b);let r=0,formula='',u='';if(ohmTarget==='U'){r=av*bv;u='V';formula='U = I · R';}if(ohmTarget==='I'){r=bv?av/bv:0;u='A';formula='I = U / R';}if(ohmTarget==='R'){r=bv?av/bv:0;u='Ω';formula='R = U / I';}if(ohmTarget==='P'){r=av*bv;u='W';formula='P = U · I';}$('ohmResult').textContent=unit(r,u,2);$('ohmUsedFormula').textContent=formula;const root=$('ohmWheel');clear(root);const items=[['U',260,55],['I',130,220],['R',390,220],['P',260,245]];line(root,260,70,145,205,'guide');line(root,260,70,375,205,'guide');line(root,145,220,375,220,'guide');items.forEach(([k,x,y])=>{const active=k===ohmTarget;root.append(svg('circle',{cx:x,cy:y,r:active?40:32,fill:active?'#17333b':'#121d25',stroke:active?'#35d3e3':'#344550','stroke-width':active?2:1}));text(root,x,y+6,k,'vector-label',active?'#35d3e3':'#94a2ac','middle');});text(root,260,135,formula,'vector-label','#c5d2d8','middle');text(root,260,155,'Klik på U, I, R eller P i vælgeren','vector-label','#596873','middle');}
+const targetConfigs={U:[['I','Strøm I','A',10],['R','Resistans R','Ω',23]],I:[['U','Spænding U','V',230],['R','Resistans R','Ω',23]],R:[['U','Spænding U','V',230],['I','Strøm I','A',10]]};
+const ohmPowerConfigs={
+  simple:{title:'P = U · I',formula:'P = U · I',fields:[['U','Spænding U','V',230],['I','Strøm I','A',10]],calc:v=>v.U*v.I,tip:'Ren resistiv/jævnstrøms-beregning uden faseforskydning.'},
+  cos:{title:'1-faset · cosφ',formula:'P = U · I · cos φ',fields:[['U','Spænding U','V',230],['I','Strøm I','A',10],['Cos','Effektfaktor cos φ','',0.80]],calc:v=>v.U*v.I*clamp(v.Cos,-1,1),tip:'Bruges ved 1-faset vekselstrøm, når strøm og spænding ikke er i fase.'},
+  three:{title:'3-faset · √3',formula:'P = √3 · Uₙ · Iₙ · cos φ',fields:[['U','Netspænding Uₙ','V',400],['I','Netstrøm Iₙ','A',16],['Cos','Effektfaktor cos φ','',0.80]],calc:v=>Math.sqrt(3)*v.U*v.I*clamp(v.Cos,-1,1),tip:'Bruges ved symmetrisk 3-faset belastning med netspænding og netstrøm.'}
+};
+const ohmValue=(id,fallback=0)=>{const value=Number($(id)?.value);return Number.isFinite(value)?value:fallback;};
+function renderOhmInputs(){
+  const root=$('ohmInputs');root.innerHTML='';
+  if(ohmTarget==='P'){
+    const selector=document.createElement('div');selector.className='segmented three field-wide ohm-power-selector';selector.id='ohmPowerMode';
+    selector.innerHTML=Object.entries(ohmPowerConfigs).map(([key,cfg])=>`<button class="${key===ohmPowerMode?'active':''}" data-power-formula="${key}">${cfg.title}</button>`).join('');
+    root.append(selector);
+    $$('#ohmPowerMode button',root).forEach(b=>b.addEventListener('click',()=>{ohmPowerMode=b.dataset.powerFormula;renderOhmInputs();}));
+  }
+  const fields=ohmTarget==='P'?ohmPowerConfigs[ohmPowerMode].fields:targetConfigs[ohmTarget];
+  fields.forEach(([key,label,u,v])=>{const l=document.createElement('label');if(fields.length===3&&key==='Cos')l.className='field-wide';l.innerHTML=`<span>${label} <em>${u}</em></span><input id="ohm${key}" type="number" value="${v}" min="${key==='Cos'?-1:0}" max="${key==='Cos'?1:''}" step="${key==='Cos'?0.01:0.1}">`;root.append(l);});
+  $$('input',root).forEach(i=>i.addEventListener('input',drawOhm));drawOhm();
+}
+function drawOhm(){
+  let r=0,formula='',u='',tip='Klik på U, I, R eller P i vælgeren';
+  if(ohmTarget==='U'){const I=ohmValue('ohmI'),R=ohmValue('ohmR');r=I*R;u='V';formula='U = I · R';}
+  if(ohmTarget==='I'){const U=ohmValue('ohmU'),R=ohmValue('ohmR');r=R?U/R:0;u='A';formula='I = U / R';}
+  if(ohmTarget==='R'){const U=ohmValue('ohmU'),I=ohmValue('ohmI');r=I?U/I:0;u='Ω';formula='R = U / I';}
+  if(ohmTarget==='P'){const cfg=ohmPowerConfigs[ohmPowerMode],values={U:ohmValue('ohmU'),I:ohmValue('ohmI'),Cos:ohmValue('ohmCos',1)};r=cfg.calc(values);u='W';formula=cfg.formula;tip=cfg.tip;}
+  $('ohmResult').textContent=u==='W'?power(r):unit(r,u,2);$('ohmUsedFormula').textContent=formula;const root=$('ohmWheel');clear(root);const items=[['U',260,55],['I',130,220],['R',390,220],['P',260,245]];line(root,260,70,145,205,'guide');line(root,260,70,375,205,'guide');line(root,145,220,375,220,'guide');items.forEach(([k,x,y])=>{const active=k===ohmTarget;root.append(svg('circle',{cx:x,cy:y,r:active?40:32,fill:active?'#17333b':'#121d25',stroke:active?'#35d3e3':'#344550','stroke-width':active?2:1}));text(root,x,y+6,k,'vector-label',active?'#35d3e3':'#94a2ac','middle');});text(root,260,135,formula,'vector-label','#c5d2d8','middle');text(root,260,155,tip,'vector-label','#596873','middle');
+}
 
 function recolorArrowGroup(group,color){if(!group)return;const vector=group.querySelector('line.vector');const head=group.querySelector('polygon');const label=group.querySelector('text');if(vector)vector.setAttribute('stroke',color);if(head)head.setAttribute('fill',color);if(label)label.setAttribute('fill',color);}
 function applyElectricalColorConvention(){
@@ -323,7 +347,7 @@ $$('#transformDirection button').forEach(b=>b.addEventListener('click',()=>{$$('
 $$('#trSymDirection button').forEach(b=>b.addEventListener('click',()=>{$$('#trSymDirection button').forEach(x=>x.classList.remove('active'));b.classList.add('active');transformSymDirection=b.dataset.symTransform;drawTransformation();}));
 function activatePage(id,push=true){const page=$(id)||$('vekselstroem');$$('.page').forEach(p=>p.classList.toggle('active',p===page));$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page.id));$('pageTitle').textContent=page.dataset.title;if(push)history.replaceState(null,'',`#${page.id}`);document.body.classList.remove('menu-open');$('menuButton').setAttribute('aria-expanded','false');window.scrollTo({top:0,behavior:'auto'});}
 $$('.nav-item').forEach(b=>b.addEventListener('click',()=>activatePage(b.dataset.page)));$('menuButton').addEventListener('click',()=>{const open=document.body.classList.toggle('menu-open');$('menuButton').setAttribute('aria-expanded',String(open));});
-$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';transformSymDirection='star-delta';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#trSymDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
+$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';transformSymDirection='star-delta';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#trSymDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';ohmPowerMode='simple';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
 document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const i=Number(e.key)-1;if(i>=0&&i<9)activatePage($$('.nav-item')[i].dataset.page);});
 window.addEventListener('hashchange',()=>activatePage(location.hash.slice(1),false));
 let scaleMode='auto',manualScale=1;
