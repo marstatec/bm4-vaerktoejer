@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=theme-toggle-1">
+  <link rel="stylesheet" href="styles.css?v=three-load-1">
 </head>
 <body>
   <div class="app-shell">
@@ -22,10 +22,11 @@
         <button class="nav-item" data-page="parallel"><span class="nav-icon">RLC</span><span>1-faset parallel</span><kbd>3</kbd></button>
         <button class="nav-item" data-page="effekt"><span class="nav-icon">△</span><span>Effekt & fase</span><kbd>4</kbd></button>
         <button class="nav-item" data-page="trefaset"><span class="nav-icon">3Φ</span><span>3-faset</span><kbd>5</kbd></button>
-        <button class="nav-item" data-page="kompensering"><span class="nav-icon">C</span><span>Fasekompensering</span><kbd>6</kbd></button>
-        <button class="nav-item" data-page="forbindelser"><span class="nav-icon">YΔ</span><span>Forbindelser</span><kbd>7</kbd></button>
-        <button class="nav-item" data-page="transformation"><span class="nav-icon">ΔY</span><span>Transformation</span><kbd>8</kbd></button>
-        <button class="nav-item" data-page="ellove"><span class="nav-icon">Ω</span><span>El-love</span><kbd>9</kbd></button>
+        <button class="nav-item" data-page="trefaset-belastning"><span class="nav-icon">3~</span><span>3-faset belastning</span><kbd>6</kbd></button>
+        <button class="nav-item" data-page="kompensering"><span class="nav-icon">C</span><span>Fasekompensering</span><kbd>7</kbd></button>
+        <button class="nav-item" data-page="forbindelser"><span class="nav-icon">YΔ</span><span>Forbindelser</span><kbd>8</kbd></button>
+        <button class="nav-item" data-page="transformation"><span class="nav-icon">ΔY</span><span>Transformation</span><kbd>9</kbd></button>
+        <button class="nav-item" data-page="ellove"><span class="nav-icon">Ω</span><span>El-love</span><kbd>0</kbd></button>
       </nav>
 
       <div class="sidebar-note">
@@ -326,6 +327,48 @@
           <div class="result-strip eight"><div><span>Netspænding U<sub>n</sub></span><strong id="threeUn">—</strong><small id="threeUnFormula">—</small></div><div><span>Fasespænding U<sub>f</sub></span><strong id="threeUf">—</strong><small id="threeUfFormula">—</small></div><div><span>Impedans Z<sub>f</sub></span><strong id="threeZ">—</strong><small>√(R² + X²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeI">—</strong><small id="threeIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeP">—</strong><small id="threePFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeQ">—</strong><small id="threeQFormula">—</small></div><div><span>Fortegnet cos φ</span><strong id="threeCos">—</strong><small>− = kapacitiv</small></div></div>
         </section>
 
+        <section class="page" id="trefaset-belastning" data-title="3-faset belastning">
+          <div class="intro-row">
+            <div><span class="chapter">06 | SYMMETRISK BELASTNING</span><h2>Byg en fasegren med flere komponenter</h2><p>Vælg 1–10 komponenter i serie pr. fase. Den samme fasegren bruges i alle tre faser, så du kan se den samlede 3-fasede belastning i stjerne eller trekant.</p></div>
+            <div class="formula-badge">Z<sub>f</sub> = R<sub>Σ</sub> + jX<sub>Σ</sub></div>
+          </div>
+          <article class="card circuit-strip three-load-circuit-strip">
+            <div><span class="step">KOBLING + FASEGREN</span><h3 id="threeLoadCircuitTitle">Symmetrisk stjernebelastning</h3><p id="threeLoadCircuitNote">Samme serieopbyggede fasegren er indsat i L1, L2 og L3.</p></div>
+            <svg id="threeLoadCircuit" class="circuit-svg three-load-circuit" viewBox="0 0 900 220" role="img" aria-label="Koblingsdiagram for 3-faset belastning med flere komponenter"></svg>
+          </article>
+          <div class="workspace-grid">
+            <article class="card controls-card">
+              <div class="segmented" id="threeLoadConnection"><button class="active" data-load-connection="Y">Y: Stjerne</button><button data-load-connection="D">Δ: Trekant</button></div>
+              <div class="segmented voltage-selector" id="threeLoadVoltageType"><button class="active" data-load-voltage="line">Netspænding U<sub>n</sub></button><button data-load-voltage="phase">Fasespænding U<sub>f</sub></button></div>
+              <div class="segmented input-mode-selector" id="threeLoadInputMode"><button class="active" data-load-mode="components">Induktans L og kapacitans C</button><button data-load-mode="reactance">Reaktans X<sub>L</sub> og X<sub>C</sub></button></div>
+              <div class="component-builder" id="threeLoadComponentBuilder">
+                <div class="component-builder-head"><span>Antal komponenter pr. fase</span><div class="segmented component-count" id="threeLoadComponentCount"><button data-count="1">1</button><button data-count="2">2</button><button class="active" data-count="3">3</button><button data-count="4">4</button><button data-count="5">5</button><button data-count="6">6</button><button data-count="7">7</button><button data-count="8">8</button><button data-count="9">9</button><button data-count="10">10</button></div></div>
+                <div class="component-row" id="threeLoadComponentRow1"><b>Komponent 1</b><select id="threeLoadCompType1" aria-label="Type for 3-faset komponent 1"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue1" type="number" value="12" min="0" step="0.1"><em id="threeLoadCompUnit1">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow2"><b>Komponent 2</b><select id="threeLoadCompType2" aria-label="Type for 3-faset komponent 2"><option value="R">Resistiv R</option><option value="L" selected>Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue2" type="number" value="25" min="0" step="0.1"><em id="threeLoadCompUnit2">mH</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow3"><b>Komponent 3</b><select id="threeLoadCompType3" aria-label="Type for 3-faset komponent 3"><option value="R">Resistiv R</option><option value="L">Induktiv L</option><option value="C" selected>Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue3" type="number" value="220" min="0.001" step="0.1"><em id="threeLoadCompUnit3">µF</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow4" hidden><b>Komponent 4</b><select id="threeLoadCompType4" aria-label="Type for 3-faset komponent 4"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue4" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit4">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow5" hidden><b>Komponent 5</b><select id="threeLoadCompType5" aria-label="Type for 3-faset komponent 5"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue5" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit5">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow6" hidden><b>Komponent 6</b><select id="threeLoadCompType6" aria-label="Type for 3-faset komponent 6"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue6" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit6">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow7" hidden><b>Komponent 7</b><select id="threeLoadCompType7" aria-label="Type for 3-faset komponent 7"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue7" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit7">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow8" hidden><b>Komponent 8</b><select id="threeLoadCompType8" aria-label="Type for 3-faset komponent 8"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue8" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit8">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow9" hidden><b>Komponent 9</b><select id="threeLoadCompType9" aria-label="Type for 3-faset komponent 9"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue9" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit9">Ω</em></label></div>
+                <div class="component-row" id="threeLoadComponentRow10" hidden><b>Komponent 10</b><select id="threeLoadCompType10" aria-label="Type for 3-faset komponent 10"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue10" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit10">Ω</em></label></div>
+              </div>
+              <div class="field-grid">
+                <label><span id="threeLoadVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeLoadU" type="number" value="400" min="0"></label>
+                <label><span>Frekvens f <em>Hz</em></span><input id="threeLoadF" type="number" value="50" min="0.1"></label>
+              </div>
+              <div class="connection-explainer" id="threeLoadExplainer"><strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub></p></div>
+            </article>
+            <article class="card visual-card">
+              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeLoadDiagramTitle">Belastningens strømme</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
+              <svg id="threeLoadPhasor" class="diagram" viewBox="0 0 520 320" role="img" aria-label="Vektordiagram for 3-faset belastning"></svg>
+              <div class="visual-caption"><span id="threeLoadDiagramNote">Fasegrenen danner samme strømvinkel i alle tre faser.</span><strong id="threeLoadKind">—</strong></div>
+            </article>
+          </div>
+          <div class="result-strip eight"><div><span>R<sub>Σ</sub> pr. fase</span><strong id="threeLoadR">—</strong><small>Summen af R</small></div><div><span>X<sub>Σ</sub> pr. fase</span><strong id="threeLoadX">—</strong><small>X<sub>L</sub> − X<sub>C</sub></small></div><div><span>Z<sub>f</sub></span><strong id="threeLoadZ">—</strong><small>√(R<sub>Σ</sub>² + X<sub>Σ</sub>²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeLoadIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeLoadIn">—</strong><small id="threeLoadIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeLoadP">—</strong><small id="threeLoadPFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeLoadQ">—</strong><small>+ induktiv; − kapacitiv</small></div><div><span>Fortegnet cos φ</span><strong id="threeLoadCos">—</strong><small>− = kapacitiv</small></div></div>
+        </section>
+
         <section class="page" id="kompensering" data-title="Fasekompensering">
           <div class="intro-row"><div><span class="chapter">06 | KONDENSATORBATTERI</span><h2>Reducer Q—bevar den aktive effekt</h2><p>Beregn nødvendig kondensatoreffekt og kapacitans for at forbedre effektfaktoren. Sammenlign netstrømmen før og efter.</p></div><div class="formula-badge">Q<sub>C</sub> = P · (tan φ₁ − tan φ₂)</div></div>
           <div class="workspace-grid">
@@ -461,6 +504,6 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=theme-toggle-1"></script>
+  <script src="app.js?v=three-load-1"></script>
 </body>
 </html>
