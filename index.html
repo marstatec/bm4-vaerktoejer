@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=three-load-1">
+  <link rel="stylesheet" href="styles.css?v=formula-spacing-1">
 </head>
 <body>
   <div class="app-shell">
@@ -211,7 +211,7 @@
                 <div class="component-row" id="parallelComponentRow10" hidden><b>Komponent 10</b><select id="parallelCompType10" aria-label="Type for parallelkomponent 10"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="parallelCompValue10" type="number" value="100" min="0.001" step="0.1"><em id="parallelCompUnit10">Ω</em></label></div>
               </div>
               <div class="field-grid">
-                <label id="parVoltageField"><span>Spænding U <em>V; reference og effekt</em></span><input id="parU" type="number" value="230" min="0" step="1"></label>
+                <label id="parVoltageField"><span>Spænding U <em>V — reference og effekt</em></span><input id="parU" type="number" value="230" min="0" step="1"></label>
                 <label id="parFrequencyField"><span>Frekvens f <em>Hz</em></span><input id="parF" type="number" value="50" min="0.1" step="1"></label>
               </div>
               <div class="field-grid top-gap input-mode-fields legacy-fields" id="parallelResistanceFields">
@@ -296,7 +296,7 @@
               <svg id="powerTriangle" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Effekttrekant"></svg>
             </article>
           </div>
-          <div class="result-strip"><div><span>Aktiv effekt P</span><strong id="powerP">—</strong><small>Nyttigt arbejde</small></div><div><span>Reaktiv effekt Q</span><strong id="powerQ">—</strong><small>+ induktiv; − kapacitiv</small></div><div><span>Tilsyneladende S</span><strong id="powerS">—</strong><small>Netbelastning</small></div><div><span>Fasevinkel φ</span><strong id="powerAngle">—</strong><small>+ bagefter; − foran</small></div></div>
+          <div class="result-strip"><div><span>Aktiv effekt P</span><strong id="powerP">—</strong><small>Nyttigt arbejde</small></div><div><span>Reaktiv effekt Q</span><strong id="powerQ">—</strong><small>+ induktiv&nbsp;&nbsp;|&nbsp;&nbsp;− kapacitiv</small></div><div><span>Tilsyneladende S</span><strong id="powerS">—</strong><small>Netbelastning</small></div><div><span>Fasevinkel φ</span><strong id="powerAngle">—</strong><small>+ bagefter&nbsp;&nbsp;|&nbsp;&nbsp;− foran</small></div></div>
           <article class="card power-wave-card">
             <div class="card-head"><div><span class="step">ØJEBLIKSEFFEKT</span><h3>Effektkurven p(t) = u(t) · i(t)</h3></div><div class="legend"><span class="u">u(t)</span><span class="i">i(t)</span><span class="ref">p(t)</span></div></div>
             <svg id="powerWave" class="diagram power-wave" viewBox="0 0 900 300" role="img" aria-label="Spændings-, strøm- og effektkurve med markeret negativ effekt"></svg>
@@ -366,7 +366,7 @@
               <div class="visual-caption"><span id="threeLoadDiagramNote">Fasegrenen danner samme strømvinkel i alle tre faser.</span><strong id="threeLoadKind">—</strong></div>
             </article>
           </div>
-          <div class="result-strip eight"><div><span>R<sub>Σ</sub> pr. fase</span><strong id="threeLoadR">—</strong><small>Summen af R</small></div><div><span>X<sub>Σ</sub> pr. fase</span><strong id="threeLoadX">—</strong><small>X<sub>L</sub> − X<sub>C</sub></small></div><div><span>Z<sub>f</sub></span><strong id="threeLoadZ">—</strong><small>√(R<sub>Σ</sub>² + X<sub>Σ</sub>²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeLoadIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeLoadIn">—</strong><small id="threeLoadIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeLoadP">—</strong><small id="threeLoadPFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeLoadQ">—</strong><small>+ induktiv; − kapacitiv</small></div><div><span>Fortegnet cos φ</span><strong id="threeLoadCos">—</strong><small>− = kapacitiv</small></div></div>
+          <div class="result-strip eight"><div><span>R<sub>Σ</sub> pr. fase</span><strong id="threeLoadR">—</strong><small>Summen af R</small></div><div><span>X<sub>Σ</sub> pr. fase</span><strong id="threeLoadX">—</strong><small>X<sub>L</sub> − X<sub>C</sub></small></div><div><span>Z<sub>f</sub></span><strong id="threeLoadZ">—</strong><small>√(R<sub>Σ</sub>² + X<sub>Σ</sub>²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeLoadIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeLoadIn">—</strong><small id="threeLoadIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeLoadP">—</strong><small id="threeLoadPFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeLoadQ">—</strong><small>+ induktiv&nbsp;&nbsp;|&nbsp;&nbsp;− kapacitiv</small></div><div><span>Fortegnet cos φ</span><strong id="threeLoadCos">—</strong><small>− = kapacitiv</small></div></div>
         </section>
 
         <section class="page" id="kompensering" data-title="Fasekompensering">
@@ -442,7 +442,7 @@
           </div>
           <div class="connection-formulas">
             <article class="card formula-panel"><span class="step">STJERNE: Y</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub> / √3</p><p>I<sub>n</sub> = I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
-            <article class="card formula-panel"><span class="step">TREKANT: Δ</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub>; I<sub>n</sub> = √3 · I<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
+            <article class="card formula-panel"><span class="step">TREKANT: Δ</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub>&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>n</sub> = √3 · I<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
           </div>
         </section>
 
@@ -487,7 +487,7 @@
             </article>
           </div>
           <div class="formula-library">
-            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R; R = U/I</p></article><article><span>EFFEKT: RESISTIV</span><strong>P = U · I</strong><p>P = I²R; P = U²/R</p></article><article><span>EFFEKT: 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT: 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
+            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R&nbsp;&nbsp;|&nbsp;&nbsp;R = U/I</p></article><article><span>EFFEKT: RESISTIV</span><strong>P = U · I</strong><p>P = I²R&nbsp;&nbsp;|&nbsp;&nbsp;P = U²/R</p></article><article><span>EFFEKT: 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT: 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
           </div>
           <div class="safety-note"><span>⚠</span><p><strong>Til beregning og undervisning.</strong> Værktøjet erstatter ikke gældende regler, fabrikantdata, dimensioneringssoftware eller en faglig risikovurdering.</p></div>
         </section>
@@ -504,6 +504,6 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=three-load-1"></script>
+  <script src="app.js?v=formula-spacing-1"></script>
 </body>
 </html>
