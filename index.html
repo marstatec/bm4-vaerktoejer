@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=components-10-1">
+  <link rel="stylesheet" href="styles.css?v=comp-capacitance-1">
 </head>
 <body>
   <div class="app-shell">
@@ -338,7 +338,7 @@
               <div class="visual-caption"><span id="compPhi1">φ₁ = —</span><strong id="compPhi2">φ₂ = —</strong></div>
             </article>
           </div>
-          <div class="result-strip five"><div><span>Kondensatoreffekt Q<sub>C</sub></span><strong id="compQc">—</strong><small>Kompenseringsbehov</small></div><div><span>Kapacitans pr. fase, Δ</span><strong id="compCdelta">—</strong><small>C = Q<sub>C</sub>/(3ωU<sub>n</sub>²)</small></div><div><span>Batteristrøm I<sub>C</sub></span><strong id="compBankI">—</strong><small>Q<sub>C</sub>/(√3 U<sub>n</sub>)</small></div><div><span>Netstrøm I<sub>n</sub> før</span><strong id="compI1">—</strong><small>P/(√3 U<sub>n</sub> cosφ₁)</small></div><div><span>Netstrøm I<sub>n</sub> efter</span><strong id="compI2">—</strong><small id="compSaving">—</small></div></div>
+          <div class="result-strip five"><div><span>Kondensatoreffekt Q<sub>C</sub></span><strong id="compQc">—</strong><small>Kompenseringsbehov</small></div><div><span>Kapacitans pr. fase, Δ</span><strong id="compCdelta">—</strong><small>X<sub>C</sub> = 1/(2πfC) ⇒ C = 1/(2πfX<sub>C</sub>)</small></div><div><span>Batteristrøm I<sub>C</sub></span><strong id="compBankI">—</strong><small>Q<sub>C</sub>/(√3 U<sub>n</sub>)</small></div><div><span>Netstrøm I<sub>n</sub> før</span><strong id="compI1">—</strong><small>P/(√3 U<sub>n</sub> cosφ₁)</small></div><div><span>Netstrøm I<sub>n</sub> efter</span><strong id="compI2">—</strong><small id="compSaving">—</small></div></div>
           <div class="result-strip comp-power-summary"><div><span>Reaktiv effekt før Q₁</span><strong id="compQ1">—</strong><small>P · tanφ₁</small></div><div><span>Reaktiv effekt efter Q₂</span><strong id="compQ2">—</strong><small>P · tanφ₂</small></div><div><span>Tilsyneladende effekt før S₁</span><strong id="compS1">—</strong><small>P/cosφ₁</small></div><div><span>Tilsyneladende effekt efter S₂</span><strong id="compS2">—</strong><small>P/cosφ₂</small></div></div>
           <div class="comp-diagram-grid">
             <article class="card visual-card">
@@ -460,6 +460,6 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og mørk baggrund, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=components-10-1"></script>
+  <script src="app.js?v=comp-capacitance-1"></script>
 </body>
 </html>
