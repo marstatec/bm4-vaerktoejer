@@ -1,11 +1,11 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="da">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=formula-spacing-1">
+  <link rel="stylesheet" href="styles.css?v=component-detail-1">
 </head>
 <body>
   <div class="app-shell">
@@ -138,8 +138,8 @@
               <div class="equation-flow" id="seriesEquationFlow"><span>X<sub>L</sub> = 2πfL</span><i>−</i><span>X<sub>C</sub> = 1/(2πfC)</span><i>→</i><span>Z</span></div>
             </article>
             <article class="card visual-card">
-              <div class="card-head"><div><span class="step">SPÆNDINGSVEKTORER</span><h3>I som reference</h3></div><div class="legend"><span class="ref">I<sub>ref</sub></span><span class="r">U<sub>R</sub></span><span class="x">U<sub>X</sub></span><span class="u">U</span></div></div>
-              <svg id="rlcPhasor" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Vektordiagram for RLC-seriekreds"></svg>
+              <div class="card-head"><div><span class="step">SPÆNDINGSVEKTORER</span><h3>I som reference</h3></div><div class="diagram-tools"><div class="segmented mini-toggle" id="seriesVoltageMode"><button class="active" data-series-voltage="total">Samlet</button><button data-series-voltage="parts">Komponenter</button></div><div class="legend"><span class="ref">I<sub>ref</sub></span><span class="r">U<sub>R</sub></span><span class="x">U<sub>X</sub></span><span class="u">U</span></div></div></div>
+              <svg id="rlcPhasor" class="diagram high-res-diagram" viewBox="0 0 720 360" role="img" aria-label="Vektordiagram for RLC-seriekreds"></svg>
               <div class="visual-caption"><span id="rlcNature">—</span><strong id="rlcPhiText">φ<sub>I</sub> = —</strong></div>
               <div class="embedded-resonance">
                 <span class="insight-icon">◎</span>
@@ -158,8 +158,8 @@
           </article>
           <div class="impedance-workspace">
             <article class="card impedance-visual">
-              <div class="card-head"><div><span class="step">IMPEDANSTREKANT</span><h3>R, X og Z</h3></div><span class="angle-pill" id="impedanceType">—</span></div>
-              <svg id="impedanceTriangle" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Impedanstrekant med resistans, reaktans og impedans"></svg>
+              <div class="card-head"><div><span class="step">IMPEDANSTREKANT</span><h3>R, X og Z</h3></div><div class="diagram-tools"><div class="segmented mini-toggle" id="seriesImpedanceMode"><button class="active" data-series-impedance="total">Samlet</button><button data-series-impedance="parts">Komponenter</button></div><span class="angle-pill" id="impedanceType">—</span></div></div>
+              <svg id="impedanceTriangle" class="diagram high-res-diagram" viewBox="0 0 720 360" role="img" aria-label="Impedanstrekant med resistans, reaktans og impedans"></svg>
               <div class="triangle-values"><span><i class="dot r-dot"></i>R <strong id="impedanceR">—</strong></span><span><i class="dot x-dot"></i>X<sub>L</sub> − X<sub>C</sub> <strong id="impedanceX">—</strong></span><span><i class="dot z-dot"></i>Z <strong id="impedanceZ">—</strong></span></div>
             </article>
             <article class="card impedance-formulas">
@@ -175,7 +175,7 @@
                 <div><span>Impedansvinkel</span><strong>∠Z = tan⁻¹(X/R)</strong><small id="impedancePhiFormula">—</small></div>
                 <div><span>Effektfaktor</span><strong>cos(∠Z) = R/Z</strong><small id="impedanceCosFormula">—</small></div>
               </div>
-              <p class="formula-foot"><b>Kompleks form:</b> Z̲ = R + j(X<sub>L</sub> − X<sub>C</sub>). Et negativt X giver en kapacitiv fasevinkel.</p>
+              <p class="formula-foot"><b>Polar/trekant:</b> Z findes af R og X, hvor X = X<sub>L</sub> − X<sub>C</sub>. Et negativt X giver en kapacitiv fasevinkel.</p>
             </article>
           </div>
         </section>
@@ -251,8 +251,8 @@
               <div class="mini-note"><span>i</span><p id="parallelNatureText">Grenstrømmene summeres geometrisk—ikke almindeligt numerisk.</p></div>
             </article>
             <article class="card visual-card">
-              <div class="card-head"><div><span class="step">STRØMVEKTORER</span><h3 id="parallelDiagramTitle">U og I<sub>R</sub> som reference</h3></div><div class="legend parallel-legend"><span class="r">I<sub>R</sub></span><span class="il">I<sub>L</sub></span><span class="ic">I<sub>C</sub></span><span class="u">I</span></div></div>
-              <svg id="parallelPhasor" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Strømvektordiagram for parallel RLC-kreds"></svg>
+              <div class="card-head"><div><span class="step">STRØMVEKTORER</span><h3 id="parallelDiagramTitle">U og I<sub>R</sub> som reference</h3></div><div class="diagram-tools"><div class="segmented mini-toggle" id="parallelVectorMode"><button class="active" data-parallel-vector="total">Samlet</button><button data-parallel-vector="branches">Grene</button></div><div class="legend parallel-legend"><span class="r">I<sub>R</sub></span><span class="il">I<sub>L</sub></span><span class="ic">I<sub>C</sub></span><span class="u">I</span></div></div></div>
+              <svg id="parallelPhasor" class="diagram high-res-diagram" viewBox="0 0 720 360" role="img" aria-label="Strømvektordiagram for parallel RLC-kreds"></svg>
               <div class="visual-caption"><span id="parallelReferenceText">Reference: U og I<sub>R</sub> ∠0°</span><strong id="parallelPhiText">φ = —</strong></div>
               <div class="embedded-resonance parallel-embedded-resonance">
                 <span class="insight-icon">◎</span>
@@ -330,7 +330,7 @@
         <section class="page" id="trefaset-belastning" data-title="3-faset belastning">
           <div class="intro-row">
             <div><span class="chapter">06 | SYMMETRISK BELASTNING</span><h2>Byg en fasegren med flere komponenter</h2><p>Vælg 1–10 komponenter i serie pr. fase. Den samme fasegren bruges i alle tre faser, så du kan se den samlede 3-fasede belastning i stjerne eller trekant.</p></div>
-            <div class="formula-badge">Z<sub>f</sub> = R<sub>Σ</sub> + jX<sub>Σ</sub></div>
+            <div class="formula-badge">Z<sub>f</sub>: R<sub>Σ</sub> og X<sub>Σ</sub></div>
           </div>
           <article class="card circuit-strip three-load-circuit-strip">
             <div><span class="step">KOBLING + FASEGREN</span><h3 id="threeLoadCircuitTitle">Symmetrisk stjernebelastning</h3><p id="threeLoadCircuitNote">Samme serieopbyggede fasegren er indsat i L1, L2 og L3.</p></div>
@@ -487,7 +487,7 @@
             </article>
           </div>
           <div class="formula-library">
-            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R&nbsp;&nbsp;|&nbsp;&nbsp;R = U/I</p></article><article><span>EFFEKT: RESISTIV</span><strong>P = U · I</strong><p>P = I²R&nbsp;&nbsp;|&nbsp;&nbsp;P = U²/R</p></article><article><span>EFFEKT: 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT: 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
+            <article><span>OHMS LOV</span><strong>U = R · I</strong><p>I = U/R&nbsp;&nbsp;|&nbsp;&nbsp;R = U/I</p></article><article><span>EFFEKT: RESISTIV / DC</span><strong>P = U · I</strong><p>Bruges direkte i DC og ved ren resistiv AC. P = I²R&nbsp;&nbsp;|&nbsp;&nbsp;P = U²/R</p></article><article><span>EFFEKT: 1-FASET AC</span><strong>P = U · I · cos φ</strong><p>Aktiv effekt når strøm og spænding er faseforskudt.</p></article><article><span>EFFEKT: 3-FASET AC</span><strong>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ</strong><p>Symmetrisk belastning med netspænding og netstrøm.</p></article><article><span>SERIE</span><strong>R<sub>tot</sub> = R₁ + R₂ + …</strong><p>Samme strøm gennem alle led.</p></article><article><span>PARALLEL</span><strong>1/R<sub>tot</sub> = Σ 1/R</strong><p>Samme spænding over alle grene.</p></article>
           </div>
           <div class="safety-note"><span>⚠</span><p><strong>Til beregning og undervisning.</strong> Værktøjet erstatter ikke gældende regler, fabrikantdata, dimensioneringssoftware eller en faglig risikovurdering.</p></div>
         </section>
@@ -504,6 +504,8 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=formula-spacing-1"></script>
+  <script src="app.js?v=component-detail-1"></script>
 </body>
 </html>
+
+

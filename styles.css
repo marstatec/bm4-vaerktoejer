@@ -48,3 +48,15 @@ svg text{font-family:'DM Mono',monospace}.grid-line{stroke:#22303a;stroke-width:
 @media(max-width:420px){.result-strip.five{grid-template-columns:1fr}}
 .legend .i,.parallel-legend .u{color:var(--current)}
 .circuit-current{fill:var(--current)}
+.high-res-diagram{height:340px}
+.diagram-tools{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.mini-toggle{width:210px;grid-template-columns:1fr 1fr}
+.mini-toggle button{padding:6px 7px;font-size:10px}
+.three-load-circuit{height:250px}
+.three-load-circuit-strip{grid-template-columns:minmax(230px,.45fr) minmax(560px,1.55fr)}
+.overview-board{fill:#fff;stroke:#c9d2da;stroke-width:1}
+.overview-wire{stroke:#1f2b34;stroke-width:1.7;fill:none}
+.overview-component{stroke:#1f2b34;stroke-width:1.9;fill:#fff}
+.overview-label{font:500 12px 'DM Mono';fill:#1f2b34}
+.overview-current{font:500 11px 'DM Mono';fill:#1f2b34}
+@media(max-width:760px){.high-res-diagram{height:280px}.diagram-tools{justify-content:flex-start}.mini-toggle{width:100%}.three-load-circuit{height:230px}}
