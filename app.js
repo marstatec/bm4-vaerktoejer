@@ -12,6 +12,7 @@ const power = (watts, reactive = false) => {
   const suffix = reactive ? 'var' : 'W';
   return Math.abs(watts) >= 1000 ? unit(watts / 1000, reactive ? 'kvar' : 'kW', 2) : unit(watts, suffix, 1);
 };
+const themeSurface = () => document.body.classList.contains('light-theme') ? '#ffffff' : '#111b24';
 const svg = (tag, attrs = {}, text = '') => {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
   Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
@@ -314,10 +315,10 @@ function openDiagramModal(diagram,button){
 }
 function closeDiagramModal(){if($('diagramModal').hidden)return;$('diagramModal').hidden=true;$('diagramModalCanvas').replaceChildren();document.body.classList.remove('modal-open');activeDiagram=null;lastExpandButton?.focus();}
 function exportableSvg(source){
-  const copy=source.cloneNode(true),sourceNodes=[source,...source.querySelectorAll('*')],copyNodes=[copy,...copy.querySelectorAll('*')],properties=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','font-family','font-size','font-weight'];sourceNodes.forEach((node,i)=>{const styles=getComputedStyle(node);properties.forEach(prop=>copyNodes[i].style.setProperty(prop,styles.getPropertyValue(prop)));});const viewBox=source.viewBox.baseVal,w=1600,h=Math.round(w*(viewBox.height/viewBox.width));copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.setAttribute('width',w);copy.setAttribute('height',h);const background=svg('rect',{x:viewBox.x,y:viewBox.y,width:viewBox.width,height:viewBox.height,fill:'#111b24'});copy.insertBefore(background,copy.firstChild);return {copy,w,h};
+  const copy=source.cloneNode(true),sourceNodes=[source,...source.querySelectorAll('*')],copyNodes=[copy,...copy.querySelectorAll('*')],properties=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','font-family','font-size','font-weight'];sourceNodes.forEach((node,i)=>{const styles=getComputedStyle(node);properties.forEach(prop=>copyNodes[i].style.setProperty(prop,styles.getPropertyValue(prop)));});const viewBox=source.viewBox.baseVal,w=1600,h=Math.round(w*(viewBox.height/viewBox.width));copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.setAttribute('width',w);copy.setAttribute('height',h);const background=svg('rect',{x:viewBox.x,y:viewBox.y,width:viewBox.width,height:viewBox.height,fill:themeSurface()});copy.insertBefore(background,copy.firstChild);return {copy,w,h};
 }
 function downloadActiveDiagram(){
-  if(!activeDiagram)return;const {copy,w,h}=exportableSvg(activeDiagram),data=new XMLSerializer().serializeToString(copy),blob=new Blob([data],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const context=canvas.getContext('2d');context.fillStyle='#111b24';context.fillRect(0,0,w,h);context.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);canvas.toBlob(png=>{const link=document.createElement('a'),page=activeDiagram.closest('.page')?.dataset.title||'diagram';link.href=URL.createObjectURL(png);link.download=`VektorLab-${page.toLowerCase().replace(/[^a-z0-9æøå]+/gi,'-')}.png`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);},'image/png');};img.src=url;
+  if(!activeDiagram)return;const {copy,w,h}=exportableSvg(activeDiagram),data=new XMLSerializer().serializeToString(copy),blob=new Blob([data],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const context=canvas.getContext('2d');context.fillStyle=themeSurface();context.fillRect(0,0,w,h);context.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);canvas.toBlob(png=>{const link=document.createElement('a'),page=activeDiagram.closest('.page')?.dataset.title||'diagram';link.href=URL.createObjectURL(png);link.download=`VektorLab-${page.toLowerCase().replace(/[^a-z0-9æøå]+/gi,'-')}.png`;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1000);},'image/png');};img.src=url;
 }
 $('closeDiagram').addEventListener('click',closeDiagramModal);$('downloadDiagram').addEventListener('click',downloadActiveDiagram);$('diagramModal').addEventListener('click',e=>{if(e.target===$('diagramModal'))closeDiagramModal();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('diagramModal').hidden)closeDiagramModal();});
 
@@ -361,6 +362,16 @@ document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target
 window.addEventListener('hashchange',()=>activatePage(location.hash.slice(1),false));
 let scaleMode='auto',manualScale=1;
 try{const saved=localStorage.getItem('vektorlab-scale');if(saved&&saved!=='auto'){scaleMode='manual';manualScale=clamp(Number(saved)||1,.85,1.35);}}catch(e){}
+let themeMode='dark';
+try{themeMode=localStorage.getItem('vektorlab-theme')||'dark';}catch(e){}
+function applyTheme(){
+  const light=themeMode==='light';
+  document.body.classList.toggle('light-theme',light);
+  const button=$('themeToggle');
+  if(button){button.setAttribute('aria-pressed',String(light));button.innerHTML=`${light?'☾':'☀'} <span>${light?'Mørkt tema':'Lyst tema'}</span>`;}
+}
+function saveTheme(value){try{localStorage.setItem('vektorlab-theme',value);}catch(e){}}
+$('themeToggle').addEventListener('click',()=>{themeMode=document.body.classList.contains('light-theme')?'dark':'light';saveTheme(themeMode);applyTheme();});
 function automaticScale(){const width=window.innerWidth;return width>=2200?1.22:width>=1800?1.15:width>=1500?1.07:1;}
 function applyDisplayScale(){const effective=window.innerWidth<=760?1:scaleMode==='auto'?automaticScale():manualScale;document.documentElement.style.setProperty('--ui-zoom',effective);$('scaleAuto').textContent=`${scaleMode==='auto'?'Auto | ':''}${Math.round(effective*100)}%`;}
 function saveScale(value){try{localStorage.setItem('vektorlab-scale',value);}catch(e){}}
@@ -368,4 +379,4 @@ $('scaleDown').addEventListener('click',()=>{const current=scaleMode==='auto'?au
 $('scaleUp').addEventListener('click',()=>{const current=scaleMode==='auto'?automaticScale():manualScale;scaleMode='manual';manualScale=clamp(Math.round((current+.1)*100)/100,.85,1.35);saveScale(String(manualScale));applyDisplayScale();});
 $('scaleAuto').addEventListener('click',()=>{scaleMode='auto';saveScale('auto');applyDisplayScale();});
 window.addEventListener('resize',()=>{if(scaleMode==='auto')applyDisplayScale();});
-applyDisplayScale();renderOhmInputs();syncInputModeUI();activatePage(location.hash.slice(1)||'vekselstroem',false);updateAll();installDiagramExpanders();window.addEventListener('load',()=>window.scrollTo({top:0,behavior:'auto'}),{once:true});setTimeout(()=>window.scrollTo(0,0),350);
+applyTheme();applyDisplayScale();renderOhmInputs();syncInputModeUI();activatePage(location.hash.slice(1)||'vekselstroem',false);updateAll();installDiagramExpanders();window.addEventListener('load',()=>window.scrollTo({top:0,behavior:'auto'}),{once:true});setTimeout(()=>window.scrollTo(0,0),350);

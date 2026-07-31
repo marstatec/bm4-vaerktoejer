@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=comp-capacitance-1">
+  <link rel="stylesheet" href="styles.css?v=theme-toggle-1">
 </head>
 <body>
   <div class="app-shell">
@@ -48,6 +48,7 @@
             <button id="scaleAuto" class="scale-readout" title="Brug automatisk skalering">Auto | 100%</button>
             <button id="scaleUp" title="Gør visningen større" aria-label="Gør visningen større">A+</button>
           </div>
+          <button class="ghost-button theme-toggle" id="themeToggle" title="Skift mellem mørkt og lyst tema" aria-pressed="false">☀ <span>Lyst tema</span></button>
           <span class="status"><i></i> Klar</span>
           <button class="ghost-button" id="resetButton" title="Nulstil den aktuelle fane">↻ <span>Nulstil</span></button>
         </div>
@@ -457,9 +458,9 @@
         <div class="diagram-modal-actions"><button id="downloadDiagram" class="download-diagram">⇩ Gem som PNG</button><button id="closeDiagram" class="close-diagram" aria-label="Luk diagram">×</button></div>
       </header>
       <div class="diagram-modal-canvas" id="diagramModalCanvas"></div>
-      <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og mørk baggrund, klar til at indsætte i en opgave.</p>
+      <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=comp-capacitance-1"></script>
+  <script src="app.js?v=theme-toggle-1"></script>
 </body>
 </html>
