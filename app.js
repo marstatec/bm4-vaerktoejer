@@ -64,7 +64,14 @@ function drawSeriesCircuit(components){
 }
 function drawParallelCircuit(components){
   $('parallelCircuitTitle').textContent=`${components.length} parallel${components.length===1?'gren':'grene'}`;
-  const root=$('parallelCircuit');clear(root);const compact=components.length>5;circuitWire(root,30,38,482,38);circuitWire(root,30,125,482,125);circuitNode(root,30,38);circuitNode(root,30,125);circuitArrow(root,48,38,38,0,'I');circuitText(root,13,85,'U','circuit-label','middle');const start=components.length===1?280:compact?68:components.length===2?210:170,end=components.length===1?280:compact?455:components.length===2?370:410,step=components.length>1?(end-start)/(components.length-1):0,xs=components.map((_,i)=>start+i*step);components.forEach((component,i)=>{const x=xs[i];circuitNode(root,x,38);circuitNode(root,x,125);if(!compact)circuitArrow(root,x,45,20,-90,currentSymbol(component.type,component.index));compact?drawCompactCircuitComponent(root,component.type,x,82,90):drawCircuitComponent(root,component.type,x,82,90);circuitText(root,x+(compact?0:17),compact?104:86,componentSymbol(component.type,component.index),compact?'circuit-label tiny-label':'circuit-label',compact?'middle':'start');});
+  const root=$('parallelCircuit');clear(root),compact=components.length>5;
+  circuitWire(root,30,38,482,38);circuitWire(root,30,125,482,125);circuitNode(root,30,38);circuitNode(root,30,125);circuitArrow(root,48,38,38,0,'I');circuitText(root,13,85,'U','circuit-label','middle');
+  const start=components.length===1?280:compact?68:components.length===2?210:170,end=components.length===1?280:compact?455:components.length===2?370:410,step=components.length>1?(end-start)/(components.length-1):0,xs=components.map((_,i)=>start+i*step);
+  components.forEach((component,i)=>{
+    const x=xs[i];circuitNode(root,x,38);circuitNode(root,x,125);
+    if(compact){circuitWire(root,x,38,x,67);circuitWire(root,x,97,x,125);circuitArrow(root,x,44,20,-90,currentSymbol(component.type,component.index));drawCompactCircuitComponent(root,component.type,x,82,90);circuitText(root,x,107,componentSymbol(component.type,component.index),'circuit-label tiny-label','middle');}
+    else{circuitArrow(root,x,45,20,-90,currentSymbol(component.type,component.index));drawCircuitComponent(root,component.type,x,82,90);circuitText(root,x+17,86,componentSymbol(component.type,component.index),'circuit-label','start');}
+  });
 }
 
 const defaults = {};
