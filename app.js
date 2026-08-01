@@ -203,11 +203,16 @@ function drawParallel(){
 }
 
 function drawParallelVectorDiagram(branches,I,currentAngle,phi,state){
-  const root=$('parallelPhasor'),cx=350,cy=185,W=680,H=310,maxVector=Math.max(I,...branches.map(b=>b.value),.001),s=Math.min(150/maxVector,28),iAngle=90+currentAngle;clear(root);drawAxisGrid(root,cx,cy,W,H);root.append(svg('circle',{cx,cy,r:132,class:'guide'}));
+  const root=$('parallelPhasor'),cx=330,cy=185,W=680,H=310,IRsum=branches.filter(b=>b.type==='R').reduce((sum,b)=>sum+b.value,0),ILsum=branches.filter(b=>b.type==='L').reduce((sum,b)=>sum+b.value,0),ICsum=branches.filter(b=>b.type==='C').reduce((sum,b)=>sum+b.value,0),maxVector=Math.max(I,IRsum,ILsum,ICsum,...branches.map(b=>b.value),.001),s=Math.min(145/maxVector,28),iAngle=90+currentAngle;clear(root);drawAxisGrid(root,cx,cy,W,H);root.append(svg('circle',{cx,cy,r:132,class:'guide'}));
   const uEnd=arrow(root,cx,cy,150,90,VOLTAGE_COLOR,'',.75);text(root,uEnd.x-12,uEnd.y-8,'U som reference','vector-label',VOLTAGE_COLOR,'end');
   if(parallelVectorMode==='branches'){
-    const labelOffsets=[{x:-14,y:-12,anchor:'end'},{x:14,y:-5,anchor:'start'},{x:-14,y:17,anchor:'end'},{x:16,y:15,anchor:'start'}];
-    branches.forEach((b,index)=>{const end=arrow(root,cx,cy,b.value*s,90+b.angle,b.color,'',.62),offset=labelOffsets[index%labelOffsets.length];if(index<10)text(root,end.x+offset.x,end.y+offset.y,`${b.name} ${da(b.value,2)} A`,'vector-label',b.color,offset.anchor);});
+    if(parallelInputMode==='currents'){
+      branches.forEach(b=>arrow(root,cx,cy,b.value*s,90+b.angle,b.color,'',.52));
+    }else{
+      const groups=[{name:'ΣIᴿ',value:IRsum,angle:90,color:'#9b87f5',dx:18,dy:-10,anchor:'start'},{name:'ΣIᴸ',value:ILsum,angle:0,color:'#ff9f43',dx:18,dy:5,anchor:'start'},{name:'ΣIᶜ',value:ICsum,angle:180,color:'#55d6a1',dx:-18,dy:18,anchor:'end'}];
+      groups.filter(g=>g.value>.0001).forEach(g=>{const end=arrow(root,cx,cy,g.value*s,g.angle,g.color,'',.68);text(root,end.x+g.dx,end.y+g.dy,`${g.name} = ${da(g.value,2)} A`,'vector-label',g.color,g.anchor);});
+    }
+    const legendX=505,legendY=58,colGap=105,row=18;root.append(svg('rect',{x:legendX-14,y:legendY-18,width:206,height:Math.min(224,34+Math.ceil(branches.length/2)*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,legendX,legendY,'Grenliste','parallel-state','#8f9da6');branches.slice(0,10).forEach((b,index)=>{const col=index>=5?1:0,r=index%5,x=legendX+col*colGap,y=legendY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:b.color}));text(root,x,y,`${b.name} ${da(b.value,2)} A${parallelInputMode==='currents'?` ∠${da(b.angle,0)}°`:''}`,'vector-label',b.color,'start');});
   }else{
     text(root,58,326,'Skift til “Grene” for at se de enkelte grenstrømme.','parallel-state','#8f9da6');
   }
