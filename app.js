@@ -210,14 +210,14 @@ function drawParallel(){
 }
 
 function drawParallelVectorDiagram(branches,I,currentAngle,phi,state){
-  const root=$('parallelPhasor'),cx=330,cy=185,W=680,H=310,IRsum=branches.filter(b=>b.type==='R').reduce((sum,b)=>sum+b.value,0),ILsum=branches.filter(b=>b.type==='L').reduce((sum,b)=>sum+b.value,0),ICsum=branches.filter(b=>b.type==='C').reduce((sum,b)=>sum+b.value,0),maxVector=Math.max(I,IRsum,ILsum,ICsum,...branches.map(b=>b.value),.001),s=Math.min(145/maxVector,28),iAngle=90+currentAngle;clear(root);drawAxisGrid(root,cx,cy,W,H);root.append(svg('circle',{cx,cy,r:132,class:'guide'}));
+  const root=$('parallelPhasor'),cx=330,cy=185,W=680,H=310,IRsum=branches.filter(b=>b.type==='R').reduce((sum,b)=>sum+b.value,0),ILsum=branches.filter(b=>b.type==='L').reduce((sum,b)=>sum+b.value,0),ICsum=branches.filter(b=>b.type==='C').reduce((sum,b)=>sum+b.value,0),pathSum=branches.reduce((sum,b)=>sum+b.value,0),maxVector=Math.max(I,IRsum,ILsum,ICsum,parallelInputMode==='currents'?pathSum:0,...branches.map(b=>b.value),.001),s=Math.min(145/maxVector,28),iAngle=90+currentAngle;clear(root);drawAxisGrid(root,cx,cy,W,H);root.append(svg('circle',{cx,cy,r:132,class:'guide'}));
   const uEnd=arrow(root,cx,cy,150,90,VOLTAGE_COLOR,'',.75);text(root,uEnd.x-12,uEnd.y-8,'U som reference','vector-label',VOLTAGE_COLOR,'end');
   if(parallelVectorMode==='branches'){
     if(parallelInputMode==='currents'){
-      branches.forEach(b=>arrow(root,cx,cy,b.value*s,90+b.angle,b.color,'',.52));
+      let px=cx,py=cy;branches.forEach((b,index)=>{const len=b.value*s,angle=90+b.angle,ex=px+len*Math.cos(rad(angle)),ey=py-len*Math.sin(rad(angle));arrow(root,px,py,len,angle,b.color,'',.52);if(index<10)text(root,(px+ex)/2+(index%2?16:-16),(py+ey)/2+(index%2?13:-9),`${b.name}`,'vector-label',b.color,index%2?'start':'end');px=ex;py=ey;});
     }else{
-      const groups=[{name:'ΣIᴿ',value:IRsum,angle:90,color:'#9b87f5',dx:18,dy:-10,anchor:'start'},{name:'ΣIᴸ',value:ILsum,angle:0,color:'#ff9f43',dx:18,dy:5,anchor:'start'},{name:'ΣIᶜ',value:ICsum,angle:180,color:'#55d6a1',dx:-18,dy:18,anchor:'end'}];
-      groups.filter(g=>g.value>.0001).forEach(g=>{const end=arrow(root,cx,cy,g.value*s,g.angle,g.color,'',.68);text(root,end.x+g.dx,end.y+g.dy,`${g.name} = ${da(g.value,2)} A`,'vector-label',g.color,g.anchor);});
+      let px=cx,py=cy;const drawStack=(items,angle,side)=>items.forEach((b,n)=>{const len=b.value*s,ex=px+len*Math.cos(rad(angle)),ey=py-len*Math.sin(rad(angle));arrow(root,px,py,len,angle,b.color,'',.52);const label=`${b.name} ${da(b.value,2)} A`;if(side==='R')text(root,px+(n%2?18:-18),(py+ey)/2+4,label,'vector-label',b.color,n%2?'start':'end');else text(root,(px+ex)/2,py+(side==='L'?-12:20+n*3),label,'vector-label',b.color,'middle');px=ex;py=ey;});
+      drawStack(branches.filter(b=>b.type==='R'),90,'R');drawStack(branches.filter(b=>b.type==='L'),0,'L');drawStack(branches.filter(b=>b.type==='C'),180,'C');line(root,cx,py,px,py,'guide');text(root,58,326,'Grenstrømmene lægges hale-til-spids: R på y-aksen, L mod højre, C mod venstre.','parallel-state','#8f9da6');
     }
     const legendX=505,legendY=58,colGap=105,row=18;root.append(svg('rect',{x:legendX-14,y:legendY-18,width:206,height:Math.min(224,34+Math.ceil(branches.length/2)*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,legendX,legendY,'Grenliste','parallel-state','#8f9da6');branches.slice(0,10).forEach((b,index)=>{const col=index>=5?1:0,r=index%5,x=legendX+col*colGap,y=legendY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:b.color}));text(root,x,y,`${b.name} ${da(b.value,2)} A${parallelInputMode==='currents'?` ∠${da(b.angle,0)}°`:''}`,'vector-label',b.color,'start');});
   }else{
