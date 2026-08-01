@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=component-detail-1">
+  <link rel="stylesheet" href="styles.css?v=load-diagram-1">
 </head>
 <body>
   <div class="app-shell">
@@ -257,7 +257,7 @@
               <div class="embedded-resonance parallel-embedded-resonance">
                 <span class="insight-icon">◎</span>
                 <div class="embedded-resonance-copy"><span class="step">PARALLELRESONANS</span><h3 id="parResonanceTitle">Afstand til resonans</h3><p id="parResonanceText">—</p></div>
-                <div class="resonance-meter"><i id="parResonanceNeedle"></i><span>Induktiv</span><span>Resonans</span><span>Kapacitiv</span></div>
+                <div class="resonance-meter"><i id="parResonanceNeedle"></i><span>Kapacitiv</span><span>Resonans</span><span>Induktiv</span></div>
               </div>
             </article>
           </div>
@@ -333,8 +333,8 @@
             <div class="formula-badge">Z<sub>f</sub>: R<sub>Σ</sub> og X<sub>Σ</sub></div>
           </div>
           <article class="card circuit-strip three-load-circuit-strip">
-            <div><span class="step">KOBLING + FASEGREN</span><h3 id="threeLoadCircuitTitle">Symmetrisk stjernebelastning</h3><p id="threeLoadCircuitNote">Samme serieopbyggede fasegren er indsat i L1, L2 og L3.</p></div>
-            <svg id="threeLoadCircuit" class="circuit-svg three-load-circuit" viewBox="0 0 900 220" role="img" aria-label="Koblingsdiagram for 3-faset belastning med flere komponenter"></svg>
+            <div><span class="step">KOBLING</span><h3 id="threeLoadCircuitTitle">Symmetrisk stjernebelastning</h3><p id="threeLoadCircuitNote">Oversigt over hvordan de tre ens fasebelastninger er koblet.</p></div>
+            <svg id="threeLoadCircuit" class="circuit-svg three-load-circuit" viewBox="0 0 900 260" role="img" aria-label="Koblingsdiagram for 3-faset belastning med flere komponenter"></svg>
           </article>
           <div class="workspace-grid">
             <article class="card controls-card">
@@ -362,7 +362,7 @@
             </article>
             <article class="card visual-card">
               <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeLoadDiagramTitle">Belastningens strømme</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
-              <svg id="threeLoadPhasor" class="diagram" viewBox="0 0 520 320" role="img" aria-label="Vektordiagram for 3-faset belastning"></svg>
+              <svg id="threeLoadPhasor" class="diagram high-res-diagram" viewBox="0 0 720 420" role="img" aria-label="Vektordiagram for 3-faset belastning"></svg>
               <div class="visual-caption"><span id="threeLoadDiagramNote">Fasegrenen danner samme strømvinkel i alle tre faser.</span><strong id="threeLoadKind">—</strong></div>
             </article>
           </div>
@@ -504,7 +504,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=component-detail-1"></script>
+  <script src="app.js?v=load-diagram-1"></script>
 </body>
 </html>
 

@@ -60,3 +60,21 @@ svg text{font-family:'DM Mono',monospace}.grid-line{stroke:#22303a;stroke-width:
 .overview-label{font:500 12px 'DM Mono';fill:#1f2b34}
 .overview-current{font:500 11px 'DM Mono';fill:#1f2b34}
 @media(max-width:760px){.high-res-diagram{height:280px}.diagram-tools{justify-content:flex-start}.mini-toggle{width:100%}.three-load-circuit{height:230px}}
+.vector-label,.parallel-state,.impedance-zero{paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.diagram-modal-panel{width:min(98vw,1760px);max-height:98vh}
+.diagram-modal-canvas{min-height:520px}
+.diagram-modal-canvas svg{height:min(82vh,980px);min-height:520px}
+.three-load-circuit{height:300px}
+.three-load-circuit-strip{grid-template-columns:minmax(230px,.36fr) minmax(620px,1.64fr)}
+.overview-board{fill:#0f181f;stroke:#263946;stroke-width:1}
+.overview-wire{stroke:#8d9ba5;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.overview-component{stroke:#d3dde1;stroke-width:1.9;fill:#101820}
+.overview-label{font:500 12px 'DM Mono';fill:#d8e2e6}
+.overview-current{font:500 11px 'DM Mono';fill:var(--current);paint-order:stroke;stroke:#0f181f;stroke-width:3px;stroke-linejoin:round}
+body.light-theme .vector-label,body.light-theme .parallel-state,body.light-theme .impedance-zero{stroke:#fff}
+body.light-theme .overview-board{fill:#fff;stroke:#c9d2da}
+body.light-theme .overview-wire{stroke:#1f2b34}
+body.light-theme .overview-component{fill:#fff;stroke:#1f2b34}
+body.light-theme .overview-label{fill:#1f2b34}
+body.light-theme .overview-current{fill:#c6283a;stroke:#fff}
+@media(max-width:760px){.diagram-modal-canvas{min-height:360px}.diagram-modal-canvas svg{height:78vh;min-height:360px}.three-load-circuit{height:260px}}

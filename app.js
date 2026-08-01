@@ -149,8 +149,8 @@ function drawSeriesVoltageDiagram(root,components,R,X,U,I,phi,f){
     line(root,ex,y0,ex,ey,'vector','#ff9f43');text(root,ex+14,(y0+ey)/2+4,`U_X = ${da(UX,1)} V`,'vector-label','#ff9f43');
     const uEnd=arrow(root,x0,y0,U*s,phi,VOLTAGE_COLOR,'',.85);text(root,uEnd.x+12,uEnd.y+(phi>=0?-12:20),`U = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR);line(root,x0,ey,ex,ey,'guide');return;
   }
-  const points=[{x:0,y:0}];let vx=0,vy=0;parts.forEach(part=>{vx+=part.Ux;vy+=part.Uy;points.push({x:vx,y:vy});});const s=fitScaleFromPoints(points,W,H,80);let px=x0,py=y0;
-  parts.forEach((part,index)=>{const nx=px+part.Ux*s,ny=py-part.Uy*s;line(root,px,py,nx,ny,'vector',part.color);const angle=deg(Math.atan2(part.Uy,part.Ux||.000001));arrow(root,px,py,Math.hypot(part.Ux,part.Uy)*s,angle,part.color,'',.58);const label=`${part.prefix}${part.index} = ${da(Math.hypot(part.Ux,part.Uy),1)} V`;text(root,(px+nx)/2+6,(py+ny)/2+(index%2?-10:18),label,'vector-label',part.color,'middle');px=nx;py=ny;});
+  const points=[{x:0,y:0}];let vx=0,vy=0;parts.forEach(part=>{vx+=part.Ux;vy+=part.Uy;points.push({x:vx,y:vy});});const s=fitScaleFromPoints(points,W,H,80);let px=x0,py=y0,labelCounts={R:0,L:0,C:0};
+  parts.forEach(part=>{const nx=px+part.Ux*s,ny=py-part.Uy*s;line(root,px,py,nx,ny,'vector',part.color);const angle=deg(Math.atan2(part.Uy,part.Ux||.000001));arrow(root,px,py,Math.hypot(part.Ux,part.Uy)*s,angle,part.color,'',.58);const n=labelCounts[part.type]++,label=`${part.prefix}${part.index} = ${da(Math.hypot(part.Ux,part.Uy),1)} V`;let lx=(px+nx)/2,ly=(py+ny)/2;if(part.type==='R')ly=y0+28+n*15;if(part.type==='L'){lx=nx+38;ly=Math.min(y0-22,ny-14-n*15);}if(part.type==='C'){lx=nx+38;ly=Math.max(y0+28,ny+22+n*15);}text(root,lx,ly,label,'vector-label',part.color,part.type==='R'?'middle':'start');px=nx;py=ny;});
   const uEnd=arrow(root,x0,y0,Math.hypot(vx,vy)*s,deg(Math.atan2(vy,vx||.000001)),VOLTAGE_COLOR,'',.8);text(root,uEnd.x+12,uEnd.y-12,`U = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR);text(root,50,330,'Komponenterne lægges sammen vektorielt fra hale til spids.','vector-label','#778791');
 }
 
@@ -164,8 +164,8 @@ function drawImpedanceTriangle(R,XL,XC,X,Z,phi,components=[],f=50){
   const root=$('impedanceTriangle');clear(root);
   if(seriesImpedanceMode==='parts'&&components.length){
     const omega=2*Math.PI*f,parts=seriesComponentParts(components,1,omega),x0=115,y0=185,W=680,H=310;drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
-    const points=[{x:0,y:0}];let vx=0,vy=0;parts.forEach(part=>{vx+=part.R;vy+=part.X;points.push({x:vx,y:vy});});const s=fitScaleFromPoints(points,W,H,80);let px=x0,py=y0;
-    parts.forEach((part,index)=>{const dx=part.R*s,dy=part.X*s,nx=px+dx,ny=py-dy,mag=Math.hypot(part.R,part.X),angle=deg(Math.atan2(part.X,part.R||.000001));arrow(root,px,py,mag*s,angle,part.color,'',.58);text(root,(px+nx)/2+6,(py+ny)/2+(index%2?-10:18),`${part.xPrefix}${part.index} = ${da(mag,1)} Ω`,'vector-label',part.color,'middle');px=nx;py=ny;});
+    const points=[{x:0,y:0}];let vx=0,vy=0;parts.forEach(part=>{vx+=part.R;vy+=part.X;points.push({x:vx,y:vy});});const s=fitScaleFromPoints(points,W,H,80);let px=x0,py=y0,labelCounts={R:0,L:0,C:0};
+    parts.forEach(part=>{const dx=part.R*s,dy=part.X*s,nx=px+dx,ny=py-dy,mag=Math.hypot(part.R,part.X),angle=deg(Math.atan2(part.X,part.R||.000001));arrow(root,px,py,mag*s,angle,part.color,'',.58);const n=labelCounts[part.type]++;let lx=(px+nx)/2,ly=(py+ny)/2;if(part.type==='R')ly=y0+28+n*15;if(part.type==='L'){lx=nx+38;ly=Math.min(y0-22,ny-14-n*15);}if(part.type==='C'){lx=nx+38;ly=Math.max(y0+28,ny+22+n*15);}text(root,lx,ly,`${part.xPrefix}${part.index} = ${da(mag,1)} Ω`,'vector-label',part.color,part.type==='R'?'middle':'start');px=nx;py=ny;});
     const zEnd=arrow(root,x0,y0,Z*s,phi,VOLTAGE_COLOR,'',.8);text(root,zEnd.x+12,zEnd.y-12,`Z = ${da(Z,1)} Ω`,'vector-label',VOLTAGE_COLOR);text(root,50,330,'Komponenternes R og X lægges sammen til den samlede impedans.','vector-label','#778791');return;
   }
   baseGrid(root,115,185,680,310);arrow(root,115,185,520,0,CURRENT_COLOR,'',.75);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
@@ -193,7 +193,7 @@ function drawParallel(){
   $('parPhiNote').innerHTML='φ = −arg(ΣI̲<sub>gren</sub>)';$('parCosNote').innerHTML='cos φ = P/(U · I)';$('parPNote').innerHTML=directCurrents?'P = U · Σ(I<sub>k</sub> cos θ<sub>k</sub>)':'P = U · ΣI<sub>R</sub>';$('parQNote').innerHTML=directCurrents?'Q = −U · Σ(I<sub>k</sub> sin θ<sub>k</sub>)':'Q = U · (ΣI<sub>L</sub>−ΣI<sub>C</sub>)';$('parResFormula').textContent=f0?`f₀ = ${da(f0,2)} Hz`:'Kræver både L- og C-gren';$('parZFormula').textContent=`Z = ${da(U,1)} / ${da(I,2)} = ${da(Z,2)} Ω`;$('parallelType').textContent=state==='inductive'?'Induktiv':state==='capacitive'?'Kapacitiv':isResonant?'Parallelresonans':'Resistiv';
   const angleHelp=directCurrents?' Positiv grenvinkel er foran U&nbsp;&nbsp;|&nbsp;&nbsp;negativ er bagefter U.':'';if(state==='inductive')$('parallelNatureText').innerHTML=`<strong>Induktiv:</strong> Resultatstrømmen er ${da(Math.abs(currentAngle),1)}° bagefter spændingen.${angleHelp}`;if(state==='capacitive')$('parallelNatureText').innerHTML=`<strong>Kapacitiv:</strong> Resultatstrømmen er ${da(Math.abs(currentAngle),1)}° foran spændingen.${angleHelp}`;if(state==='resistive')$('parallelNatureText').innerHTML=isResonant?'<strong>Parallelresonans:</strong> De induktive og kapacitive grenstrømme ophæver hinanden.':`<strong>Resistiv:</strong> Resultatstrømmen er i fase med spændingen.${angleHelp}`;
   drawParallelVectorDiagram(branches,I,currentAngle,phi,state);
-  if(directCurrents){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Grenstrømme indtastet direkte';$('parResonanceText').textContent='Vektorsummen, fasevinklen, P, Q og Z beregnes direkte ud fra de aktive grenstrømme.';}else if(!f0){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Parallelresonans kræver både L og C';$('parResonanceText').textContent='Vælg mindst én induktiv og én kapacitiv gren for at beregne resonans.';}else{const resRatio=clamp((f/f0-1)*.5,-.5,.5);$('parResonanceNeedle').style.left=`${50+resRatio*92}%`;$('parResonanceTitle').textContent=isResonant?'Kredsen er i parallelresonans':'Afstand til parallelresonans';$('parResonanceText').textContent=`Resonansfrekvens f₀ = ${da(f0,2)} Hz. Ved resonans ophæver de samlede L- og C-strømme hinanden.`;}
+  if(directCurrents){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Grenstrømme indtastet direkte';$('parResonanceText').textContent='Vektorsummen, fasevinklen, P, Q og Z beregnes direkte ud fra de aktive grenstrømme.';}else if(!f0){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Parallelresonans kræver både L og C';$('parResonanceText').textContent='Vælg mindst én induktiv og én kapacitiv gren for at beregne resonans.';}else{const resRatio=clamp((1-f/f0)*.5,-.5,.5);$('parResonanceNeedle').style.left=`${50+resRatio*92}%`;$('parResonanceTitle').textContent=isResonant?'Kredsen er i parallelresonans':'Afstand til parallelresonans';$('parResonanceText').textContent=`Resonansfrekvens f₀ = ${da(f0,2)} Hz. Ved resonans ophæver de samlede L- og C-strømme hinanden.`;}
 }
 
 function drawParallelVectorDiagram(branches,I,currentAngle,phi,state){
@@ -266,28 +266,40 @@ function drawThreeLoad(){
   $('threeLoadIFormula').textContent=threeLoadConnection==='Y'?'Iₙ = I_f':`Iₙ = √3 · I_f (${da(If,2)} A)`;$('threeLoadPFormula').textContent=threeLoadVoltageType==='line'?'√3 · Uₙ · Iₙ · |cosφ|':'3 · U_f · I_f · |cosφ|';
   $('threeLoadExplainer').innerHTML=threeLoadConnection==='Y'?`<strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub><br>Z<sub>f</sub>: RΣ = ${da(R,1)} Ω, XΣ = ${da(X,1)} Ω</p>`:`<strong>Δ</strong><p>U<sub>f</sub> = U<sub>n</sub><br>I<sub>n</sub> = √3 · I<sub>f</sub><br>Z<sub>f</sub>: RΣ = ${da(R,1)} Ω, XΣ = ${da(X,1)} Ω</p>`;
   $('threeLoadDiagramTitle').textContent=threeLoadConnection==='Y'?'Stjerne: strøm gennem fasegrenene':'Trekant: grenstrømme og netstrømme';$('threeLoadDiagramNote').textContent=threeLoadConnection==='Y'?'Samme fasegren i alle tre faser giver tre lige store netstrømme.':'Netstrømmen er vektorsummen/forskellen af to grenstrømme og bliver √3 gange fasestrømmen.';$('threeLoadType').textContent=X<0?'Kapacitiv: strømmen er foran':X>0?'Induktiv: strømmen er bagefter':'Resistiv: strøm og spænding i fase';
-  drawThreeDiagram($('threeLoadPhasor'),threeLoadConnection,phi,'line');drawThreeLoadCircuit(parts,threeLoadConnection,R,X,Z);if($('threeLoadKind'))$('threeLoadKind').textContent=$('threeLoadType').textContent;
+  drawThreeLoadPhasor($('threeLoadPhasor'),threeLoadConnection,phi,If,In);drawThreeLoadCircuit(parts,threeLoadConnection,R,X,Z,If,In);if($('threeLoadKind'))$('threeLoadKind').textContent=$('threeLoadType').textContent;
 }
-function drawThreeLoadCircuit(parts,connection,R,X,Z){
-  const root=$('threeLoadCircuit');clear(root);
-  $('threeLoadCircuitTitle').textContent=connection==='Y'?'Symmetrisk stjernebelastning med fasegrene':'Symmetrisk trekantbelastning med fasegrene';
-  $('threeLoadCircuitNote').textContent=`${parts.length} komponent${parts.length===1?'':'er'} i serie danner hver fasegren: Zf = ${da(Z,1)} Ω.`;
-  root.append(svg('rect',{x:12,y:12,width:420,height:200,rx:3,class:'overview-board'}));
-  const ys=[42,70,98,126],labels=['L1','L2','L3','N'];
-  ys.forEach((y,i)=>{circuitText(root,30,y+4,labels[i],'overview-label','middle','#1f2b34');if(i<3||connection==='Y')root.append(svg('line',{x1:50,y1:y,x2:410,y2:y,class:'overview-wire'}));});
-  [0,1,2].forEach(i=>{circuitArrow(root,58,ys[i],28,0,`Iₙ${i+1}`,'#1f2b34');});
+function drawThreeLoadPhasor(root,connection,phi,If,In){
+  clear(root);const cx=360,cy=210,W=680,H=360;drawAxisGrid(root,cx,cy,W,H);root.append(svg('circle',{cx,cy,r:145,class:'guide'}));
+  const base=[0,-120,120],phaseNames=connection==='Y'?['I_f1 / I_n1','I_f2 / I_n2','I_f3 / I_n3']:['I_12','I_23','I_31'],lineNames=['I_n1','I_n2','I_n3'],phaseColors=['#ff9f43','#f7c948','#55d6a1'],lineColors=[CURRENT_COLOR,'#ff8a70','#d94f8a'];
+  const maxI=Math.max(If,In,.001),phaseScale=connection==='D'?112/maxI:145/maxI,lineScale=145/maxI;
+  text(root,60,36,'Strømvektorer — resistiv reference ligger på x-aksen','vector-label','#8f9da6');
   if(connection==='Y'){
-    const xs=[150,260,370];xs.forEach((x,i)=>{root.append(svg('circle',{cx:x,cy:ys[i],r:3,fill:'#1f2b34'}));root.append(svg('line',{x1:x,y1:ys[i],x2:x,y2:145,class:'overview-wire'}));root.append(svg('rect',{x:x-18,y:145,width:36,height:14,class:'overview-component'}));root.append(svg('line',{x1:x,y1:159,x2:x,y2:126,class:'overview-wire'}));root.append(svg('circle',{cx:x,cy:126,r:3,fill:'#1f2b34'}));circuitText(root,x,184,`Zf ${i+1}`,'overview-current','middle','#1f2b34');});
-    circuitText(root,215,203,'Y: hver fasegren ligger mellem fase og N','overview-current','middle','#1f2b34');
+    base.forEach((a,i)=>{const angle=a-phi,end=arrow(root,cx,cy,In*lineScale,angle,lineColors[i],'',.72);const offset=i===0?{x:18,y:-12,a:'start'}:i===1?{x:-18,y:-10,a:'end'}:{x:-18,y:22,a:'end'};text(root,end.x+offset.x,end.y+offset.y,`I_f${i+1} = ${lineNames[i]} = ${da(In,2)} A`,'vector-label',lineColors[i],offset.a);});
+    text(root,646,360,'Y: I_f = I_n','vector-label','#8f9da6','end');
   }else{
-    const branches=[{x1:145,y1:42,x2:215,y2:70,y:145,label:'Z12'},{x1:245,y1:70,x2:315,y2:98,y:166,label:'Z23'},{x1:345,y1:98,x2:395,y2:42,y:187,label:'Z31'}];
-    branches.forEach((b,i)=>{root.append(svg('circle',{cx:b.x1,cy:b.y1,r:3,fill:'#1f2b34'}));root.append(svg('circle',{cx:b.x2,cy:b.y2,r:3,fill:'#1f2b34'}));root.append(svg('line',{x1:b.x1,y1:b.y1,x2:b.x1,y2:b.y,class:'overview-wire'}));root.append(svg('rect',{x:(b.x1+b.x2)/2-18,y:b.y-7,width:36,height:14,class:'overview-component'}));root.append(svg('line',{x1:b.x2,y1:b.y,x2:b.x2,y2:b.y2,class:'overview-wire'}));circuitText(root,(b.x1+b.x2)/2,b.y-13,b.label,'overview-current','middle','#1f2b34');});
-    circuitText(root,215,203,'Δ: hver fasegren ligger mellem to faser','overview-current','middle','#1f2b34');
+    base.forEach((a,i)=>{const angle=a-phi,end=arrow(root,cx,cy,If*phaseScale,angle,phaseColors[i],'',.58);const offset=i===0?{x:12,y:18,a:'start'}:i===1?{x:-14,y:-10,a:'end'}:{x:-14,y:22,a:'end'};text(root,end.x+offset.x,end.y+offset.y,`${phaseNames[i]} = ${da(If,2)} A`,'vector-label',phaseColors[i],offset.a);});
+    base.forEach((a,i)=>{const angle=a-phi-30,end=arrow(root,cx,cy,In*lineScale,angle,lineColors[i],'',.74);const offset=i===0?{x:16,y:-15,a:'start'}:i===1?{x:-18,y:-15,a:'end'}:{x:-18,y:26,a:'end'};text(root,end.x+offset.x,end.y+offset.y,`${lineNames[i]} = ${da(In,2)} A`,'vector-label',lineColors[i],offset.a);});
+    text(root,646,360,'Δ: I_n = √3 · I_f','vector-label','#8f9da6','end');
   }
-  circuitWire(root,455,22,455,212,'#2a3a45');circuitText(root,675,34,'Fasegren Zf','circuit-label','middle',VOLTAGE_COLOR);circuitNode(root,500,92);circuitNode(root,840,92);
-  const compact=parts.length>5,start=parts.length===1?670:525,end=parts.length===1?670:815,step=parts.length>1?(end-start)/(parts.length-1):0;let previous=500;
-  parts.forEach((part,i)=>{const x=start+i*step,half=part.type==='R'?12:part.type==='L'?13:15;circuitWire(root,previous,92,x-half,92);drawCompactCircuitComponent(root,part.type,x,92);circuitText(root,x,compact?119:123,componentSymbol(part.type,part.index),compact?'circuit-label tiny-label':'circuit-label','middle');previous=x+half;});
-  circuitWire(root,previous,92,840,92);circuitText(root,675,158,`RΣ = ${da(R,1)} Ω    XΣ = ${da(X,1)} Ω`,'circuit-label','middle');circuitText(root,675,180,`Zf = ${da(Z,1)} Ω`,'circuit-label','middle',VOLTAGE_COLOR);
+  if(Math.abs(phi)>.2){const r=46,endX=cx+r*Math.cos(rad(-phi)),endY=cy-r*Math.sin(rad(-phi)),sweep=phi>0?1:0;root.append(svg('path',{d:`M ${cx+r} ${cy} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+62,cy+(phi>0?24:-18),`φ = ${phi>0?'+':''}${da(phi,1)}°`,'vector-label','#8c9aa3');}
+}
+
+function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In){
+  const root=$('threeLoadCircuit');clear(root);
+  $('threeLoadCircuitTitle').textContent=connection==='Y'?'Symmetrisk stjernebelastning':'Symmetrisk trekantbelastning';
+  $('threeLoadCircuitNote').textContent=`${parts.length} komponent${parts.length===1?'':'er'} pr. fase giver Zf = ${da(Z,1)} Ω. Strømmene er vist direkte i koblingsdiagrammet.`;
+  root.append(svg('rect',{x:14,y:12,width:872,height:236,rx:10,class:'overview-board'}));
+  const ys=[50,84,118,152],labels=['L1','L2','L3','N'];
+  ys.forEach((y,i)=>{circuitText(root,38,y+4,labels[i],'overview-label','middle');if(i<3||connection==='Y')root.append(svg('line',{x1:62,y1:y,x2:838,y2:y,class:'overview-wire'}));});
+  [0,1,2].forEach(i=>{circuitArrow(root,72,ys[i],46,0,`I_n${i+1} = ${da(In,2)} A`,CURRENT_COLOR);});
+  if(connection==='Y'){
+    const xs=[245,450,655];xs.forEach((x,i)=>{root.append(svg('circle',{cx:x,cy:ys[i],r:3,fill:'currentColor',color:'#d3dde1'}));root.append(svg('line',{x1:x,y1:ys[i],x2:x,y2:168,class:'overview-wire'}));root.append(svg('rect',{x:x-26,y:168,width:52,height:18,rx:2,class:'overview-component'}));root.append(svg('line',{x1:x,y1:186,x2:x,y2:152,class:'overview-wire'}));root.append(svg('circle',{cx:x,cy:152,r:3,fill:'currentColor',color:'#d3dde1'}));circuitArrow(root,x,126,28,-90,`I_f${i+1} = ${da(If,2)} A`,CURRENT_COLOR);circuitText(root,x,204,'Zf','overview-label','middle');});
+    circuitText(root,450,232,'Y: hver belastning ligger mellem fase og N — derfor er I_f = I_n','overview-current','middle');
+  }else{
+    const branches=[{x1:245,y1:50,x2:390,y2:84,y:174,label:'I_12'},{x1:430,y1:84,x2:575,y2:118,y:204,label:'I_23'},{x1:615,y1:118,x2:760,y2:50,y:144,label:'I_31'}];
+    branches.forEach((b,i)=>{root.append(svg('circle',{cx:b.x1,cy:b.y1,r:3,fill:'currentColor',color:'#d3dde1'}));root.append(svg('circle',{cx:b.x2,cy:b.y2,r:3,fill:'currentColor',color:'#d3dde1'}));root.append(svg('line',{x1:b.x1,y1:b.y1,x2:b.x1,y2:b.y,class:'overview-wire'}));root.append(svg('rect',{x:(b.x1+b.x2)/2-26,y:b.y-9,width:52,height:18,rx:2,class:'overview-component'}));root.append(svg('line',{x1:b.x2,y1:b.y,x2:b.x2,y2:b.y2,class:'overview-wire'}));circuitArrow(root,b.x1,Math.min(b.y1+18,b.y-36),28,-90,`${b.label} = ${da(If,2)} A`,CURRENT_COLOR);circuitText(root,(b.x1+b.x2)/2,b.y-16,'Zf','overview-label','middle');});
+    circuitText(root,450,232,'Δ: hver belastning ligger mellem to faser — netstrømmen er √3 gange fasestrømmen','overview-current','middle');
+  }
 }
 
 function drawComp(){
@@ -495,6 +507,7 @@ $('scaleUp').addEventListener('click',()=>{const current=scaleMode==='auto'?auto
 $('scaleAuto').addEventListener('click',()=>{scaleMode='auto';saveScale('auto');applyDisplayScale();});
 window.addEventListener('resize',()=>{if(scaleMode==='auto')applyDisplayScale();});
 applyTheme();applyDisplayScale();renderOhmInputs();syncInputModeUI();activatePage(location.hash.slice(1)||'vekselstroem',false);updateAll();installDiagramExpanders();window.addEventListener('load',()=>window.scrollTo({top:0,behavior:'auto'}),{once:true});setTimeout(()=>window.scrollTo(0,0),350);
+
 
 
 
