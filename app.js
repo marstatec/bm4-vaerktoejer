@@ -21,6 +21,7 @@ const svg = (tag, attrs = {}, text = '') => {
 };
 const clear = el => { while(el.firstChild) el.removeChild(el.firstChild); };
 const MAX_COMPONENTS = 10;
+const THREE_LOAD_MAX_COMPONENTS = 5;
 const line = (root, x1,y1,x2,y2, cls='grid-line', color) => root.append(svg('line',{x1,y1,x2,y2,class:cls, ...(color?{stroke:color}:{})}));
 const text = (root, x,y,value, cls='vector-label', color='#aab6be', anchor='start') => root.append(svg('text',{x,y,class:cls,fill:color,'text-anchor':anchor},value));
 const subscriptText = (root,x,y,main,sub,cls='vector-label',color='#aab6be',anchor='start') => {
@@ -304,7 +305,7 @@ function drawThreeCircuit(connection){
 
 function threeLoadParts(){
   const omega=2*Math.PI*Math.max(.1,num('threeLoadF'));
-  return builderComponents('threeLoad',threeLoadComponentCount).map(component=>{
+  return builderComponents('threeLoad',Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS)).map(component=>{
     const value=component.value;
     if(component.type==='R')return {...component,R:value,X:0};
     if(threeLoadInputMode==='reactance')return {...component,R:0,X:component.type==='L'?value:-value};
@@ -342,7 +343,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In){
 function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In){
   const root=$('threeLoadCircuit');clear(root);
   $('threeLoadCircuitTitle').textContent=connection==='Y'?'Symmetrisk stjernebelastning':'Symmetrisk trekantbelastning';
-  $('threeLoadCircuitNote').textContent=`${parts.length} belastningsgruppe${parts.length===1?'':'r'} pr. fase. Hver gruppe svarer til komponenterne i fasegrenen; Zf = ${da(Z,1)} Ω.`;
+  $('threeLoadCircuitNote').textContent=`${parts.length} belastningsgruppe${parts.length===1?'':'r'} pr. fase (maks. 5 for læsbarhed). Hver gruppe svarer til komponenterne i fasegrenen; Zf = ${da(Z,1)} Ω.`;
   root.append(svg('rect',{x:14,y:10,width:1392,height:248,rx:10,class:'overview-board'}));
   const ys=[42,76,110,144],lineNames=['L1','L2','L3','N'],end=1384,groupStep=parts.length>1?clamp(1085/(parts.length-1),112,360):0,groupStart=parts.length===1?610:165;
   lineNames.forEach((label,i)=>{circuitText(root,50,ys[i]+5,label,'overview-label','middle');root.append(svg('line',{x1:78,y1:ys[i],x2:i===3&&connection==='D'?155:end,y2:ys[i],class:'overview-wire'}));});
@@ -478,7 +479,7 @@ function applyElectricalColorConvention(){
 
 let activeDiagram=null,lastExpandButton=null;
 function installDiagramExpanders(){
-  $$('svg.diagram').forEach(diagram=>{const card=diagram.closest('.card');if(!card||card.querySelector('.diagram-expand'))return;card.classList.add('diagram-host');const button=document.createElement('button');button.className='diagram-expand';button.type='button';button.textContent='⛶';button.title='Forstør diagram';button.setAttribute('aria-label','Forstør diagram');button.addEventListener('click',()=>openDiagramModal(diagram,button));card.append(button);});
+  $$('svg.diagram, svg[data-expandable-diagram]').forEach(diagram=>{const card=diagram.closest('.card');if(!card||card.querySelector('.diagram-expand'))return;card.classList.add('diagram-host');const button=document.createElement('button');button.className='diagram-expand';button.type='button';button.textContent='⛶';button.title='Forstør diagram';button.setAttribute('aria-label','Forstør diagram');button.addEventListener('click',()=>openDiagramModal(diagram,button));card.append(button);});
 }
 function openDiagramModal(diagram,button){
   activeDiagram=diagram;lastExpandButton=button;const clone=diagram.cloneNode(true);clone.removeAttribute('id');$('diagramModalCanvas').replaceChildren(clone);const page=diagram.closest('.page'),card=diagram.closest('.card'),heading=card?.querySelector('h3')?.textContent||'Diagram';$('diagramModalTitle').textContent=`${page?.dataset.title||'VektorLab'} | ${heading}`;$('diagramModal').hidden=false;document.body.classList.add('modal-open');$('closeDiagram').focus();
@@ -503,7 +504,8 @@ function syncComponentBuilders(){
 }
 function syncThreeLoadBuilder(){
   if(!$('threeLoadComponentBuilder'))return;
-  for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=threeLoadComponentCount,type=$(`threeLoadCompType${i}`).value;$(`threeLoadComponentRow${i}`).hidden=!active;$(`threeLoadCompUnit${i}`).textContent=componentUnit(type,threeLoadInputMode);}
+  threeLoadComponentCount=Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS);
+  for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=threeLoadComponentCount&&i<=THREE_LOAD_MAX_COMPONENTS,type=$(`threeLoadCompType${i}`).value;$(`threeLoadComponentRow${i}`).hidden=!active;$(`threeLoadCompUnit${i}`).textContent=componentUnit(type,threeLoadInputMode);}
   $$('#threeLoadComponentCount button').forEach(b=>b.classList.toggle('active',Number(b.dataset.count)===threeLoadComponentCount));
   $$('#threeLoadInputMode button').forEach(b=>b.classList.toggle('active',b.dataset.loadMode===threeLoadInputMode));
 }
