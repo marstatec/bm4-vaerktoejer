@@ -29,6 +29,11 @@ const subscriptText = (root,x,y,main,sub,cls='vector-label',color='#aab6be',anch
   t.append(svg('tspan',{'baseline-shift':'sub','font-size':'72%'},sub));
   root.append(t); return t;
 };
+const subscriptValueText = (root,x,y,main,sub,suffix,cls='vector-label',color='#aab6be',anchor='start') => {
+  const t=subscriptText(root,x,y,main,sub,cls,color,anchor);
+  t.append(svg('tspan',{},suffix));
+  return t;
+};
 function arrow(root, cx, cy, length, angle, color, label, scale=1){
   const a=rad(angle), ex=cx+length*Math.cos(a), ey=cy-length*Math.sin(a);
   const g=svg('g'); g.append(svg('line',{x1:cx,y1:cy,x2:ex,y2:ey,class:'vector',stroke:color,'stroke-linecap':'butt'}));
@@ -171,9 +176,10 @@ function drawSeriesVoltageDiagram(root,components,R,X,U,I,phi,f){
   drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
   if(seriesVoltageMode==='total'){
     const UR=I*R,UX=I*X,scale=Math.min(Math.abs(UR)>0?360/Math.abs(UR):Infinity,Math.abs(UX)>0?135/Math.abs(UX):Infinity,U>0?330/U:Infinity),s=Number.isFinite(scale)?scale:1,ex=x0+UR*s,ey=y0-UX*s;
-    arrow(root,x0,y0,Math.abs(UR)*s,UR>=0?0:180,'#9b87f5','',.85);text(root,(x0+ex)/2,y0+24,`U_R = ${da(UR,1)} V`,'vector-label','#9b87f5','middle');
-    line(root,ex,y0,ex,ey,'vector','#ff9f43');text(root,ex+14,(y0+ey)/2+4,`U_X = ${da(UX,1)} V`,'vector-label','#ff9f43');
-    const uEnd=arrow(root,x0,y0,U*s,phi,VOLTAGE_COLOR,'',.85);text(root,uEnd.x+12,uEnd.y+(phi>=0?-12:20),`U = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR);
+    const rLabelY=UX<0?y0-14:y0+24;
+    arrow(root,x0,y0,Math.abs(UR)*s,UR>=0?0:180,'#9b87f5','',.85);subscriptValueText(root,(x0+ex)/2,rLabelY,'U','R',` = ${da(UR,1)} V`,'vector-label','#9b87f5','middle');
+    line(root,ex,y0,ex,ey,'vector','#ff9f43');subscriptValueText(root,ex+14,(y0+ey)/2+4,'U','X',` = ${da(UX,1)} V`,'vector-label','#ff9f43');
+    const uEnd=arrow(root,x0,y0,U*s,phi,VOLTAGE_COLOR,'',.85);subscriptValueText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','kreds',` = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR,'middle');
     if(Math.abs(phi)>.5){const r=42,sweep=phi>0?0:1,endX=x0+r*Math.cos(rad(phi)),endY=y0-r*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58,y0+(phi<0?36:-24),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','middle');}
     return;
   }
