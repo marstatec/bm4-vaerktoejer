@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=axis-aligned-grid-1">
+  <link rel="stylesheet" href="styles.css?v=circuit-expand-1">
 </head>
 <body>
   <div class="app-shell">
@@ -100,7 +100,7 @@
           <div class="intro-row"><div><span class="chapter">02 | RLC I SERIE</span><h2>Byg impedansen led for led</h2><p>Resistans og reaktans står vinkelret på hinanden. Fortegnet på X afgør, om kredsen er induktiv eller kapacitiv.</p></div><div class="formula-badge">Z = √<span>R² + (X<sub>L</sub> − X<sub>C</sub>)²</span></div></div>
           <article class="card circuit-strip">
             <div><span class="step">KREDSKOBLING</span><h3 id="seriesCircuitTitle">Tre komponenter i vandret serie</h3><p>Den samme strøm I løber gennem alle aktive komponenter.</p></div>
-            <svg id="seriesCircuit" class="circuit-svg" viewBox="0 0 520 150" role="img" aria-label="Vandret seriekobling med resistans, induktans og kapacitans"></svg>
+            <svg id="seriesCircuit" class="circuit-svg diagram" viewBox="0 0 520 150" role="img" aria-label="Vandret seriekobling med resistans, induktans og kapacitans"></svg>
           </article>
           <div class="workspace-grid">
             <article class="card controls-card">
@@ -187,7 +187,7 @@
           </div>
           <article class="card circuit-strip">
             <div><span class="step">KREDSKOBLING</span><h3 id="parallelCircuitTitle">Tre parallelle grene</h3><p>Spændingen U er fælles, mens de aktive grenstrømme summeres som vektorer.</p></div>
-            <svg id="parallelCircuit" class="circuit-svg" viewBox="0 0 520 155" role="img" aria-label="Parallelkobling med resistans, induktans og kapacitans"></svg>
+            <svg id="parallelCircuit" class="circuit-svg diagram" viewBox="0 0 520 155" role="img" aria-label="Parallelkobling med resistans, induktans og kapacitans"></svg>
           </article>
           <div class="workspace-grid">
             <article class="card controls-card">
@@ -504,7 +504,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=axis-aligned-grid-1"></script>
+  <script src="app.js?v=circuit-expand-1"></script>
 </body>
 </html>
 
