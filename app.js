@@ -32,8 +32,10 @@ function arrow(root, cx, cy, length, angle, color, label, scale=1){
   g.append(svg('text',{x:ex+12*Math.cos(a),y:ey-12*Math.sin(a),fill:color,class:'vector-label','text-anchor':Math.cos(a)<-.2?'end':'start'},label)); root.append(g); return {x:ex,y:ey};
 }
 function baseGrid(root,cx,cy,w=480,h=250){
-  for(let x=40;x<=w;x+=40) line(root,x,25,x,h+25);
-  for(let y=25;y<=h+25;y+=40) line(root,40,y,w,y);
+  for(let x=cx;x>=40;x-=40) line(root,x,25,x,h+25);
+  for(let x=cx+40;x<=w;x+=40) line(root,x,25,x,h+25);
+  for(let y=cy;y>=25;y-=40) line(root,40,y,w,y);
+  for(let y=cy+40;y<=h+25;y+=40) line(root,40,y,w,y);
   line(root,35,cy,w+5,cy,'axis'); line(root,cx,20,cx,h+30,'axis');
   root.append(svg('circle',{cx,cy,r:3,fill:'#5f707b'}));
 }
@@ -125,8 +127,10 @@ function fitScaleFromPoints(points,width,height,pad=60){
   return Math.min((width-pad*2)/Math.max(1,maxX-minX),(height-pad*2)/Math.max(1,maxY-minY),14);
 }
 function drawAxisGrid(root,cx,cy,w=680,h=310){
-  for(let x=40;x<=w;x+=50)line(root,x,25,x,h+25);
-  for(let y=25;y<=h+25;y+=50)line(root,40,y,w,y);
+  for(let x=cx;x>=40;x-=50)line(root,x,25,x,h+25);
+  for(let x=cx+50;x<=w;x+=50)line(root,x,25,x,h+25);
+  for(let y=cy;y>=25;y-=50)line(root,40,y,w,y);
+  for(let y=cy+50;y<=h+25;y+=50)line(root,40,y,w,y);
   line(root,35,cy,w+5,cy,'axis');line(root,cx,20,cx,h+30,'axis');root.append(svg('circle',{cx,cy,r:3,fill:'#5f707b'}));
 }
 
