@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=series-voltage-phi-1">
+  <link rel="stylesheet" href="styles.css?v=ac-time-delta-1">
 </head>
 <body>
   <div class="app-shell">
@@ -82,15 +82,16 @@
             </article>
           </div>
 
-          <div class="result-strip">
+          <div class="result-strip five">
             <div><span>Aktiv effekt</span><strong id="acP">—</strong><small>P = U · I · cos φ<sub>I</sub></small></div>
             <div><span>Reaktiv effekt</span><strong id="acQ">—</strong><small>Q = −U · I · sin φ<sub>I</sub></small></div>
             <div><span>Tilsyneladende</span><strong id="acS">—</strong><small>S = U · I</small></div>
             <div><span>Effektfaktor</span><strong id="acCos">—</strong><small>cos φ<sub>I</sub> = P / S</small></div>
+            <div><span>Tidsforskel Δt</span><strong id="acDt">—</strong><small id="acDtNote">Δt = |φ|/360° · T</small></div>
           </div>
 
           <article class="card formula-card">
-            <div><span class="step">FORMELSAMMENHÆNG</span><h3>Øjebliksværdier</h3><p>Maksimalværdien er √2 gange effektivværdien. Kurverne viser to perioder.</p></div>
+            <div><span class="step">FORMELSAMMENHÆNG</span><h3>Øjebliksværdier</h3><p id="acWaveCaption">Maksimalværdien er √2 gange effektivværdien. Kurverne viser to perioder.</p></div>
             <div class="formula-main"><span>u(t) =</span><b id="acUhatFormula">325,3</b><span> · sin(2π · </span><b id="acFFormula">50</b><span> · t)</span></div>
             <svg id="waveDiagram" class="wave-diagram" viewBox="0 0 850 180" role="img" aria-label="Sinuskurver for spænding og strøm"></svg>
           </article>
@@ -504,7 +505,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=series-voltage-phi-1"></script>
+  <script src="app.js?v=ac-time-delta-1"></script>
 </body>
 </html>
 

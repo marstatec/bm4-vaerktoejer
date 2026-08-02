@@ -88,9 +88,11 @@ function drawAc(){
   if(loadType==='inductive'){$('acLoadTitle').textContent='Induktiv last';$('acLoadExplanation').textContent='Strøm bagefter spænding';$('acSignNote').innerHTML='<strong>Induktiv:</strong> Strømmen er bagefter spændingen.';}
   if(loadType==='capacitive'){$('acLoadTitle').textContent='Kapacitiv last';$('acLoadExplanation').textContent='Strøm foran spænding';$('acSignNote').innerHTML='<strong>Kapacitiv:</strong> Strømmen er foran spændingen.';}
   if(loadType==='resistive'){$('acLoadTitle').textContent='Resistiv last';$('acLoadExplanation').textContent='Strøm og spænding er i fase';$('acSignNote').innerHTML='<strong>Resistiv:</strong> Strøm og spænding følges ad.';}
-  const S=U*I, P=S*Math.cos(rad(phi)), Q=-S*Math.sin(rad(phi));
+  const S=U*I, P=S*Math.cos(rad(phi)), Q=-S*Math.sin(rad(phi)),T=1/f,dt=Math.abs(phi)/360*T;
   $('acP').textContent=power(P); $('acQ').textContent=power(Q,true); $('acS').textContent=Math.abs(S)>=1000?unit(S/1000,'kVA',2):unit(S,'VA'); $('acCos').textContent=da(Math.cos(rad(phi)),3);
+  $('acDt').textContent=`${da(dt*1000,2)} ms`;$('acDtNote').textContent=`Δt = |${da(phi,0)}°| / 360° · ${da(T*1000,1)} ms`;
   $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'+'+da(phi,0):'−'+da(Math.abs(phi),0)}°`;
+  $('acWaveCaption').textContent=phi<0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms efter spændingen.`:phi>0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms før spændingen.`:'Der er ingen tidsforskel: strøm og spænding passerer samme punkt samtidig.';
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
   const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,uAngle,VOLTAGE_COLOR,`U = ${da(U,0)} V`);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,1)} A`);
@@ -102,6 +104,10 @@ function drawWaves(U,I,f,phi){
   for(let x=20;x<=830;x+=81) line(root,x,15,x,165);
   const path=(phase,amp)=>{let d='';for(let x=20;x<=830;x+=3){const t=(x-20)/810*4*Math.PI;const y=mid-amp*Math.sin(t+rad(phase));d+=(x===20?'M':'L')+` ${x} ${y}`;}return d;};
   root.append(svg('path',{d:path(0,60),fill:'none',stroke:VOLTAGE_COLOR,'stroke-width':2.2}));root.append(svg('path',{d:path(phi,42),fill:'none',stroke:CURRENT_COLOR,'stroke-width':2}));
+  const periodPx=405,refX=425,currentX=refX-phi/360*periodPx,dtY=153,left=Math.min(refX,currentX),right=Math.max(refX,currentX),dt=Math.abs(phi)/360/f*1000;
+  line(root,refX,mid,refX,166,'guide',VOLTAGE_COLOR);line(root,currentX,mid,currentX,166,'guide',CURRENT_COLOR);
+  if(Math.abs(phi)>.05){line(root,left,dtY,right,dtY,'vector','#82909a');root.append(svg('polygon',{points:`${left},${dtY} ${left+7},${dtY-4} ${left+7},${dtY+4}`,fill:'#82909a'}));root.append(svg('polygon',{points:`${right},${dtY} ${right-7},${dtY-4} ${right-7},${dtY+4}`,fill:'#82909a'}));text(root,(left+right)/2,dtY-8,`Δt = ${da(dt,2)} ms`,'vector-label','#82909a','middle');text(root,(left+right)/2,170,phi<0?'I bagefter U':'I foran U','vector-label',CURRENT_COLOR,'middle');}
+  else text(root,425,153,'Δt = 0 ms — i fase','vector-label','#55d6a1','middle');
   text(root,28,27,`û = ${da(U*Math.SQRT2,1)} V`,'vector-label',VOLTAGE_COLOR); text(root,28,44,`î = ${da(I*Math.SQRT2,1)} A`,'vector-label',CURRENT_COLOR); text(root,824,107,`${da(2/f*1000,1)} ms`,'vector-label','#596873','end');
 }
 
