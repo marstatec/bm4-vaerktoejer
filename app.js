@@ -336,8 +336,8 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[]){
     if(showBranches){
       const maxI=Math.max(branchTotal,...branchCurrents.map(b=>b.value),.001),baseLen=64;
       branchCurrents.forEach(b=>{const len=Math.max(18,b.value/maxI*baseLen);arrow(root,p[0],p[1],len,ref+b.angle,b.color,'',.45);});
-      const totalLen=Math.max(30,branchTotal/maxI*78),end=arrow(root,p[0],p[1],totalLen,totalAngle,currentColors[i],'',.82),anchor=end.x<p[0]?'end':'start';
-      text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`Σ${names[i]}`,'vector-label',currentColors[i],anchor);
+      const totalLen=Math.max(30,branchTotal/maxI*78),end=arrow(root,p[0],p[1],totalLen,totalAngle,CURRENT_COLOR,'',.82),anchor=end.x<p[0]?'end':'start';
+      text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`Σ${names[i]}`,'vector-label',CURRENT_COLOR,anchor);
     }else{
       const end=arrow(root,p[0],p[1],74,totalAngle,currentColors[i],'',.78),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`${names[i]} = ${da(value,2)} A`,'vector-label',currentColors[i],anchor);
