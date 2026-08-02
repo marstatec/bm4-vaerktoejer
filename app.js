@@ -23,6 +23,12 @@ const clear = el => { while(el.firstChild) el.removeChild(el.firstChild); };
 const MAX_COMPONENTS = 10;
 const line = (root, x1,y1,x2,y2, cls='grid-line', color) => root.append(svg('line',{x1,y1,x2,y2,class:cls, ...(color?{stroke:color}:{})}));
 const text = (root, x,y,value, cls='vector-label', color='#aab6be', anchor='start') => root.append(svg('text',{x,y,class:cls,fill:color,'text-anchor':anchor},value));
+const subscriptText = (root,x,y,main,sub,cls='vector-label',color='#aab6be',anchor='start') => {
+  const t=svg('text',{x,y,class:cls,fill:color,'text-anchor':anchor});
+  t.append(svg('tspan',{},main));
+  t.append(svg('tspan',{'baseline-shift':'sub','font-size':'72%'},sub));
+  root.append(t); return t;
+};
 function arrow(root, cx, cy, length, angle, color, label, scale=1){
   const a=rad(angle), ex=cx+length*Math.cos(a), ey=cy-length*Math.sin(a);
   const g=svg('g'); g.append(svg('line',{x1:cx,y1:cy,x2:ex,y2:ey,class:'vector',stroke:color}));
@@ -188,9 +194,10 @@ function drawImpedanceTriangle(R,XL,XC,X,Z,phi,components=[],f=50){
     const omega=2*Math.PI*f,parts=seriesComponentParts(components,1,omega),x0=115,y0=185,W=680,H=310;drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
     const Rparts=parts.filter(p=>p.type==='R'),Lparts=parts.filter(p=>p.type==='L'),Cparts=parts.filter(p=>p.type==='C'),Rsum=Rparts.reduce((sum,p)=>sum+p.R,0),XLsum=Lparts.reduce((sum,p)=>sum+Math.abs(p.X),0),XCsum=Cparts.reduce((sum,p)=>sum+Math.abs(p.X),0),Xsum=XLsum-XCsum;
     const s=Math.min(Rsum>0?380/Rsum:Infinity,Math.max(XLsum,XCsum,Math.abs(Xsum))>0?130/Math.max(XLsum,XCsum,Math.abs(Xsum)):Infinity,Z>0?330/Z:Infinity),safeS=Number.isFinite(s)?s:1,rx=x0+Rsum*safeS,finalY=y0-Xsum*safeS;
-    let px=x0;Rparts.forEach((part,n)=>{const nx=px+part.R*safeS;arrow(root,px,y0,part.R*safeS,0,part.color,'',.5);text(root,(px+nx)/2,y0+22+(n%2)*12,`${part.xPrefix}${part.index}`,'vector-label',part.color,'middle');px=nx;});
-    let vy=y0;Lparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy-len;arrow(root,rx,vy,len,90,part.color,'',.5);text(root,rx+16,(vy+nextY)/2+4,`${part.xPrefix}${part.index}`,'vector-label',part.color,'start');vy=nextY;});
-    Cparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy+len;arrow(root,rx,vy,len,-90,part.color,'',.5);text(root,rx+16,(vy+nextY)/2+4,`${part.xPrefix}${part.index}`,'vector-label',part.color,'start');vy=nextY;});
+    const rLabelY=Xsum<0?y0-14:y0+22;
+    let px=x0;Rparts.forEach(part=>{const nx=px+part.R*safeS;arrow(root,px,y0,part.R*safeS,0,part.color,'',.5);text(root,(px+nx)/2,rLabelY,`${part.xPrefix}${part.index}`,'vector-label',part.color,'middle');px=nx;});
+    let vy=y0;Lparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy-len;arrow(root,rx,vy,len,90,part.color,'',.5);subscriptText(root,rx+16,(vy+nextY)/2+4,'X',`L${part.index}`,'vector-label',part.color,'start');vy=nextY;});
+    Cparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy+len;arrow(root,rx,vy,len,-90,part.color,'',.5);subscriptText(root,rx+16,(vy+nextY)/2+4,'X',`C${part.index}`,'vector-label',part.color,'start');vy=nextY;});
     if(Math.abs(Xsum)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const zEnd=arrow(root,x0,y0,Z*safeS,phi,VOLTAGE_COLOR,'',.8);text(root,(x0+zEnd.x)/2,(y0+zEnd.y)/2+(Xsum>=0?-13:22),'Z','vector-label',VOLTAGE_COLOR,'middle');
     const rows=[...parts.map(part=>({name:`${part.xPrefix}${part.index}`,value:part.type==='R'?part.R:Math.abs(part.X),color:part.color})),{name:'Z',value:Z,color:VOLTAGE_COLOR}],boxX=500,boxY=28,row=18,colGap=90;root.append(svg('rect',{x:boxX-14,y:boxY-18,width:190,height:Math.min(224,36+Math.ceil(rows.length/2)*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,boxX,boxY,'Værdier','parallel-state','#8f9da6');rows.forEach((item,index)=>{const col=index>=Math.ceil(rows.length/2)?1:0,r=col?index-Math.ceil(rows.length/2):index,x=boxX+col*colGap,y=boxY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:item.color}));text(root,x,y,`${item.name} ${da(item.value,1)} Ω`,'vector-label',item.color,'start');});
     text(root,50,330,'R-komponenter ligger på x-aksen; X-komponenter tegnes lodret fra R-summen.','vector-label','#778791');return;
