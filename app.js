@@ -31,8 +31,8 @@ const subscriptText = (root,x,y,main,sub,cls='vector-label',color='#aab6be',anch
 };
 function arrow(root, cx, cy, length, angle, color, label, scale=1){
   const a=rad(angle), ex=cx+length*Math.cos(a), ey=cy-length*Math.sin(a);
-  const g=svg('g'); g.append(svg('line',{x1:cx,y1:cy,x2:ex,y2:ey,class:'vector',stroke:color}));
-  const back=10*scale, wing=5*scale;
+  const g=svg('g'); g.append(svg('line',{x1:cx,y1:cy,x2:ex,y2:ey,class:'vector',stroke:color,'stroke-linecap':'butt'}));
+  const back=Math.max(8,10*scale), wing=Math.max(4.5,5*scale);
   const p1=[ex,ey],p2=[ex-back*Math.cos(a)+wing*Math.sin(a),ey+back*Math.sin(a)+wing*Math.cos(a)],p3=[ex-back*Math.cos(a)-wing*Math.sin(a),ey+back*Math.sin(a)-wing*Math.cos(a)];
   g.append(svg('polygon',{points:`${p1.join(',')} ${p2.join(',')} ${p3.join(',')}`,fill:color}));
   g.append(svg('text',{x:ex+12*Math.cos(a),y:ey-12*Math.sin(a),fill:color,class:'vector-label','text-anchor':Math.cos(a)<-.2?'end':'start'},label)); root.append(g); return {x:ex,y:ey};
@@ -105,7 +105,7 @@ function drawAc(){
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
   const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,uAngle,VOLTAGE_COLOR,`U = ${da(U,0)} V`);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,1)} A`);
-  if(phi!==0){const r=42,sweep=phi>0?0:1,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+phi/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φI ${phi>0?'+':'−'}${da(Math.abs(phi),0)}°`,'vector-label','#778791','middle');}
+  if(phi!==0){const r=42,sweep=phi>0?0:1,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+phi/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φ = ${da(Math.abs(phi),0)}°`,'vector-label','#778791','middle');}
   drawWaves(U,I,f,phi);
 }
 function drawWaves(U,I,f,phi){
@@ -153,7 +153,7 @@ function drawRlc(){
   const {U,f,R,L,C,XL,XC,components}=seriesValues(),X=XL-XC,Z=Math.hypot(R,X),I=Z?U/Z:0,zAngle=deg(Math.atan2(X,R)),currentAngle=-zAngle,P=I*I*R,hasL=XL>.00001,hasC=XC>.00001,isResonant=hasL&&hasC&&Math.abs(X)<.05;drawSeriesCircuit(components);
   $('seriesInputTitle').textContent=`${seriesComponentCount} komponent${seriesComponentCount===1?'':'er'} i serie`;$('seriesCircuitTitle').textContent=`${seriesComponentCount} komponent${seriesComponentCount===1?'':'er'} i vandret serie`;
   let seriesFlow='';components.forEach((component,index)=>{const term=component.type==='R'?`R<sub>${component.index}</sub>`:component.type==='L'?`X<sub>L${component.index}</sub>`:`X<sub>C${component.index}</sub>`,operator=index===0?'':component.type==='C'?'<i>−</i>':'<i>+</i>';seriesFlow+=`${operator}<span>${term}</span>`;});$('seriesEquationFlow').innerHTML=`${seriesFlow}<i>→</i><span>Z</span>`;
-  const signedCurrentAngle=Math.abs(currentAngle)<.05?'0,0':`${currentAngle>0?'+':'−'}${da(Math.abs(currentAngle),1)}`;$('rlcXL').textContent=unit(XL,'Ω');$('rlcXC').textContent=unit(XC,'Ω');$('rlcZ').textContent=unit(Z,'Ω');$('rlcI').textContent=unit(I,'A',2);$('rlcPhi').textContent=`${signedCurrentAngle} °`;$('rlcP').textContent=power(P);$('rlcPhiText').textContent=`φI = ${signedCurrentAngle}°`;$('rlcNature').textContent=isResonant?'Resonans: spænding og strøm i fase':Math.abs(X)<.05?'Resistiv: spænding og strøm i fase':X>0?'Induktiv: strømmen halter efter':'Kapacitiv: strømmen er foran';
+  const signedCurrentAngle=Math.abs(currentAngle)<.05?'0,0':`${currentAngle>0?'+':'−'}${da(Math.abs(currentAngle),1)}`;$('rlcXL').textContent=unit(XL,'Ω');$('rlcXC').textContent=unit(XC,'Ω');$('rlcZ').textContent=unit(Z,'Ω');$('rlcI').textContent=unit(I,'A',2);$('rlcPhi').textContent=`${signedCurrentAngle} °`;$('rlcP').textContent=power(P);$('rlcPhiText').textContent=`φ = ${signedCurrentAngle}°`;$('rlcNature').textContent=isResonant?'Resonans: spænding og strøm i fase':Math.abs(X)<.05?'Resistiv: spænding og strøm i fase':X>0?'Induktiv: strømmen halter efter':'Kapacitiv: strømmen er foran';
   drawSeriesVoltageDiagram($('rlcPhasor'),components,R,X,U,I,zAngle,f);
   drawSeriesUIPhasor(U,I,zAngle);drawImpedanceTriangle(R,XL,XC,X,Z,zAngle,components,f);
   const ratio=clamp(X/(Math.abs(XL)+Math.abs(XC)+.001),-.5,.5);$('resonanceNeedle').style.left=`${50+ratio*92}%`;const f0=Number.isFinite(C)&&L>0&&C>0?1/(2*Math.PI*Math.sqrt(L*C)):0;$('resonanceTitle').textContent=!f0?'Serieresonans kræver både L og C':isResonant?'Kredsen er i resonans':'Afstand til resonans';$('resonanceText').textContent=f0?`Resonansfrekvens f₀ = ${da(f0,1)} Hz. Ved resonans er Xᴸ = Xᶜ, Z = R og strømmen størst.`:'Vælg mindst én induktiv og én kapacitiv komponent for at beregne resonans.';
@@ -162,7 +162,7 @@ function drawRlc(){
 function drawSeriesUIPhasor(U,I,phi){
   const root=$('seriesUIPhasor'),cx=260,cy=190,currentAngle=-phi,iAngle=90+currentAngle;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,90,VOLTAGE_COLOR,`U = ${da(U,0)} V`,.85);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,2)} A`,.85);
-  if(Math.abs(currentAngle)>.05){const r=42,sweep=currentAngle<0?1:0,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+currentAngle/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φI ${currentAngle>0?'+':'−'}${da(Math.abs(currentAngle),1)}°`,'vector-label','#778791','middle');}
+  if(Math.abs(currentAngle)>.05){const r=42,sweep=currentAngle<0?1:0,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+currentAngle/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φ = ${da(Math.abs(currentAngle),1)}°`,'vector-label','#778791','middle');}
   $('seriesUIAngle').textContent=`I∠${Math.abs(currentAngle)<.05?'0':currentAngle>0?'+'+da(Math.abs(currentAngle),1):'−'+da(Math.abs(currentAngle),1)}°`;
 }
 
@@ -174,7 +174,7 @@ function drawSeriesVoltageDiagram(root,components,R,X,U,I,phi,f){
     arrow(root,x0,y0,Math.abs(UR)*s,UR>=0?0:180,'#9b87f5','',.85);text(root,(x0+ex)/2,y0+24,`U_R = ${da(UR,1)} V`,'vector-label','#9b87f5','middle');
     line(root,ex,y0,ex,ey,'vector','#ff9f43');text(root,ex+14,(y0+ey)/2+4,`U_X = ${da(UX,1)} V`,'vector-label','#ff9f43');
     const uEnd=arrow(root,x0,y0,U*s,phi,VOLTAGE_COLOR,'',.85);text(root,uEnd.x+12,uEnd.y+(phi>=0?-12:20),`U = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR);
-    if(Math.abs(phi)>.5){const r=42,sweep=phi>0?0:1,endX=x0+r*Math.cos(rad(phi)),endY=y0-r*Math.sin(rad(phi)),mid=phi/2;root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58*Math.cos(rad(mid)),y0-58*Math.sin(rad(mid))+(phi>0?-3:14),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','middle');}
+    if(Math.abs(phi)>.5){const r=42,sweep=phi>0?0:1,endX=x0+r*Math.cos(rad(phi)),endY=y0-r*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58,y0+(phi<0?36:-24),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','middle');}
     return;
   }
   const URparts=parts.filter(p=>p.type==='R'),Lparts=parts.filter(p=>p.type==='L'),Cparts=parts.filter(p=>p.type==='C'),URsum=URparts.reduce((sum,p)=>sum+p.Ux,0),ULsum=Lparts.reduce((sum,p)=>sum+Math.abs(p.Uy),0),UCsum=Cparts.reduce((sum,p)=>sum+Math.abs(p.Uy),0),UX=ULsum-UCsum;
@@ -183,7 +183,7 @@ function drawSeriesVoltageDiagram(root,components,R,X,U,I,phi,f){
   let px=x0;URparts.forEach(part=>{const nx=px+part.Ux*safeS;arrow(root,px,y0,part.Ux*safeS,0,part.color,'',.5);subscriptText(root,(px+nx)/2,rLabelY,'U',`R${part.index}`,'vector-label',part.color,'middle');px=nx;});
   let vy=y0;Lparts.forEach(part=>{const len=Math.abs(part.Uy)*safeS,nextY=vy-len;arrow(root,rx,vy,len,90,part.color,'',.5);subscriptText(root,rx+18,(vy+nextY)/2+4,'U',`L${part.index}`,'vector-label',part.color,'start');vy=nextY;});
   Cparts.forEach(part=>{const len=Math.abs(part.Uy)*safeS,nextY=vy+len;arrow(root,rx,vy,len,-90,part.color,'',.5);subscriptText(root,rx+18,(vy+nextY)/2+4,'U',`C${part.index}`,'vector-label',part.color,'start');vy=nextY;});
-  if(Math.abs(UX)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const compPhi=deg(Math.atan2(UX,URsum||.000001)),uEnd=arrow(root,x0,y0,U*safeS,compPhi,VOLTAGE_COLOR,'',.8);subscriptText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','samlet','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(compPhi)>.5){const r=42,sweep=compPhi>0?0:1,endX=x0+r*Math.cos(rad(compPhi)),endY=y0-r*Math.sin(rad(compPhi)),mid=compPhi/2;root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58*Math.cos(rad(mid)),y0-58*Math.sin(rad(mid))+(compPhi>0?-3:14),`φ = ${da(Math.abs(compPhi),1)}°`,'vector-label','#82909a','middle');}
+  if(Math.abs(UX)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const compPhi=deg(Math.atan2(UX,URsum||.000001)),uEnd=arrow(root,x0,y0,U*safeS,compPhi,VOLTAGE_COLOR,'',.8);subscriptText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','samlet','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(compPhi)>.5){const r=42,sweep=compPhi>0?0:1,endX=x0+r*Math.cos(rad(compPhi)),endY=y0-r*Math.sin(rad(compPhi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58,y0+(compPhi<0?36:-24),`φ = ${da(Math.abs(compPhi),1)}°`,'vector-label','#82909a','middle');}
   const rows=[...parts.map(part=>({main:'U',sub:`${part.type}${part.index}`,value:part.type==='R'?part.Ux:Math.abs(part.Uy),color:part.color})),{main:'U',sub:'samlet',value:U,color:VOLTAGE_COLOR}],boxX=500,boxY=28,row=18,colGap=92,split=Math.ceil(rows.length/2);root.append(svg('rect',{x:boxX-14,y:boxY-18,width:206,height:Math.min(146,34+split*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,boxX,boxY,'Værdier','parallel-state','#8f9da6');rows.forEach((item,index)=>{const col=index>=split?1:0,r=col?index-split:index,x=boxX+col*colGap,y=boxY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:item.color}));subscriptText(root,x,y,item.main,item.sub,'vector-label',item.color,'start');text(root,x+36,y,`${da(item.value,1)} V`,'vector-label',item.color,'start');});
   text(root,50,330,'R-komponenter ligger på x-aksen; reaktanserne tegnes lodret fra R-summen.','vector-label','#778791');
 }
@@ -217,7 +217,7 @@ function drawImpedanceTriangle(R,XL,XC,X,Z,phi,components=[],f=50){
   text(root,(x0+rx)/2,y0+(X<0?-12:22),`R = ${da(R,1)} Ω`,'vector-label','#9b87f5','middle');
   text(root,rx+10,(y0+xy)/2+4,`X = ${da(X,1)} Ω`,'vector-label','#ff9f43');
   line(root,x0,xy,rx,xy,'guide');
-  if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+50,y0+(phi>0?-9:31),`∠Z ${phi>0?'+':''}${da(phi,1)}°`,'vector-label','#83919a');}
+  if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+50,y0+(phi>0?-9:31),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#83919a');}
   if(Math.abs(X)<.05)text(root,rx+18,y0-10,isResonant?'X = 0  |  resonans':'X = 0  |  resistiv','impedance-zero','#55d6a1');
 }
 
