@@ -328,7 +328,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[]){
   root.append(svg('polygon',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:voltageColor,'stroke-width':1.9}));
   line(root,neutral[0],neutral[1],top[0],top[1],'guide',voltageColor);line(root,neutral[0],neutral[1],right[0],right[1],'guide',voltageColor);line(root,neutral[0],neutral[1],left[0],left[1],'guide',voltageColor);
   text(root,top[0]+12,top[1]+12,'U_L1','vector-label',voltageColor);text(root,right[0]-10,right[1]+22,'U_L2','vector-label',voltageColor,'end');text(root,left[0]+8,left[1]-8,'U_L3','vector-label',voltageColor);
-  const refs=connection==='D'?[104,-10,226]:[96,-24,216],names=connection==='D'?['I₁₂','I₂₃','I₃₁']:['I₁₀','I₂₀','I₃₀'],value=connection==='D'?If:In;
+  const refs=[90,-30,-150],names=connection==='D'?['I₁₂','I₂₃','I₃₁']:['I₁₀','I₂₀','I₃₀'],value=connection==='D'?If:In;
   const branchCurrents=parts.map((part,i)=>{const z=Math.hypot(part.R,part.X),angle=z?-deg(Math.atan2(part.X,part.R)):0,val=z?Uf/z:0;return {...part,name:`I${subscriptNumber(part.index)}`,value:val,angle,color:branchColors[i%branchColors.length]};}),branchSumX=branchCurrents.reduce((sum,b)=>sum+b.value*Math.cos(rad(b.angle)),0),branchSumY=branchCurrents.reduce((sum,b)=>sum+b.value*Math.sin(rad(b.angle)),0),branchTotal=Math.hypot(branchSumX,branchSumY),branchPhi=branchTotal?deg(Math.atan2(branchSumY,branchSumX)):0,showBranches=threeLoadVectorMode==='branches'&&branchCurrents.length>1;
   pts.forEach((p,i)=>{
     const ref=refs[i],totalAngle=showBranches?ref+branchPhi:ref-phi,refEnd={x:p[0]+62*Math.cos(rad(ref)),y:p[1]-62*Math.sin(rad(ref))};
@@ -337,7 +337,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[]){
       const maxI=Math.max(branchTotal,...branchCurrents.map(b=>b.value),.001),baseLen=64;
       branchCurrents.forEach((b,k)=>{const len=Math.max(18,b.value/maxI*baseLen),startOffset=(k-(branchCurrents.length-1)/2)*4,a=rad(ref+b.angle+90),sx=p[0]+startOffset*Math.cos(a),sy=p[1]-startOffset*Math.sin(a);arrow(root,sx,sy,len,ref+b.angle,b.color,'',.45);});
       const totalLen=Math.max(30,branchTotal/maxI*78),end=arrow(root,p[0],p[1],totalLen,totalAngle,currentColors[i],'',.82),anchor=end.x<p[0]?'end':'start';
-      text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`${names[i]}Σ`,'vector-label',currentColors[i],anchor);
+      text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`Σ${names[i]}`,'vector-label',currentColors[i],anchor);
     }else{
       const end=arrow(root,p[0],p[1],74,totalAngle,currentColors[i],'',.78),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`${names[i]} = ${da(value,2)} A`,'vector-label',currentColors[i],anchor);
@@ -346,7 +346,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[]){
     if(Math.abs(shownPhi)>.2){const r=25,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(totalAngle)),y:p[1]-r*Math.sin(rad(totalAngle))},sweep=shownPhi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ`,'vector-label','#8c9aa3','middle');}
   });
   if(showBranches){
-    const lx=500,ly=55,row=18;root.append(svg('rect',{x:lx-14,y:ly-18,width:178,height:38+row*(branchCurrents.length+1),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,'Værdier i én fase','parallel-state','#8f9da6');branchCurrents.forEach((b,k)=>{const y=ly+24+k*row;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:b.color}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(b.angle,0)}°`,'vector-label',b.color);});const y=ly+24+branchCurrents.length*row;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:CURRENT_COLOR}));text(root,lx,y,`IΣ ${da(branchTotal,2)} A ∠${da(branchPhi,0)}°`,'vector-label',CURRENT_COLOR);
+    const lx=500,ly=55,row=18;root.append(svg('rect',{x:lx-14,y:ly-18,width:178,height:38+row*(branchCurrents.length+1),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,'Værdier i én fase','parallel-state','#8f9da6');branchCurrents.forEach((b,k)=>{const y=ly+24+k*row;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:b.color}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(b.angle,0)}°`,'vector-label',b.color);});const y=ly+24+branchCurrents.length*row;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:CURRENT_COLOR}));text(root,lx,y,`ΣI ${da(branchTotal,2)} A ∠${da(branchPhi,0)}°`,'vector-label',CURRENT_COLOR);
   }
   text(root,640,365,showBranches?'Alle komponentstrømme vises i værdiboksen.':connection==='D'?`Δ: Iₙ = √3 · I_f = ${da(In,2)} A`:`Y: Iₙ = I_f = ${da(In,2)} A`,'vector-label','#8f9da6','end');
 }
