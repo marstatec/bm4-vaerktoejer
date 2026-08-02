@@ -241,7 +241,7 @@ function drawParallelVectorDiagram(branches,I,currentAngle,phi,state){
   const uEnd=arrow(root,cx,cy,150,90,VOLTAGE_COLOR,'',.75);text(root,uEnd.x-12,uEnd.y-8,'U som reference','vector-label',VOLTAGE_COLOR,'end');
   if(parallelVectorMode==='branches'){
     if(parallelInputMode==='currents'){
-      let px=cx,py=cy;branches.forEach((b,index)=>{const len=b.value*s,angle=90+b.angle,ex=px+len*Math.cos(rad(angle)),ey=py-len*Math.sin(rad(angle));arrow(root,px,py,len,angle,b.color,'',.52);if(index<10)text(root,(px+ex)/2+(index%2?16:-16),(py+ey)/2+(index%2?13:-9),`${b.name}`,'vector-label',b.color,index%2?'start':'end');px=ex;py=ey;});branchEnd={x:px,y:py};
+      let px=cx,py=cy;branches.forEach(b=>{const len=b.value*s,angle=90+b.angle,a=rad(angle),ex=px+len*Math.cos(a),ey=py-len*Math.sin(a),mx=(px+ex)/2,my=(py+ey)/2,nx=Math.sin(a),ny=Math.cos(a);arrow(root,px,py,len,angle,b.color,'',.52);text(root,mx+nx*16,my+ny*16+4,`${b.name}`,'vector-label',b.color,'middle');px=ex;py=ey;});branchEnd={x:px,y:py};
     }else{
       let px=cx,py=cy;const rLabelRight=state==='capacitive'||state==='resistive';const drawStack=(items,angle,side)=>items.forEach((b,n)=>{const len=b.value*s,ex=px+len*Math.cos(rad(angle)),ey=py-len*Math.sin(rad(angle));arrow(root,px,py,len,angle,b.color,'',.52);if(side==='R')text(root,px+(rLabelRight?18:-18),(py+ey)/2+4,b.name,'vector-label',b.color,rLabelRight?'start':'end');else text(root,(px+ex)/2,(py+ey)/2+(side==='L'?-12:20),b.name,'vector-label',b.color,'middle');px=ex;py=ey;});
       drawStack(branches.filter(b=>b.type==='R'),90,'R');drawStack(branches.filter(b=>b.type==='L'),0,'L');drawStack(branches.filter(b=>b.type==='C'),180,'C');line(root,cx,py,px,py,'guide');text(root,58,326,'Grenstrømmene lægges hale-til-spids: R på y-aksen, L mod højre, C mod venstre.','parallel-state','#8f9da6');
@@ -251,7 +251,7 @@ function drawParallelVectorDiagram(branches,I,currentAngle,phi,state){
   }else{
     text(root,58,326,'Skift til “Grene” for at se de enkelte grenstrømme.','parallel-state','#8f9da6');
   }
-  const totalEnd=branchEnd?arrowTo(root,cx,cy,branchEnd.x,branchEnd.y,CURRENT_COLOR,'',.85):arrow(root,cx,cy,I*s,iAngle,CURRENT_COLOR,'',.85);text(root,totalEnd.x+20,totalEnd.y-20,'I','vector-label',CURRENT_COLOR,'start');
+  const totalEnd=branchEnd?arrowTo(root,cx,cy,branchEnd.x,branchEnd.y,CURRENT_COLOR,'',.85):arrow(root,cx,cy,I*s,iAngle,CURRENT_COLOR,'',.85),iLabelRight=state!=='capacitive',iLabelX=(cx+totalEnd.x)/2+(iLabelRight?20:-20),iLabelY=(cy+totalEnd.y)/2+4;text(root,iLabelX,iLabelY,'I','vector-label',CURRENT_COLOR,iLabelRight?'start':'end');
   if(Math.abs(phi)>1){const r=44,sweep=phi>0?1:0,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle));root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+42,cy+24,`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','middle');}
   text(root,648,326,state==='inductive'?'I bagefter U':state==='capacitive'?'I foran U':'I i fase med U','parallel-state','#8f9da6','end');
 }
