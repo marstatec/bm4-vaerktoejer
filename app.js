@@ -335,7 +335,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[]){
     root.append(svg('line',{x1:p[0],y1:p[1],x2:refEnd.x,y2:refEnd.y,class:'guide',stroke:'#8a98a3','stroke-dasharray':'7 6'}));
     if(showBranches){
       const maxI=Math.max(branchTotal,...branchCurrents.map(b=>b.value),.001),baseLen=64;
-      branchCurrents.forEach((b,k)=>{const len=Math.max(18,b.value/maxI*baseLen),startOffset=(k-(branchCurrents.length-1)/2)*4,a=rad(ref+b.angle+90),sx=p[0]+startOffset*Math.cos(a),sy=p[1]-startOffset*Math.sin(a);arrow(root,sx,sy,len,ref+b.angle,b.color,'',.45);});
+      branchCurrents.forEach(b=>{const len=Math.max(18,b.value/maxI*baseLen);arrow(root,p[0],p[1],len,ref+b.angle,b.color,'',.45);});
       const totalLen=Math.max(30,branchTotal/maxI*78),end=arrow(root,p[0],p[1],totalLen,totalAngle,currentColors[i],'',.82),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-8:18),`Σ${names[i]}`,'vector-label',currentColors[i],anchor);
     }else{
