@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=three-load-impedance-asym-1">
+  <link rel="stylesheet" href="styles.css?v=three-load-impedance-matrix-1">
 </head>
 <body>
   <div class="app-shell">
@@ -355,14 +355,7 @@
                 <div class="component-row" id="threeLoadComponentRow9" hidden><b>Komponent 9</b><select id="threeLoadCompType9" aria-label="Type for 3-faset komponent 9"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue9" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit9">Ω</em></label></div>
                 <div class="component-row" id="threeLoadComponentRow10" hidden><b>Komponent 10</b><select id="threeLoadCompType10" aria-label="Type for 3-faset komponent 10"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue10" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit10">Ω</em></label></div>
               </div>
-              <div class="field-grid top-gap impedance-branch-fields" id="threeLoadImpedanceFields" hidden>
-                <label><span id="threeLoadZLabel1">Impedans Z<sub>10</sub> <em>Ω</em></span><input id="threeLoadZ1" type="number" value="32.7" min="0.001" step="0.1"></label>
-                <label><span id="threeLoadPhiLabel1">Vinkel φ<sub>1</sub> <em>°</em></span><input id="threeLoadPhi1" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
-                <label><span id="threeLoadZLabel2">Impedans Z<sub>20</sub> <em>Ω</em></span><input id="threeLoadZ2" type="number" value="32.7" min="0.001" step="0.1"></label>
-                <label><span id="threeLoadPhiLabel2">Vinkel φ<sub>2</sub> <em>°</em></span><input id="threeLoadPhi2" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
-                <label><span id="threeLoadZLabel3">Impedans Z<sub>30</sub> <em>Ω</em></span><input id="threeLoadZ3" type="number" value="32.7" min="0.001" step="0.1"></label>
-                <label><span id="threeLoadPhiLabel3">Vinkel φ<sub>3</sub> <em>°</em></span><input id="threeLoadPhi3" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
-              </div>
+              <div class="component-builder impedance-phase-builder" id="threeLoadImpedanceFields" hidden></div>
               <div class="field-grid">
                 <label><span id="threeLoadVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeLoadU" type="number" value="400" min="0"></label>
                 <label><span>Frekvens f <em>Hz</em></span><input id="threeLoadF" type="number" value="50" min="0.1"></label>
@@ -513,7 +506,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=three-load-impedance-asym-1"></script>
+  <script src="app.js?v=three-load-impedance-matrix-1"></script>
 </body>
 </html>
 

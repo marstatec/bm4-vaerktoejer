@@ -1,6 +1,7 @@
 ﻿const $ = (id) => document.getElementById(id);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const num = (id, fallback = 0) => Number($(id)?.value) || fallback;
+const strictNum = (id, fallback = 0) => { const value = Number($(id)?.value); return Number.isFinite(value) ? value : fallback; };
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 const rad = d => d * Math.PI / 180;
 const deg = r => r * 180 / Math.PI;
@@ -316,8 +317,15 @@ function threeLoadParts(){
   });
 }
 function threeLoadImpedanceParts(){
-  const subs=threeLoadConnection==='Y'?['10','20','30']:['12','23','31'];
-  return [1,2,3].map((n,i)=>{const Z=Math.max(.000000001,num(`threeLoadZ${n}`)),phi=clamp(num(`threeLoadPhi${n}`),-89.9,89.9);return {index:n,type:'Z',value:Z,Zmag:Z,zAngle:phi,R:Z*Math.cos(rad(phi)),X:Z*Math.sin(rad(phi)),label:`Z${subscriptNumber(subs[i])}`,currentLabel:threeLoadConnection==='Y'?`I${subscriptNumber(subs[i])}`:`I${subscriptNumber(subs[i])}`};});
+  const subs=threeLoadConnection==='Y'?['10','20','30']:['12','23','31'],count=Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS);
+  return [0,1,2].map(phase=>{
+    const components=Array.from({length:count},(_,i)=>{
+      const component=i+1,Z=Math.max(.000000001,strictNum(`threeLoadZc${component}p${phase+1}`,32.7)),phi=clamp(strictNum(`threeLoadPhic${component}p${phase+1}`,0),-89.9,89.9);
+      return {component,branch:phase+1,type:'Z',value:Z,Zmag:Z,zAngle:phi,R:Z*Math.cos(rad(phi)),X:Z*Math.sin(rad(phi)),label:`Z${subscriptNumber(component)}${subscriptNumber(subs[phase])}`};
+    });
+    const R=components.reduce((sum,p)=>sum+p.R,0),X=components.reduce((sum,p)=>sum+p.X,0),Zmag=Math.hypot(R,X),zAngle=deg(Math.atan2(X,R));
+    return {index:phase+1,type:'Z',components,R,X,value:Zmag,Zmag,zAngle,label:`ZΣ${subscriptNumber(subs[phase])}`,currentLabel:`I${subscriptNumber(subs[phase])}`};
+  });
 }
 function vectorFrom(mag,angle){return {x:mag*Math.cos(rad(angle)),y:mag*Math.sin(rad(angle)),mag,angle};}
 function vectorSum(...vectors){const x=vectors.reduce((s,v)=>s+v.x,0),y=vectors.reduce((s,v)=>s+v.y,0);return {x,y,mag:Math.hypot(x,y),angle:deg(Math.atan2(y,x))};}
@@ -384,22 +392,26 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
 function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In,analysis=null){
   const root=$('threeLoadCircuit');clear(root);
   $('threeLoadCircuitTitle').textContent=analysis?.asym?(connection==='Y'?'Usymmetrisk stjernebelastning':'Usymmetrisk trekantbelastning'):(connection==='Y'?'Symmetrisk stjernebelastning':'Symmetrisk trekantbelastning');
-  $('threeLoadCircuitNote').textContent=analysis?.asym?'Tre separate impedanser med hver sin størrelse og vinkel. Strømmene vises ved de tilhørende lodrette grene.':`${parts.length} belastningsgruppe${parts.length===1?'':'r'} pr. fase (maks. 5 for læsbarhed). Hver gruppe svarer til komponenterne i fasegrenen; Zf = ${da(Z,1)} Ω.`;
+  $('threeLoadCircuitNote').textContent=analysis?.asym?`${threeLoadComponentCount} komponent${threeLoadComponentCount===1?'':'er'} pr. fase/side med egen Z og φ. Strømmene vises ved de tilhørende lodrette grene.`:`${parts.length} belastningsgruppe${parts.length===1?'':'r'} pr. fase (maks. 5 for læsbarhed). Hver gruppe svarer til komponenterne i fasegrenen; Zf = ${da(Z,1)} Ω.`;
   root.append(svg('rect',{x:14,y:10,width:1392,height:248,rx:10,class:'overview-board'}));
   const ys=[42,76,110,144],lineNames=['L1','L2','L3','N'],end=1384,groupStep=parts.length>1?clamp(1085/(parts.length-1),112,360):0,groupStart=parts.length===1?610:165;
   lineNames.forEach((label,i)=>{circuitText(root,50,ys[i]+5,label,'overview-label','middle');root.append(svg('line',{x1:78,y1:ys[i],x2:i===3&&connection==='D'?155:end,y2:ys[i],class:'overview-wire'}));});
   ['Iₙ₁','Iₙ₂','Iₙ₃'].forEach((label,i)=>circuitArrow(root,96,ys[i],52,0,`${label} = ${da(In,2)} A`,CURRENT_COLOR));
   if(connection==='Y')circuitArrow(root,96,ys[3],52,0,'I₀',CURRENT_COLOR);
   const loadSymbol=(part,x,y)=>{drawCompactCircuitComponent(root,part.type,x,y,0);circuitText(root,x,y+25,componentSymbol(part.type,part.index),'overview-label tiny-label','middle');};
-  const branchArrow=(x,y,len,label)=>{circuitArrow(root,x,y,len,-90,'',CURRENT_COLOR);circuitText(root,x+10,y+len/2+4,label,'circuit-current','start',CURRENT_COLOR);};
+  const branchArrow=(x,y,len,label)=>{circuitArrow(root,x,y,len,-90,'',CURRENT_COLOR);circuitText(root,x+12,y-2,label,'circuit-current','start',CURRENT_COLOR);};
+  const impedanceSeries=(branch,x1,x2,y,sub)=>{
+    const components=branch.components?.length?branch.components:[branch],count=components.length,step=(x2-x1)/(count+1);
+    components.forEach((component,k)=>{const x=x1+step*(k+1),label=component.components?component.label:`Z${subscriptNumber(component.component||k+1)}${subscriptNumber(sub)}`;drawCompactCircuitComponent(root,'Z',x,y,0);circuitText(root,x,y+25,label,'overview-label tiny-label','middle');});
+  };
   if(analysis?.asym){
-    const baseX=[440,715,990];
+    const baseX=[380,700,1020],subs=connection==='Y'?['10','20','30']:['12','23','31'];
     if(connection==='Y'){
       const labels=['I₁₀','I₂₀','I₃₀'];
-      baseX.forEach((x,i)=>{const yLine=ys[i],loadY=218;root.append(svg('circle',{cx:x,cy:yLine,r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:x+58,cy:ys[3],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:x,y1:yLine,x2:x,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:x,y1:loadY,x2:x+58,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:x+58,y1:loadY,x2:x+58,y2:ys[3],class:'overview-wire'}));branchArrow(x,yLine+12,42,labels[i]);drawCompactCircuitComponent(root,'Z',(x+x+58)/2,loadY,0);circuitText(root,(x+x+58)/2,loadY+25,analysis.parts[i].label,'overview-label tiny-label','middle');});
+      baseX.forEach((x,i)=>{const yLine=ys[i],loadY=218,x2=x+148;root.append(svg('circle',{cx:x,cy:yLine,r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:x2,cy:ys[3],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:x,y1:yLine,x2:x,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:x,y1:loadY,x2:x2,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:x2,y1:loadY,x2:x2,y2:ys[3],class:'overview-wire'}));branchArrow(x,yLine+12,42,labels[i]);impedanceSeries(analysis.parts[i],x,x2,loadY,subs[i]);});
     }else{
-      const branches=[{from:0,to:1,x1:430,x2:520,label:'I₁₂',zi:0},{from:1,to:2,x1:690,x2:780,label:'I₂₃',zi:1},{from:2,to:0,x1:950,x2:1080,label:'I₃₁',zi:2}];
-      branches.forEach(b=>{const loadY=218;root.append(svg('circle',{cx:b.x1,cy:ys[b.from],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:b.x2,cy:ys[b.to],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:b.x1,y1:ys[b.from],x2:b.x1,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x1,y1:loadY,x2:b.x2,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x2,y1:loadY,x2:b.x2,y2:ys[b.to],class:'overview-wire'}));branchArrow(b.x1,ys[b.from]+14,46,b.label);drawCompactCircuitComponent(root,'Z',(b.x1+b.x2)/2,loadY,0);circuitText(root,(b.x1+b.x2)/2,loadY+25,analysis.parts[b.zi].label,'overview-label tiny-label','middle');});
+      const branches=[{from:0,to:1,x1:400,x2:575,label:'I₁₂',zi:0},{from:1,to:2,x1:665,x2:840,label:'I₂₃',zi:1},{from:2,to:0,x1:930,x2:1145,label:'I₃₁',zi:2}];
+      branches.forEach(b=>{const loadY=218;root.append(svg('circle',{cx:b.x1,cy:ys[b.from],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:b.x2,cy:ys[b.to],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:b.x1,y1:ys[b.from],x2:b.x1,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x1,y1:loadY,x2:b.x2,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x2,y1:loadY,x2:b.x2,y2:ys[b.to],class:'overview-wire'}));branchArrow(b.x1,ys[b.from]+14,46,b.label);impedanceSeries(analysis.parts[b.zi],b.x1,b.x2,loadY,subs[b.zi]);});
     }
     return;
   }
@@ -553,13 +565,28 @@ function syncComponentBuilders(){
   $('seriesComponentBuilder').classList.remove('current-entry-mode');for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=seriesComponentCount,type=$(`seriesCompType${i}`).value;$(`seriesComponentRow${i}`).hidden=!active;$(`seriesCompUnit${i}`).textContent=componentUnit(type,seriesInputMode);}$$('#seriesComponentCount button').forEach(b=>b.classList.toggle('active',Number(b.dataset.count)===seriesComponentCount));
   const direct=parallelInputMode==='currents';$('parallelComponentBuilder').classList.toggle('current-entry-mode',direct);for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=parallelComponentCount,type=$(`parallelCompType${i}`).value,name=currentSymbol(type,i);$(`parallelComponentRow${i}`).hidden=!active;$(`parallelCompUnit${i}`).textContent=componentUnit(type,parallelInputMode);$(`parCurrentLabel${i}`).innerHTML=`Strøm ${name} <em>A</em>`;$(`parAngleLabel${i}`).innerHTML=`Vinkel ${name} <em>°</em>`;$(`parCurrentRow${i}a`).hidden=!active;$(`parCurrentRow${i}b`).hidden=!active;}$$('#parallelComponentCount button').forEach(b=>b.classList.toggle('active',Number(b.dataset.count)===parallelComponentCount));
 }
+function renderThreeLoadImpedanceFields(){
+  const box=$('threeLoadImpedanceFields');if(!box)return;
+  const subs=threeLoadConnection==='Y'?['10','20','30']:['12','23','31'],names=threeLoadConnection==='Y'?['L1–N','L2–N','L3–N']:['L1–L2','L2–L3','L3–L1'],count=Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS),remember={};
+  for(let c=1;c<=THREE_LOAD_MAX_COMPONENTS;c++)for(let p=1;p<=3;p++){remember[`z${c}${p}`]=strictNum(`threeLoadZc${c}p${p}`,c===1?32.7:0);remember[`phi${c}${p}`]=strictNum(`threeLoadPhic${c}p${p}`,0);}
+  const rows=Array.from({length:THREE_LOAD_MAX_COMPONENTS},(_,i)=>{
+    const c=i+1,hidden=c>count?' hidden':'';
+    const cells=[0,1,2].map(p=>{
+      const z=remember[`z${c}${p+1}`]||32.7,phi=remember[`phi${c}${p+1}`]||0,sub=`${subscriptNumber(c)}${subscriptNumber(subs[p])}`;
+      return `<label class="impedance-phase-cell"><span>Z<sub>${sub}</sub> · ${names[p]}</span><input id="threeLoadZc${c}p${p+1}" type="number" value="${z}" min="0.001" step="0.1" aria-label="Impedans Z${c}${subs[p]} i ohm"><input id="threeLoadPhic${c}p${p+1}" type="number" value="${phi}" min="-89.9" max="89.9" step="0.1" aria-label="Vinkel phi ${c}${subs[p]} i grader"></label>`;
+    }).join('');
+    return `<div class="impedance-phase-row"${hidden}><b>Komponent ${c}</b>${cells}</div>`;
+  }).join('');
+  box.innerHTML=`<div class="component-builder-head"><span>Impedans pr. komponent og fase/side</span><small>Hver komponent kan få egen Z og φ i alle tre belastningsgrene.</small></div>${rows}`;
+  $$('input',box).forEach(input=>input.addEventListener('input',updateAll));
+}
 function syncThreeLoadBuilder(){
   if(!$('threeLoadComponentBuilder'))return;
   threeLoadComponentCount=Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS);
   const impedanceMode=threeLoadInputMode==='impedance';
-  $('threeLoadComponentBuilder').hidden=impedanceMode;$('threeLoadImpedanceFields').hidden=!impedanceMode;
-  for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=threeLoadComponentCount&&i<=THREE_LOAD_MAX_COMPONENTS,type=$(`threeLoadCompType${i}`).value;$(`threeLoadComponentRow${i}`).hidden=!active;$(`threeLoadCompUnit${i}`).textContent=componentUnit(type,threeLoadInputMode);}
-  const zLabels=threeLoadConnection==='Y'?['10','20','30']:['12','23','31'];zLabels.forEach((sub,i)=>{$(`threeLoadZLabel${i+1}`).innerHTML=`Impedans Z<sub>${sub}</sub> <em>Ω</em>`;$(`threeLoadPhiLabel${i+1}`).innerHTML=`Vinkel φ<sub>${sub}</sub> <em>°</em>`;});
+  $('threeLoadComponentBuilder').hidden=false;$('threeLoadImpedanceFields').hidden=!impedanceMode;
+  for(let i=1;i<=MAX_COMPONENTS;i++){const active=i<=threeLoadComponentCount&&i<=THREE_LOAD_MAX_COMPONENTS,type=$(`threeLoadCompType${i}`).value;$(`threeLoadComponentRow${i}`).hidden=impedanceMode||!active;$(`threeLoadCompUnit${i}`).textContent=componentUnit(type,threeLoadInputMode);}
+  if(impedanceMode)renderThreeLoadImpedanceFields();
   $$('#threeLoadComponentCount button').forEach(b=>b.classList.toggle('active',Number(b.dataset.count)===threeLoadComponentCount));
   $$('#threeLoadInputMode button').forEach(b=>b.classList.toggle('active',b.dataset.loadMode===threeLoadInputMode));
   $$('#threeLoadVectorMode button').forEach(b=>b.classList.toggle('active',b.dataset.threeLoadVector===threeLoadVectorMode));
@@ -604,7 +631,7 @@ $$('#transformDirection button').forEach(b=>b.addEventListener('click',()=>{$$('
 $$('#trSymDirection button').forEach(b=>b.addEventListener('click',()=>{$$('#trSymDirection button').forEach(x=>x.classList.remove('active'));b.classList.add('active');transformSymDirection=b.dataset.symTransform;drawTransformation();}));
 function activatePage(id,push=true){const page=$(id)||$('vekselstroem');$$('.page').forEach(p=>p.classList.toggle('active',p===page));$$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page.id));$('pageTitle').textContent=page.dataset.title;if(push)history.replaceState(null,'',`#${page.id}`);document.body.classList.remove('menu-open');$('menuButton').setAttribute('aria-expanded','false');window.scrollTo({top:0,behavior:'auto'});if(typeof updateAll==='function')updateAll();}
 $$('.nav-item').forEach(b=>b.addEventListener('click',()=>activatePage(b.dataset.page)));$('menuButton').addEventListener('click',()=>{const open=document.body.classList.toggle('menu-open');$('menuButton').setAttribute('aria-expanded',String(open));});
-$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;seriesVoltageMode='total';seriesImpedanceMode='total';}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;parallelVectorMode='total';}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset-belastning'){threeLoadConnection='Y';threeLoadVoltageType='line';threeLoadInputMode='components';threeLoadComponentCount=3;$$('#threeLoadConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeLoadVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeLoadInputMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';transformSymDirection='star-delta';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#trSymDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';ohmPowerMode='simple';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
+$('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(!active)return;$$('input',active).forEach(i=>{if(defaults[i.id]!==undefined)i.value=defaults[i.id];else if(i.defaultValue!==undefined)i.value=i.defaultValue;});$$('select',active).forEach(s=>{if(selectDefaults[s.id]!==undefined)s.value=selectDefaults[s.id];});if(active.id==='serie'){seriesInputMode='components';seriesComponentCount=3;seriesVoltageMode='total';seriesImpedanceMode='total';}if(active.id==='parallel'){parallelInputMode='components';parallelComponentCount=3;parallelVectorMode='total';}if(active.id==='effekt'){powerMode=1;$$('#powerMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset'){threeConnection='Y';threeVoltageType='line';threeCurrentView='line';$$('#threeConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeCurrentType button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='trefaset-belastning'){threeLoadConnection='Y';threeLoadVoltageType='line';threeLoadInputMode='components';threeLoadComponentCount=3;$$('#threeLoadConnection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeLoadVoltageType button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#threeLoadInputMode button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='transformation'){transformDirection='delta-star';transformSymDirection='star-delta';$$('#transformDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));$$('#trSymDirection button').forEach((b,i)=>b.classList.toggle('active',i===0));}if(active.id==='ellove'){ohmTarget='U';ohmPowerMode='simple';$$('#ohmTarget button').forEach((b,i)=>b.classList.toggle('active',i===0));renderOhmInputs();}syncInputModeUI();updateAll();});
 $('resetButton').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(active?.id==='trefaset-belastning'){threeLoadVectorMode='total';$$('#threeLoadVectorMode button').forEach((b,i)=>b.classList.toggle('active',i===0));drawThreeLoad();}});
 document.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const i=e.key==='0'?9:Number(e.key)-1;if(i>=0&&i<$$('.nav-item').length)activatePage($$('.nav-item')[i].dataset.page);});
 window.addEventListener('hashchange',()=>activatePage(location.hash.slice(1),false));
