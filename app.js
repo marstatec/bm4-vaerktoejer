@@ -297,7 +297,7 @@ function drawThreeDiagram(root,connection,phi,currentView){
 }
 
 function drawThreeCircuit(connection){
-  const root=$('threeCircuit');clear(root);const colors=['#35d3e3','#ff9f43','#9b87f5'],ys=[30,60,90];ys.forEach((y,i)=>{circuitText(root,20,y+4,`L${i+1}`,'circuit-label','middle',colors[i]);circuitWire(root,45,y,485,y,colors[i]);circuitArrow(root,62,y,34,0,`Iₗ${i+1}`);});
+  const root=$('threeCircuit');clear(root);const colors=['#35d3e3','#ff9f43','#9b87f5'],ys=[30,60,90];ys.forEach((y,i)=>{circuitText(root,20,y+4,`L${i+1}`,'circuit-label','middle',colors[i]);circuitWire(root,45,y,485,y,colors[i]);circuitArrow(root,62,y,34,0,`Iₙ${i+1}`);});
   if(connection==='Y'){
     $('threeCircuitTitle').textContent='Stjernekobling (Y)';$('threeCircuitNote').textContent='Tre ens faseimpedanser er forbundet mellem L1, L2, L3 og et fælles nulpunkt N.';circuitText(root,20,154,'N','circuit-label','middle');circuitWire(root,45,150,485,150,'#8b98a1');const xs=[180,300,420];xs.forEach((x,i)=>{circuitNode(root,x,ys[i]);circuitWire(root,x,ys[i],x,90,colors[i]);circuitResistor(root,x,120,90);circuitNode(root,x,150);circuitText(root,x+17,124,`Z${i+1}`,'circuit-label');circuitArrow(root,x,92,18,-90);subscriptText(root,x+10,104,'I',`Z${i+1}`,'circuit-current',CURRENT_COLOR);});
   }else{
@@ -360,7 +360,7 @@ function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In){
   root.append(svg('rect',{x:14,y:10,width:1392,height:248,rx:10,class:'overview-board'}));
   const ys=[42,76,110,144],lineNames=['L1','L2','L3','N'],end=1384,groupStep=parts.length>1?clamp(1085/(parts.length-1),112,360):0,groupStart=parts.length===1?610:165;
   lineNames.forEach((label,i)=>{circuitText(root,50,ys[i]+5,label,'overview-label','middle');root.append(svg('line',{x1:78,y1:ys[i],x2:i===3&&connection==='D'?155:end,y2:ys[i],class:'overview-wire'}));});
-  ['Iₗ₁','Iₗ₂','Iₗ₃'].forEach((label,i)=>circuitArrow(root,96,ys[i],52,0,`${label} = ${da(In,2)} A`,CURRENT_COLOR));
+  ['Iₙ₁','Iₙ₂','Iₙ₃'].forEach((label,i)=>circuitArrow(root,96,ys[i],52,0,`${label} = ${da(In,2)} A`,CURRENT_COLOR));
   if(connection==='Y')circuitArrow(root,96,ys[3],52,0,'I₀',CURRENT_COLOR);
   const loadSymbol=(part,x,y)=>{drawCompactCircuitComponent(root,part.type,x,y,0);circuitText(root,x,y+25,componentSymbol(part.type,part.index),'overview-label tiny-label','middle');};
   if(connection==='Y'){
