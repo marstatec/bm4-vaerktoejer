@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=three-circuit-in-label-1">
+  <link rel="stylesheet" href="styles.css?v=three-load-impedance-asym-1">
 </head>
 <body>
   <div class="app-shell">
@@ -341,7 +341,7 @@
             <article class="card controls-card">
               <div class="segmented" id="threeLoadConnection"><button class="active" data-load-connection="Y">Y: Stjerne</button><button data-load-connection="D">Δ: Trekant</button></div>
               <div class="segmented voltage-selector" id="threeLoadVoltageType"><button class="active" data-load-voltage="line">Netspænding U<sub>n</sub></button><button data-load-voltage="phase">Fasespænding U<sub>f</sub></button></div>
-              <div class="segmented input-mode-selector" id="threeLoadInputMode"><button class="active" data-load-mode="components">Induktans L og kapacitans C</button><button data-load-mode="reactance">Reaktans X<sub>L</sub> og X<sub>C</sub></button></div>
+              <div class="segmented three input-mode-selector" id="threeLoadInputMode"><button class="active" data-load-mode="components">Induktans L og kapacitans C</button><button data-load-mode="reactance">Reaktans X<sub>L</sub> og X<sub>C</sub></button><button data-load-mode="impedance">Impedans Z og vinkel φ</button></div>
               <div class="component-builder" id="threeLoadComponentBuilder">
                 <div class="component-builder-head"><span>Antal komponenter pr. fase</span><div class="segmented component-count" id="threeLoadComponentCount"><button data-count="1">1</button><button data-count="2">2</button><button class="active" data-count="3">3</button><button data-count="4">4</button><button data-count="5">5</button></div></div>
                 <div class="component-row" id="threeLoadComponentRow1"><b>Komponent 1</b><select id="threeLoadCompType1" aria-label="Type for 3-faset komponent 1"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue1" type="number" value="12" min="0" step="0.1"><em id="threeLoadCompUnit1">Ω</em></label></div>
@@ -354,6 +354,14 @@
                 <div class="component-row" id="threeLoadComponentRow8" hidden><b>Komponent 8</b><select id="threeLoadCompType8" aria-label="Type for 3-faset komponent 8"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue8" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit8">Ω</em></label></div>
                 <div class="component-row" id="threeLoadComponentRow9" hidden><b>Komponent 9</b><select id="threeLoadCompType9" aria-label="Type for 3-faset komponent 9"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue9" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit9">Ω</em></label></div>
                 <div class="component-row" id="threeLoadComponentRow10" hidden><b>Komponent 10</b><select id="threeLoadCompType10" aria-label="Type for 3-faset komponent 10"><option value="R" selected>Resistiv R</option><option value="L">Induktiv L</option><option value="C">Kapacitiv C</option></select><label class="component-value"><input id="threeLoadCompValue10" type="number" value="10" min="0" step="0.1"><em id="threeLoadCompUnit10">Ω</em></label></div>
+              </div>
+              <div class="field-grid top-gap impedance-branch-fields" id="threeLoadImpedanceFields" hidden>
+                <label><span id="threeLoadZLabel1">Impedans Z<sub>10</sub> <em>Ω</em></span><input id="threeLoadZ1" type="number" value="32.7" min="0.001" step="0.1"></label>
+                <label><span id="threeLoadPhiLabel1">Vinkel φ<sub>1</sub> <em>°</em></span><input id="threeLoadPhi1" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
+                <label><span id="threeLoadZLabel2">Impedans Z<sub>20</sub> <em>Ω</em></span><input id="threeLoadZ2" type="number" value="32.7" min="0.001" step="0.1"></label>
+                <label><span id="threeLoadPhiLabel2">Vinkel φ<sub>2</sub> <em>°</em></span><input id="threeLoadPhi2" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
+                <label><span id="threeLoadZLabel3">Impedans Z<sub>30</sub> <em>Ω</em></span><input id="threeLoadZ3" type="number" value="32.7" min="0.001" step="0.1"></label>
+                <label><span id="threeLoadPhiLabel3">Vinkel φ<sub>3</sub> <em>°</em></span><input id="threeLoadPhi3" type="number" value="0" min="-89.9" max="89.9" step="0.1"></label>
               </div>
               <div class="field-grid">
                 <label><span id="threeLoadVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeLoadU" type="number" value="400" min="0"></label>
@@ -505,7 +513,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=three-circuit-in-label-1"></script>
+  <script src="app.js?v=three-load-impedance-asym-1"></script>
 </body>
 </html>
 
