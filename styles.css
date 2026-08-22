@@ -42,7 +42,7 @@ svg text{font-family:'DM Mono',monospace}.grid-line{stroke:#22303a;stroke-width:
 #trefaset-belastning.three-load-asym-layout .controls-card{overflow:visible}
 #trefaset-belastning.three-load-asym-layout #threeLoadPhasor{height:430px}
 .phase-focus-card{grid-column:1/-1}
-#threeLoadPhaseFocus{height:340px}
+#threeLoadPhaseFocus{height:460px}
 .three-load-focus-toggle{width:260px;grid-template-columns:repeat(3,1fr)}
 .embedded-resonance{display:grid;grid-template-columns:auto minmax(180px,1fr) minmax(230px,320px);align-items:center;gap:14px;padding:14px 2px 10px}.embedded-resonance h3{margin:4px 0 0;font-size:13px}.embedded-resonance p{margin:5px 0 0;color:#76858f;font-size:10px;line-height:1.45}.embedded-resonance .resonance-meter{align-self:center}.embedded-resonance-copy{min-width:0}
 .three-load-circuit{height:190px}
