@@ -385,13 +385,13 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
       if(showBranches)phaseParts.forEach((part,k)=>{const endPart=arrow(root,p[0],p[1],Math.max(18,part.value/maxI*branchLen),part.angle,part.color,'',.42),anchor=endPart.x<p[0]?'end':'start';text(root,endPart.x+(anchor==='end'?-8:8),endPart.y+(k%2?-7:12),part.name,'vector-label',part.color,anchor);});
       const end=arrow(root,p[0],p[1],Math.max(34,lineCurrent.value/maxI*lineLen),lineCurrent.angle,CURRENT_COLOR,'',.82),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-10:18),`${lineCurrent.name}`,'vector-label',CURRENT_COLOR,anchor);
-      const shownPhi=ref-lineCurrent.angle;if(Math.abs(shownPhi)>.2){const r=24,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(lineCurrent.angle)),y:p[1]-r*Math.sin(rad(lineCurrent.angle))},sweep=shownPhi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ = ${da(Math.abs(shownPhi),1)}°`,'vector-label','#8c9aa3','middle');}
+      const shownPhi=normalizeAngle(lineCurrent.angle-ref);if(Math.abs(shownPhi)>.2){const r=24,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(lineCurrent.angle)),y:p[1]-r*Math.sin(rad(lineCurrent.angle))},sweep=shownPhi<0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ = ${da(shownPhi,1)}°`,'vector-label','#8c9aa3','middle');}
     });
     if(analysis.neutral){
       if(analysis.neutral.value>.01){const nEnd=arrow(root,neutral[0],neutral[1],Math.max(28,analysis.neutral.value/maxI*74),analysis.neutral.angle,CURRENT_COLOR,'',.72),nAnchor=nEnd.x<neutral[0]?'end':'start';text(root,nEnd.x+(nAnchor==='end'?-10:10),nEnd.y+18,`I₀ = ${da(analysis.neutral.value,2)} A`,'vector-label',CURRENT_COLOR,nAnchor);}
       else{text(root,neutral[0]+10,neutral[1]+18,'I₀ = 0 A','vector-label',CURRENT_COLOR,'start');}
     }
-    const values=showBranches?[...analysis.groupLines,...analysis.lines,analysis.neutral].filter(Boolean):[...analysis.lines,analysis.neutral].filter(Boolean),lx=556,ly=58,row=16,rows=values.length,phaseRefs=[90,-30,-150],displayAngle=b=>b.name==='I₀'?(b.value<.01?0:normalizeAngle(90-b.angle)):normalizeAngle((phaseRefs[(b.phase||1)-1]??0)-b.angle);root.append(svg('rect',{x:lx-14,y:ly-18,width:164,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(displayAngle(b),0)}°`,'vector-label',c);});
+    const values=showBranches?[...analysis.groupLines,...analysis.lines,analysis.neutral].filter(Boolean):[...analysis.lines,analysis.neutral].filter(Boolean),lx=556,ly=58,row=16,rows=values.length,phaseRefs=[90,-30,-150],displayAngle=b=>b.name==='I₀'?(b.value<.01?0:normalizeAngle(90-b.angle)):normalizeAngle(b.angle-(phaseRefs[(b.phase||1)-1]??0));root.append(svg('rect',{x:lx-14,y:ly-18,width:164,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(displayAngle(b),0)}°`,'vector-label',c);});
     text(root,640,365,connection==='M'?'Usymmetrisk: I₀ er nulstrømmen fra Y-grupperne.':connection==='D'?'Iₙ beregnes som vektorforskel: Iₙ1 = I₁₂ − I₃₁.':'Iₙ er den enkelte fasegrenstrøm i stjerne.','vector-label','#8f9da6','end');return;
   }
   const isDelta=connection==='D';
@@ -421,9 +421,9 @@ function drawThreeLoadPhaseFocus(root,analysis){
   line(root,node.x,node.y,node.x,node.y-72,'vector',VOLTAGE_COLOR);
   text(root,node.x+12,node.y-60,`${voltageNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,'start');
   text(root,node.x+12,node.y-43,'lokal spændingsreference','parallel-state',VOLTAGE_COLOR,'start');
-  const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex],showBranches=threeLoadVectorMode==='branches',neutral=analysis.neutral;
-  const visible=showBranches?[...phaseParts,total]:[total],maxI=Math.max(...visible.map(v=>v.value),neutral?.value||0,.001),scale=112/maxI;
-  const localPhi=b=>normalizeAngle(ref-b.angle),localAngle=b=>90-localPhi(b);
+  const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex],showBranches=threeLoadVectorMode==='branches';
+  const visible=showBranches?[...phaseParts,total]:[total],maxI=Math.max(...visible.map(v=>v.value),.001),scale=112/maxI;
+  const localPhi=b=>normalizeAngle(b.angle-ref),localAngle=b=>90+localPhi(b);
   const drawFocusVector=(v,k,color,isTotal=false)=>{
     const angle=localAngle(v),len=Math.max(isTotal?46:30,Math.min(isTotal?126:96,v.value*scale*(isTotal?1:.82))),nearVertical=Math.abs(Math.cos(rad(angle)))<.18,branchCount=Math.max(1,phaseParts.length),offset=isTotal?0:(k-(branchCount-1)/2)*10,perp=nearVertical?{x:offset,y:0}:{x:-offset*Math.sin(rad(angle)),y:-offset*Math.cos(rad(angle))},sx=node.x+perp.x,sy=node.y+perp.y,end=arrow(root,sx,sy,len,angle,color,'',isTotal?.9:.58),mx=sx+(end.x-sx)*.56,my=sy+(end.y-sy)*.56,anchor=Math.cos(rad(angle))<-.22?'end':'start',labelDx=nearVertical?12:(anchor==='end'?-10:10);
     text(root,mx+labelDx,my+(isTotal?-8:8),v.name,'vector-label',color,anchor);
@@ -432,18 +432,14 @@ function drawThreeLoadPhaseFocus(root,analysis){
   if(showBranches)phaseParts.forEach((part,k)=>drawFocusVector(part,k,part.color,false));
   if(total){
     const totalDraw=drawFocusVector(total,0,CURRENT_COLOR,true),phi=localPhi(total),angle=totalDraw.angle;
-    if(Math.abs(phi)>.2){const r=35,from={x:node.x,y:node.y-r},to={x:node.x+r*Math.cos(rad(angle)),y:node.y-r*Math.sin(rad(angle))},sweep=phi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,node.x+(phi>0?44:-44),node.y-25,`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#8c9aa3','middle');}
+    if(Math.abs(phi)>.2){const r=35,from={x:node.x,y:node.y-r},to={x:node.x+r*Math.cos(rad(angle)),y:node.y-r*Math.sin(rad(angle))},sweep=phi<0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,node.x+(phi>0?44:-44),node.y-25,`φ = ${da(phi,1)}°`,'vector-label','#8c9aa3','middle');}
     else text(root,node.x-38,node.y+28,'φ = 0°','vector-label','#8c9aa3','middle');
   }
-  if(neutral&&neutral.value>.01){
-    const nPhi=normalizeAngle(90-neutral.angle),nAngle=90-nPhi,nEnd=arrow(root,node.x,node.y+74,Math.max(30,Math.min(82,neutral.value*scale*.75)),nAngle,CURRENT_COLOR,'',.55),nAnchor=nEnd.x<node.x?'end':'start';
-    text(root,(node.x+nEnd.x)/2+(nAnchor==='end'?-10:10),(node.y+74+nEnd.y)/2+14,`I₀ ∠${da(nPhi,0)}°`,'vector-label',CURRENT_COLOR,nAnchor);
-  }
-  const values=[...visible,neutral].filter(Boolean),lx=522,ly=58,row=18;root.append(svg('rect',{x:lx-14,y:ly-18,width:182,height:38+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');
-  values.forEach((b,k)=>{const y=ly+24+k*row,isNeutral=b.name==='I₀',angle=isNeutral?(b.value<.01?0:normalizeAngle(90-b.angle)):localPhi(b),c=isNeutral||!b.name.includes('.')?CURRENT_COLOR:b.color;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(angle,0)}°`,'vector-label',c);});
+  const values=visible.filter(Boolean),lx=522,ly=58,row=18;root.append(svg('rect',{x:lx-14,y:ly-18,width:182,height:38+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');
+  values.forEach((b,k)=>{const y=ly+24+k*row,angle=localPhi(b),c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(angle,0)}°`,'vector-label',c);});
   text(root,670,288,showBranches?'Zoom på valgt fase: enkeltstrømme og resultant adskilles lidt for læsbarhed.':'Zoom på valgt fase: kun resultant vises.','vector-label','#8f9da6','end');
   $('threeLoadFocusTitle').textContent=`Fase ${phase}: zoom på strømvektorer`;
-  $('threeLoadFocusNote').textContent=`Vinklerne er målt fra fase ${phase}s egen spændingsreference. I₀ måles fra lodret nulreference.`;
+  $('threeLoadFocusNote').textContent=`Vinklerne er målt fra fase ${phase}s egen spændingsreference. Nulstrømmen vises kun i hoveddiagrammet.`;
 }
 
 function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In,analysis=null){
