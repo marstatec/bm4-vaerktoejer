@@ -321,8 +321,8 @@ function threeLoadImpedanceParts(){
   return Array.from({length:count},(_,i)=>{
     const index=i+1,connection=threeLoadConnection==='M'?($(`threeLoadGroupConn${index}`)?.value||'Y'):threeLoadConnection,subs=connection==='Y'?['10','20','30']:['12','23','31'],names=connection==='Y'?['I₁₀','I₂₀','I₃₀']:['I₁₂','I₂₃','I₃₁'];
     const branches=[0,1,2].map(phase=>{
-      const Z=Math.max(.000000001,strictNum(`threeLoadZc${index}p${phase+1}`,32.7)),phi=clamp(strictNum(`threeLoadPhic${index}p${phase+1}`,0),-89.9,89.9);
-      return {group:index,phase:phase+1,type:'Z',value:Z,Zmag:Z,zAngle:phi,R:Z*Math.cos(rad(phi)),X:Z*Math.sin(rad(phi)),label:`Z${subscriptNumber(index)}${subscriptNumber(subs[phase])}`,currentName:names[phase],sub:subs[phase]};
+      const zInput=$(`threeLoadZc${index}p${phase+1}`),raw=zInput?String(zInput.value).trim():'32.7',zValue=Number(raw),enabled=$(`threeLoadActivec${index}p${phase+1}`)?.checked??true,active=enabled&&raw!==''&&Number.isFinite(zValue)&&zValue>0,Z=active?zValue:Infinity,phi=active?clamp(strictNum(`threeLoadPhic${index}p${phase+1}`,0),-89.9,89.9):0;
+      return {group:index,phase:phase+1,type:'Z',active,value:active?Z:0,Zmag:Z,zAngle:phi,R:active?Z*Math.cos(rad(phi)):0,X:active?Z*Math.sin(rad(phi)):0,label:`Z${subscriptNumber(index)}${subscriptNumber(subs[phase])}`,currentName:names[phase],sub:subs[phase]};
     });
     const R=branches.reduce((sum,p)=>sum+p.R,0),X=branches.reduce((sum,p)=>sum+p.X,0),Zmag=Math.hypot(R,X),zAngle=deg(Math.atan2(X,R));
     return {index,connection,branches,R,X,value:Zmag,Zmag,zAngle,label:`Gruppe ${index}`};
@@ -343,13 +343,13 @@ function threeLoadAsymAnalysis(Uf,Un){
   let P=0,Q=0;
   groups.forEach((group,gIndex)=>{
     const sourceU=group.connection==='Y'?Uf:Un;
-    const b=group.branches.map((branch,i)=>{const value=sourceU/branch.Zmag,angle=refs[i]-branch.zAngle,vec=vectorFrom(value,angle),item={...branch,group:group.index,connection:group.connection,name:branch.currentName,value,angle,vec,ref:refs[i],color:colors[gIndex%colors.length]};P+=sourceU*value*Math.cos(rad(branch.zAngle));Q+=sourceU*value*Math.sin(rad(branch.zAngle));branches.push(item);return item;});
+    const b=group.branches.map((branch,i)=>{const value=branch.active?sourceU/branch.Zmag:0,angle=refs[i]-branch.zAngle,vec=vectorFrom(value,angle),item={...branch,group:group.index,connection:group.connection,name:branch.currentName,value,angle,vec,ref:refs[i],color:colors[gIndex%colors.length]};if(branch.active){P+=sourceU*value*Math.cos(rad(branch.zAngle));Q+=sourceU*value*Math.sin(rad(branch.zAngle));branches.push(item);}return item;});
     const lines=group.connection==='Y'?b.map((branch,i)=>({...branch,phase:i+1,name:`Iₙ${i+1}.${group.index}`,sourceName:branch.name,value:branch.value,angle:branch.angle,vec:branch.vec,color:colors[gIndex%colors.length]})):
       [vectorSum(b[0].vec,vectorFrom(b[2].value,b[2].angle+180)),vectorSum(b[1].vec,vectorFrom(b[0].value,b[0].angle+180)),vectorSum(b[2].vec,vectorFrom(b[1].value,b[1].angle+180))]
         .map((v,i)=>({phase:i+1,name:`Iₙ${i+1}.${group.index}`,sourceName:i===0?'I₁₂−I₃₁':i===1?'I₂₃−I₁₂':'I₃₁−I₂₃',group:group.index,connection:group.connection,value:v.mag,angle:v.angle,vec:v,color:colors[gIndex%colors.length]}));
-    lines.forEach((lineCurrent,i)=>{groupLines.push(lineCurrent);lineVecs[i]=vectorSum(lineVecs[i],lineCurrent.vec);});
-    if(group.connection==='Y')b.forEach(branch=>neutralSourceVecs.push(branch.vec));
-    group.branchCurrents=b;group.lineCurrents=lines;
+    lines.forEach((lineCurrent,i)=>{lineVecs[i]=vectorSum(lineVecs[i],lineCurrent.vec);if(lineCurrent.value>.0001)groupLines.push(lineCurrent);});
+    if(group.connection==='Y')b.filter(branch=>branch.active).forEach(branch=>neutralSourceVecs.push(branch.vec));
+    group.branchCurrents=b.filter(branch=>branch.active);group.lineCurrents=lines.filter(line=>line.value>.0001);
   });
   const lines=lineVecs.map((v,i)=>({phase:i+1,name:`Iₙ${i+1}`,value:v.mag,angle:v.angle,vec:v,color:CURRENT_COLOR}));
   const neutralSource=vectorSum(...neutralSourceVecs),neutralVec=vectorFrom(neutralSource.mag,neutralSource.angle+180),neutral={name:'I₀',value:neutralVec.mag,angle:neutralVec.angle,vec:neutralVec,color:CURRENT_COLOR};
@@ -465,10 +465,10 @@ function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In,analysis=null){
       const base=groupStart+idx*groupStep,loadY=221;
       if(group.connection==='Y'){
         const taps=[base,base+40,base+80];
-        taps.forEach((tap,i)=>{const neutralTap=tap+36,branch=group.branches[i];root.append(svg('circle',{cx:tap,cy:ys[i],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:neutralTap,cy:ys[3],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:tap,y1:ys[i],x2:tap,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:tap,y1:loadY,x2:neutralTap,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:neutralTap,y1:loadY,x2:neutralTap,y2:ys[3],class:'overview-wire'}));branchArrow(tap,ys[i]+12,30,branch.currentName);drawCompactCircuitComponent(root,'Z',(tap+neutralTap)/2,loadY,0);circuitText(root,(tap+neutralTap)/2,loadY+25,branch.label,'overview-label tiny-label','middle');});
+        taps.forEach((tap,i)=>{const neutralTap=tap+36,branch=group.branches[i];if(!branch.active)return;root.append(svg('circle',{cx:tap,cy:ys[i],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:neutralTap,cy:ys[3],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:tap,y1:ys[i],x2:tap,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:tap,y1:loadY,x2:neutralTap,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:neutralTap,y1:loadY,x2:neutralTap,y2:ys[3],class:'overview-wire'}));branchArrow(tap,ys[i]+12,30,branch.currentName);drawCompactCircuitComponent(root,'Z',(tap+neutralTap)/2,loadY,0);circuitText(root,(tap+neutralTap)/2,loadY+25,branch.label,'overview-label tiny-label','middle');});
       }else{
         const branches=[{from:0,to:1,x1:base,x2:base+35,zi:0},{from:1,to:2,x1:base+46,x2:base+81,zi:1},{from:2,to:0,x1:base+92,x2:base+127,zi:2}];
-        branches.forEach(b=>{const branch=group.branches[b.zi];root.append(svg('circle',{cx:b.x1,cy:ys[b.from],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:b.x2,cy:ys[b.to],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:b.x1,y1:ys[b.from],x2:b.x1,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x1,y1:loadY,x2:b.x2,y2:loadY,class:'overview-wire'}));branchArrow(b.x1,ys[b.from]+16,38,branch.currentName);drawCompactCircuitComponent(root,'Z',(b.x1+b.x2)/2,loadY,0);circuitText(root,(b.x1+b.x2)/2,loadY+25,branch.label,'overview-label tiny-label','middle');root.append(svg('line',{x1:b.x2,y1:loadY,x2:b.x2,y2:ys[b.to],class:'overview-wire'}));});
+        branches.forEach(b=>{const branch=group.branches[b.zi];if(!branch.active)return;root.append(svg('circle',{cx:b.x1,cy:ys[b.from],r:2.8,class:'circuit-node'}));root.append(svg('circle',{cx:b.x2,cy:ys[b.to],r:2.8,class:'circuit-node'}));root.append(svg('line',{x1:b.x1,y1:ys[b.from],x2:b.x1,y2:loadY,class:'overview-wire'}));root.append(svg('line',{x1:b.x1,y1:loadY,x2:b.x2,y2:loadY,class:'overview-wire'}));branchArrow(b.x1,ys[b.from]+16,38,branch.currentName);drawCompactCircuitComponent(root,'Z',(b.x1+b.x2)/2,loadY,0);circuitText(root,(b.x1+b.x2)/2,loadY+25,branch.label,'overview-label tiny-label','middle');root.append(svg('line',{x1:b.x2,y1:loadY,x2:b.x2,y2:ys[b.to],class:'overview-wire'}));});
       }
     });
     return;
@@ -636,17 +636,24 @@ function syncComponentBuilders(){
 function renderThreeLoadImpedanceFields(){
   const box=$('threeLoadImpedanceFields');if(!box)return;
   const mixed=threeLoadConnection==='M',count=Math.min(threeLoadComponentCount,THREE_LOAD_MAX_COMPONENTS),remember={};
-  for(let c=1;c<=THREE_LOAD_MAX_COMPONENTS;c++){remember[`conn${c}`]=$(`threeLoadGroupConn${c}`)?.value||'Y';for(let p=1;p<=3;p++){remember[`z${c}${p}`]=strictNum(`threeLoadZc${c}p${p}`,32.7);remember[`phi${c}${p}`]=strictNum(`threeLoadPhic${c}p${p}`,0);}}
+  for(let c=1;c<=THREE_LOAD_MAX_COMPONENTS;c++){
+    remember[`conn${c}`]=$(`threeLoadGroupConn${c}`)?.value||'Y';
+    for(let p=1;p<=3;p++){
+      remember[`z${c}${p}`]=$(`threeLoadZc${c}p${p}`)?.value??'32.7';
+      remember[`phi${c}${p}`]=$(`threeLoadPhic${c}p${p}`)?.value??'0';
+      remember[`active${c}${p}`]=$(`threeLoadActivec${c}p${p}`)?.checked??true;
+    }
+  }
   const rows=Array.from({length:THREE_LOAD_MAX_COMPONENTS},(_,i)=>{
     const c=i+1,connection=mixed?remember[`conn${c}`]:threeLoadConnection,subs=connection==='Y'?['10','20','30']:['12','23','31'],names=connection==='Y'?['L1–N','L2–N','L3–N']:['L1–L2','L2–L3','L3–L1'],hidden=c>count?' hidden':'',connSelect=mixed?`<label class="impedance-phase-connection"><span>Kobling</span><select id="threeLoadGroupConn${c}" aria-label="Kobling for belastningsgruppe ${c}"><option value="Y"${connection==='Y'?' selected':''}>Y</option><option value="D"${connection==='D'?' selected':''}>Δ</option></select></label>`:'';
     const cells=[0,1,2].map(p=>{
-      const z=remember[`z${c}${p+1}`]||32.7,phi=remember[`phi${c}${p+1}`]||0,sub=`${subscriptNumber(c)}${subscriptNumber(subs[p])}`;
-      return `<label class="impedance-phase-cell"><span>Z<sub>${sub}</sub> · ${names[p]}</span><input id="threeLoadZc${c}p${p+1}" type="number" value="${z}" min="0.001" step="0.1" aria-label="Impedans Z${c}${subs[p]} i ohm"><input id="threeLoadPhic${c}p${p+1}" type="number" value="${phi}" min="-89.9" max="89.9" step="0.1" aria-label="Vinkel phi ${c}${subs[p]} i grader"></label>`;
+      const rawZ=String(remember[`z${c}${p+1}`]),z=rawZ.replace(/"/g,'&quot;'),phi=String(remember[`phi${c}${p+1}`]||0).replace(/"/g,'&quot;'),sub=`${subscriptNumber(c)}${subscriptNumber(subs[p])}`,zNumber=Number(rawZ),checked=remember[`active${c}${p+1}`]&&rawZ.trim()!==''&&Number.isFinite(zNumber)&&zNumber>0?' checked':'';
+      return `<div class="impedance-phase-cell"><div class="impedance-cell-head"><span>Z<sub>${sub}</sub> · ${names[p]}</span><label class="impedance-enable"><input id="threeLoadActivec${c}p${p+1}" type="checkbox"${checked}> Til</label></div><input id="threeLoadZc${c}p${p+1}" type="number" value="${z}" min="0" step="0.1" placeholder="frakoblet" aria-label="Impedans Z${c}${subs[p]} i ohm"><input id="threeLoadPhic${c}p${p+1}" type="number" value="${phi}" min="-89.9" max="89.9" step="0.1" aria-label="Vinkel phi ${c}${subs[p]} i grader"></div>`;
     }).join('');
     return `<div class="impedance-phase-row${mixed?' mixed':''}"${hidden}><b>Gruppe ${c}</b>${connSelect}${cells}</div>`;
   }).join('');
-  box.innerHTML=`<div class="component-builder-head"><span>Impedans pr. belastningsgruppe</span><small>Usymmetrisk: hver gruppe har tre impedanser og kan være Y eller Δ.</small></div>${rows}`;
-  $$('input',box).forEach(input=>input.addEventListener('input',updateAll));$$('select',box).forEach(select=>select.addEventListener('change',()=>{renderThreeLoadImpedanceFields();drawThreeLoad();}));
+  box.innerHTML=`<div class="component-builder-head"><span>Impedans pr. belastningsgruppe</span><small>Usymmetrisk: slå enkelte grene fra med “Til” eller lad Z være tom/0. Hver gruppe kan være Y eller Δ.</small></div>${rows}`;
+  $$('input',box).forEach(input=>{input.addEventListener('input',updateAll);input.addEventListener('change',updateAll);});$$('select',box).forEach(select=>select.addEventListener('change',()=>{renderThreeLoadImpedanceFields();drawThreeLoad();}));
 }
 function syncThreeLoadBuilder(){
   if(!$('threeLoadComponentBuilder'))return;
