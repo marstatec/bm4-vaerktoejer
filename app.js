@@ -416,20 +416,20 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
 
 function drawThreeLoadPhaseFocus(root,analysis){
   if(!root)return;clear(root);if(!analysis?.asym)return;
-  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],focusOrigins=[{x:405,y:288},{x:405,y:164},{x:405,y:164}],cx=focusOrigins[phaseIndex].x,cy=focusOrigins[phaseIndex].y,W=900,H=410,referenceNames=['U₁₀','U₂₀','U₃₀'];
+  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],focusOrigins=[{x:405,y:324},{x:405,y:130},{x:405,y:130}],cx=focusOrigins[phaseIndex].x,cy=focusOrigins[phaseIndex].y,W=900,H=410,referenceNames=['U₁₀','U₂₀','U₃₀'];
   drawAxisGrid(root,cx,cy,W,H);
-  const node={x:cx,y:cy},bounds={minX:90,maxX:760,minY:68,maxY:352};
-  root.append(svg('circle',{cx:node.x,cy:node.y,r:3.2,fill:'#cfd8de'}));
-  const refLength=132,refEnd={x:node.x+refLength*Math.cos(rad(ref)),y:node.y-refLength*Math.sin(rad(ref))},refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
-  root.append(svg('line',{x1:node.x,y1:node.y,x2:refEnd.x,y2:refEnd.y,stroke:VOLTAGE_COLOR,'stroke-width':2,'stroke-dasharray':'7 6','stroke-linecap':'round',opacity:.9}));
-  text(root,refEnd.x+(refAnchor==='end'?-12:12),refEnd.y-8,referenceNames[phaseIndex],'vector-label',VOLTAGE_COLOR,refAnchor);
-  const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex];
-  const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),maxLenForAngle=angle=>{
+  const node={x:cx,y:cy},bounds={minX:90,maxX:760,minY:52,maxY:366},maxLenForAngle=angle=>{
     const c=Math.cos(rad(angle)),s=-Math.sin(rad(angle)),limits=[];
     if(c>.001)limits.push((bounds.maxX-node.x)/c); if(c<-.001)limits.push((bounds.minX-node.x)/c);
     if(s>.001)limits.push((bounds.maxY-node.y)/s); if(s<-.001)limits.push((bounds.minY-node.y)/s);
     return Math.max(40,Math.min(...limits.filter(Number.isFinite)));
-  },fitScale=Math.min(260/maxI,...visible.map(v=>(maxLenForAngle(v.angle)-18)/(Math.max(v.value,.001)*(v===total?1:.92)))),scale=Math.max(.8,fitScale);
+  };
+  root.append(svg('circle',{cx:node.x,cy:node.y,r:3.2,fill:'#cfd8de'}));
+  const refLength=Math.max(120,maxLenForAngle(ref)-8),refEnd={x:node.x+refLength*Math.cos(rad(ref)),y:node.y-refLength*Math.sin(rad(ref))},refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
+  root.append(svg('line',{x1:node.x,y1:node.y,x2:refEnd.x,y2:refEnd.y,stroke:VOLTAGE_COLOR,'stroke-width':2,'stroke-dasharray':'7 6','stroke-linecap':'round',opacity:.9}));
+  text(root,refEnd.x+(refAnchor==='end'?-12:12),refEnd.y-8,referenceNames[phaseIndex],'vector-label',VOLTAGE_COLOR,refAnchor);
+  const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex];
+  const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),fitScale=Math.min(315/maxI,...visible.map(v=>(maxLenForAngle(v.angle)-18)/(Math.max(v.value,.001)*(v===total?1:.92)))),scale=Math.max(.8,fitScale);
   const localPhi=b=>normalizeAngle(b.angle-ref),localAngle=b=>b.angle;
   const drawFocusVector=(v,k,color,isTotal=false)=>{
     const angle=localAngle(v),dirMax=maxLenForAngle(angle)-12,target=v.value*scale*(isTotal?1:.92),len=Math.min(dirMax,Math.max(isTotal?82:54,target)),end=arrow(root,node.x,node.y,len,angle,color,'',isTotal?1.08:.78);
@@ -443,7 +443,7 @@ function drawThreeLoadPhaseFocus(root,analysis){
     if(Math.abs(phi)>.2){const r=35,from={x:node.x+r*Math.cos(rad(ref)),y:node.y-r*Math.sin(rad(ref))},to={x:node.x+r*Math.cos(rad(angle)),y:node.y-r*Math.sin(rad(angle))},sweep=phi<0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));}
   }
   text(root,node.x-22,node.y+32,`φ = ${da(focusPhi,1)}°`,'vector-label','#8f9da6','end');
-  const values=visible,lx=626,ly=66,row=24;root.append(svg('rect',{x:lx-16,y:ly-20,width:300,height:84+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');text(root,lx,ly+18,`Fælles reference: ${referenceNames[phaseIndex]}`,'parallel-state',VOLTAGE_COLOR);text(root,lx,ly+36,`φ = ${da(focusPhi,1)}° fra fælles reference`,'parallel-state','#8f9da6');
+  const values=visible,lx=626,ly=66,row=24;root.append(svg('rect',{x:lx-16,y:ly-20,width:300,height:84+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');text(root,lx,ly+18,`Reference: ${referenceNames[phaseIndex]}`,'parallel-state',VOLTAGE_COLOR);text(root,lx,ly+36,`φ = ${da(focusPhi,1)}° fra reference`,'parallel-state','#8f9da6');
   values.forEach((b,k)=>{const y=ly+64+k*row,angle=localPhi(b),c=b.name.includes('.')?b.color:CURRENT_COLOR,refText=b.refName?` · ref. ${b.refName}`:'';root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(angle,0)}°${refText}`,'vector-label',c);});
   $('threeLoadFocusTitle').textContent=`Fase ${phase}: zoom på strømvektorer`;
   $('threeLoadFocusNote').textContent=`Lokal reference: ${referenceNames[phaseIndex]}. Vinklerne og φ står i værdiboksen, så selve diagrammet kun viser vektorerne.`;
