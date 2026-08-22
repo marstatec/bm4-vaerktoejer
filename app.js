@@ -14,6 +14,7 @@ const power = (watts, reactive = false) => {
   return Math.abs(watts) >= 1000 ? unit(watts / 1000, reactive ? 'kvar' : 'kW', 2) : unit(watts, suffix, 1);
 };
 const phiResultLabel = phi => Math.abs(phi) < .05 ? 'φ = 0,0°  |  resistiv' : `φ = ${phi > 0 ? '+' : ''}${da(phi,1)}°  |  ${phi < 0 ? 'kapacitiv' : 'induktiv'}`;
+const phaseVoltageFromLine = Un => Math.abs(Un-380)<.51 ? 220 : Math.abs(Un-400)<.51 ? 230 : Un/Math.sqrt(3);
 const themeSurface = () => document.body.classList.contains('light-theme') ? '#ffffff' : '#111b24';
 const svg = (tag, attrs = {}, text = '') => {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -339,10 +340,10 @@ function threeLoadSymAnalysis(Uf,Un,parts,connection){
   return {asym:false,parallelGroups:true,parts,branches:branchCurrents,R,X,Zmag,If,In,P,Q,S,phi:zAngle,cos,branchTotal:If,branchPhi:phaseCurrentAngle,sourceU,Uf,Un};
 }
 function threeLoadAsymAnalysis(Uf,Un){
-  const groups=threeLoadImpedanceParts(),refs=[90,-30,-150],colors=['#9b87f5','#ff9f43','#55d6a1','#8fb7ff','#d94f8a'],lineVecs=[vectorFrom(0,0),vectorFrom(0,0),vectorFrom(0,0)],neutralSourceVecs=[],branches=[],groupLines=[];
+  const groups=threeLoadImpedanceParts(),phaseRefs=[90,-30,-150],deltaRefs=[120,0,-120],colors=['#9b87f5','#ff9f43','#55d6a1','#8fb7ff','#d94f8a'],lineVecs=[vectorFrom(0,0),vectorFrom(0,0),vectorFrom(0,0)],neutralSourceVecs=[],branches=[],groupLines=[];
   let P=0,Q=0;
   groups.forEach((group,gIndex)=>{
-    const sourceU=group.connection==='Y'?Uf:Un;
+    const sourceU=group.connection==='Y'?Uf:Un,refs=group.connection==='Y'?phaseRefs:deltaRefs;
     const b=group.branches.map((branch,i)=>{const value=branch.active?sourceU/branch.Zmag:0,angle=refs[i]-branch.zAngle,vec=vectorFrom(value,angle),item={...branch,group:group.index,connection:group.connection,name:branch.currentName,value,angle,vec,ref:refs[i],color:colors[gIndex%colors.length]};if(branch.active){P+=sourceU*value*Math.cos(rad(branch.zAngle));Q+=sourceU*value*Math.sin(rad(branch.zAngle));branches.push(item);}return item;});
     const lines=group.connection==='Y'?b.map((branch,i)=>({...branch,phase:i+1,name:`Iₙ${i+1}.${group.index}`,sourceName:branch.name,value:branch.value,angle:branch.angle,vec:branch.vec,color:colors[gIndex%colors.length]})):
       [vectorSum(b[0].vec,vectorFrom(b[2].value,b[2].angle+180)),vectorSum(b[1].vec,vectorFrom(b[0].value,b[0].angle+180)),vectorSum(b[2].vec,vectorFrom(b[1].value,b[1].angle+180))]
@@ -359,13 +360,14 @@ function threeLoadAsymAnalysis(Uf,Un){
 function drawThreeLoad(){
   if(threeLoadConnection==='M'){threeLoadInputMode='impedance';threeLoadVoltageType='line';}
   else if(threeLoadInputMode==='impedance')threeLoadInputMode='components';
-  const inputU=Math.max(0,num('threeLoadU')),mixed=threeLoadConnection==='M',Un=inputU,Uf=threeLoadConnection==='D'?Un:Un/Math.sqrt(3),asym=threeLoadInputMode==='impedance';
+  const inputU=Math.max(0,num('threeLoadU')),mixed=threeLoadConnection==='M',Un=inputU,Uf=threeLoadConnection==='D'?Un:phaseVoltageFromLine(Un),asym=threeLoadInputMode==='impedance',usesNominalPair=Math.abs(Un-380)<.51||Math.abs(Un-400)<.51;
   $('trefaset-belastning')?.classList.toggle('three-load-asym-layout',asym);
   const parts=asym?threeLoadImpedanceParts():threeLoadParts(),analysis=asym?threeLoadAsymAnalysis(Uf,Un):threeLoadSymAnalysis(Uf,Un,parts,threeLoadConnection),R=analysis.R,X=analysis.X,Z=analysis.Zmag,phi=analysis.phi,cosMagnitude=Math.abs(analysis.cos),signedCos=analysis.cos,If=analysis.If??Math.max(...analysis.IfValues),In=analysis.In??Math.max(...analysis.InValues),S=analysis.S,P=analysis.P,Q=analysis.Q;
   $('threeLoadVoltageLabel').innerHTML='<b>Netspænding U<sub>n</sub></b><em>V</em>';
   $('threeLoadR').textContent=asym?'varierer':unit(R,'Ω');$('threeLoadX').textContent=asym?'varierer':unit(X,'Ω');$('threeLoadZ').textContent=asym?`${analysis.groups.length} gruppe${analysis.groups.length===1?'':'r'}`:unit(Z,'Ω');$('threeLoadIf').textContent=asym?`maks. ${unit(If,'A',2)}`:unit(If,'A',2);$('threeLoadIn').textContent=asym?`maks. ${unit(In,'A',2)}`:unit(In,'A',2);$('threeLoadP').textContent=power(P);$('threeLoadQ').textContent=power(Q,true);$('threeLoadCos').textContent=da(signedCos,3);$('threeLoadCosAngle').textContent=phiResultLabel(phi);
   $('threeLoadIFormula').textContent=asym?'se Iₙ1, Iₙ2, Iₙ3 og I₀ i diagrammet':threeLoadConnection==='Y'?'Iₙ = I_f':`Iₙ = √3 · I_f (${da(If,2)} A)`;$('threeLoadPFormula').textContent=asym?'Σ(U_gren · I_gren · cosφ_gren)':'√3 · Uₙ · Iₙ · |cosφ|';
-  $('threeLoadExplainer').innerHTML=asym?`<strong>Usymmetrisk</strong><p>Hver belastningsgruppe vælger Y eller Δ.<br>Alle grene angives direkte med Z og φ, og netstrømmene summeres vektorielt.</p>`:threeLoadConnection==='Y'?`<strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`:`<strong>Δ</strong><p>U<sub>f</sub> = U<sub>n</sub><br>I<sub>n</sub> = √3 · I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`;
+  const phaseFormula=usesNominalPair?`U<sub>f</sub> ≈ U<sub>n</sub>/√3 = ${da(Uf,0)} V nominelt`:`U<sub>f</sub> = U<sub>n</sub>/√3`;
+  $('threeLoadExplainer').innerHTML=asym?`<strong>Usymmetrisk</strong><p>Hver belastningsgruppe vælger Y eller Δ.<br>Y-grene bruger ${phaseFormula}; Δ-grene bruger U<sub>n</sub>. Netstrømmene summeres vektorielt.</p>`:threeLoadConnection==='Y'?`<strong>Y</strong><p>${phaseFormula}<br>I<sub>n</sub> = I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`:`<strong>Δ</strong><p>U<sub>f</sub> = U<sub>n</sub><br>I<sub>n</sub> = √3 · I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`;
   $('threeLoadDiagramTitle').textContent=mixed?'Usymmetrisk: samlede netstrømme':threeLoadConnection==='Y'?'Stjerne: netstrømme på spændingstrekant':'Trekant: netstrømme på spændingstrekant';$('threeLoadDiagramNote').textContent=asym?'Røde vektorer er de samlede netstrømme Iₙ1, Iₙ2 og Iₙ3.':'Røde vektorer er netstrømmene Iₙ1, Iₙ2 og Iₙ3.';$('threeLoadType').textContent=Q<0?'Kapacitiv: strømmen er foran':Q>0?'Induktiv: strømmen er bagefter':'Resistiv: strøm og spænding i fase';
   if($('threeLoadFocusCard'))$('threeLoadFocusCard').hidden=!asym;$$('#threeLoadFocusPhase button').forEach(b=>b.classList.toggle('active',Number(b.dataset.loadFocus)===threeLoadFocusPhase));
   drawThreeLoadPhasor($('threeLoadPhasor'),threeLoadConnection,phi,If,In,Uf,parts,analysis);drawThreeLoadPhaseFocus($('threeLoadPhaseFocus'),analysis);drawThreeLoadCircuit(parts,threeLoadConnection,R,X,Z,If,In,analysis);if($('threeLoadKind'))$('threeLoadKind').textContent=$('threeLoadType').textContent;
