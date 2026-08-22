@@ -416,12 +416,13 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
 
 function drawThreeLoadPhaseFocus(root,analysis){
   if(!root)return;clear(root);if(!analysis?.asym)return;
-  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],cx=405,cy=228,W=900,H=410,voltageNames=['U₁₂ / U₁₀','U₂₃ / U₂₀','U₃₁ / U₃₀'];
+  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],cx=405,cy=228,W=900,H=410,referenceNames=['U₁₀','U₂₀','U₃₀'];
   drawAxisGrid(root,cx,cy,W,H);
   const node={x:cx,y:cy},bounds={minX:90,maxX:760,minY:68,maxY:352};
   root.append(svg('circle',{cx:node.x,cy:node.y,r:3.2,fill:'#cfd8de'}));
-  const refEnd=arrow(root,node.x,node.y,128,ref,VOLTAGE_COLOR,'',.72),refLabelX=node.x+72*Math.cos(rad(ref)),refLabelY=node.y-72*Math.sin(rad(ref)),refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
-  text(root,refLabelX+(refAnchor==='end'?-12:12),refLabelY,`${voltageNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,refAnchor);
+  const refLength=132,refEnd={x:node.x+refLength*Math.cos(rad(ref)),y:node.y-refLength*Math.sin(rad(ref))},refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
+  root.append(svg('line',{x1:node.x,y1:node.y,x2:refEnd.x,y2:refEnd.y,stroke:VOLTAGE_COLOR,'stroke-width':2,'stroke-dasharray':'7 6','stroke-linecap':'round',opacity:.9}));
+  text(root,refEnd.x+(refAnchor==='end'?-12:12),refEnd.y-8,`Reference: ${referenceNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,refAnchor);
   const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex];
   const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),maxLenForAngle=angle=>{
     const c=Math.cos(rad(angle)),s=-Math.sin(rad(angle)),limits=[];
@@ -445,7 +446,7 @@ function drawThreeLoadPhaseFocus(root,analysis){
   const values=visible,lx=650,ly=66,row=20;root.append(svg('rect',{x:lx-16,y:ly-20,width:226,height:62+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');text(root,lx,ly+18,`φ = ${da(focusPhi,1)}° fra lokal U-reference`,'parallel-state','#8f9da6');
   values.forEach((b,k)=>{const y=ly+44+k*row,angle=localPhi(b),c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(angle,0)}°`,'vector-label',c);});
   $('threeLoadFocusTitle').textContent=`Fase ${phase}: zoom på strømvektorer`;
-  $('threeLoadFocusNote').textContent=`Lokal reference: ${voltageNames[phaseIndex]}. Vinklerne og φ står i værdiboksen, så selve diagrammet kun viser vektorerne.`;
+  $('threeLoadFocusNote').textContent=`Lokal reference: ${referenceNames[phaseIndex]}. Vinklerne og φ står i værdiboksen, så selve diagrammet kun viser vektorerne.`;
 }
 
 function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In,analysis=null){
