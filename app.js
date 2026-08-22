@@ -499,7 +499,17 @@ function drawCompCurrentPhasor(Ip,Iq1,Iq2,I1,I2,Ic){
 }
 
 function drawCompCurrentFlow(Ibefore,Iafter,Ic,U,valid){
-  const root=$('compCurrentFlow');clear(root);root.append(svg('rect',{x:45,y:76,width:100,height:62,rx:9,class:'circuit-component'}));text(root,95,101,'FORSYNING','vector-label','#8c9aa3','middle');text(root,95,121,'Uₙ','vector-label',VOLTAGE_COLOR,'middle');circuitWire(root,145,107,755,107,'#71808a');root.append(svg('rect',{x:755,y:65,width:110,height:84,rx:9,class:'circuit-component'}));text(root,810,91,'BELASTNING','vector-label','#d3dde1','middle');text(root,810,116,'før komp.','vector-label','#70808b','middle');circuitArrow(root,195,107,130,0,'Iₙ efter',CURRENT_COLOR);circuitArrow(root,575,107,130,0,'I belastning','#b37a83');circuitNode(root,505,107);circuitWire(root,505,107,505,214,'#55d6a1');circuitArrow(root,505,122,38,-90,'Iᴄ','#55d6a1');circuitCapacitor(root,505,196,90);text(root,548,193,'KONDENSATORBATTERI','vector-label','#55d6a1');text(root,548,213,valid?'Kapacitiv grenstrøm':'Kontrollér inddata','vector-label','#81909a');text(root,450,244,'Værdierne vises i resultatfelterne ovenfor','vector-label','#667681','middle');
+  const root=$('compCurrentFlow'),afterText=valid?unit(Iafter,'A',2):'—',beforeText=unit(Ibefore,'A',2),icText=valid?unit(Ic,'A',2):'—';clear(root);
+  root.append(svg('rect',{x:45,y:76,width:100,height:62,rx:9,class:'circuit-component'}));text(root,95,101,'FORSYNING','vector-label','#8c9aa3','middle');text(root,95,121,`Uₙ = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR,'middle');
+  circuitWire(root,145,107,755,107,'#71808a');root.append(svg('rect',{x:755,y:65,width:110,height:84,rx:9,class:'circuit-component'}));text(root,810,91,'BELASTNING','vector-label','#d3dde1','middle');text(root,810,116,'før komp.','vector-label','#70808b','middle');
+  circuitArrow(root,195,107,130,0,'Iₙ efter',CURRENT_COLOR);text(root,260,88,afterText,'vector-label',CURRENT_COLOR,'middle');
+  circuitArrow(root,575,107,130,0,'I belastning','#b37a83');text(root,640,88,beforeText,'vector-label','#b37a83','middle');
+  circuitNode(root,505,107);circuitWire(root,505,107,505,214,'#55d6a1');circuitWire(root,505,122,505,160,'#55d6a1');root.append(svg('polygon',{points:'505,160 501,152 509,152',fill:'#55d6a1'}));text(root,505,134,'Iᴄ','vector-label','#55d6a1','middle');text(root,522,151,icText,'vector-label','#55d6a1','start');
+  circuitCapacitor(root,505,196,90);text(root,548,193,'KONDENSATORBATTERI','vector-label','#55d6a1');text(root,548,213,valid?'Kapacitiv grenstrøm':'Kontrollér inddata','vector-label','#81909a');
+  root.append(svg('rect',{x:333,y:172,width:128,height:62,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));
+  text(root,349,194,`Iₙ før = ${beforeText}`,'vector-label','#b37a83','start');
+  text(root,349,211,`Iₙ efter = ${afterText}`,'vector-label',CURRENT_COLOR,'start');
+  text(root,349,228,`Iᴄ = ${icText}`,'vector-label','#55d6a1','start');
 }
 
 function drawConnections(){
