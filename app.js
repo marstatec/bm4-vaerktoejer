@@ -425,13 +425,13 @@ function drawThreeLoadPhaseFocus(root,analysis){
   const visible=showBranches?[...phaseParts,total]:[total],maxI=Math.max(...visible.map(v=>v.value),neutral?.value||0,.001),scale=112/maxI;
   const localPhi=b=>normalizeAngle(ref-b.angle),localAngle=b=>90-localPhi(b);
   const drawFocusVector=(v,k,color,isTotal=false)=>{
-    const angle=localAngle(v),len=Math.max(isTotal?46:30,Math.min(isTotal?126:96,v.value*scale*(isTotal?1:.82))),nearVertical=Math.abs(Math.cos(rad(angle)))<.18,offset=(k-(visible.length-1)/2)*10,perp=nearVertical?{x:offset,y:0}:{x:-offset*Math.sin(rad(angle)),y:-offset*Math.cos(rad(angle))},sx=node.x+perp.x,sy=node.y+perp.y,end=arrow(root,sx,sy,len,angle,color,'',isTotal?.9:.58),mx=sx+(end.x-sx)*.56,my=sy+(end.y-sy)*.56,anchor=Math.cos(rad(angle))<-.22?'end':'start',labelDx=nearVertical?12:(anchor==='end'?-10:10);
+    const angle=localAngle(v),len=Math.max(isTotal?46:30,Math.min(isTotal?126:96,v.value*scale*(isTotal?1:.82))),nearVertical=Math.abs(Math.cos(rad(angle)))<.18,branchCount=Math.max(1,phaseParts.length),offset=isTotal?0:(k-(branchCount-1)/2)*10,perp=nearVertical?{x:offset,y:0}:{x:-offset*Math.sin(rad(angle)),y:-offset*Math.cos(rad(angle))},sx=node.x+perp.x,sy=node.y+perp.y,end=arrow(root,sx,sy,len,angle,color,'',isTotal?.9:.58),mx=sx+(end.x-sx)*.56,my=sy+(end.y-sy)*.56,anchor=Math.cos(rad(angle))<-.22?'end':'start',labelDx=nearVertical?12:(anchor==='end'?-10:10);
     text(root,mx+labelDx,my+(isTotal?-8:8),v.name,'vector-label',color,anchor);
     return {end,angle,sx,sy};
   };
   if(showBranches)phaseParts.forEach((part,k)=>drawFocusVector(part,k,part.color,false));
   if(total){
-    const totalDraw=drawFocusVector(total,visible.length,CURRENT_COLOR,true),phi=localPhi(total),angle=totalDraw.angle;
+    const totalDraw=drawFocusVector(total,0,CURRENT_COLOR,true),phi=localPhi(total),angle=totalDraw.angle;
     if(Math.abs(phi)>.2){const r=35,from={x:node.x,y:node.y-r},to={x:node.x+r*Math.cos(rad(angle)),y:node.y-r*Math.sin(rad(angle))},sweep=phi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,node.x+(phi>0?44:-44),node.y-25,`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#8c9aa3','middle');}
     else text(root,node.x-38,node.y+28,'φ = 0°','vector-label','#8c9aa3','middle');
   }
