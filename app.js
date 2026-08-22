@@ -338,7 +338,7 @@ function threeLoadSymAnalysis(Uf,Un,parts,connection){
   return {asym:false,parallelGroups:true,parts,branches:branchCurrents,R,X,Zmag,If,In,P,Q,S,phi:zAngle,cos,branchTotal:If,branchPhi:phaseCurrentAngle,sourceU,Uf,Un};
 }
 function threeLoadAsymAnalysis(Uf,Un){
-  const groups=threeLoadImpedanceParts(),refs=[90,-30,-150],colors=['#9b87f5','#ff9f43','#55d6a1','#8fb7ff','#d94f8a'],lineVecs=[vectorFrom(0,0),vectorFrom(0,0),vectorFrom(0,0)],branches=[],groupLines=[];
+  const groups=threeLoadImpedanceParts(),refs=[90,-30,-150],colors=['#9b87f5','#ff9f43','#55d6a1','#8fb7ff','#d94f8a'],lineVecs=[vectorFrom(0,0),vectorFrom(0,0),vectorFrom(0,0)],neutralSourceVecs=[],branches=[],groupLines=[];
   let P=0,Q=0;
   groups.forEach((group,gIndex)=>{
     const sourceU=group.connection==='Y'?Uf:Un;
@@ -347,20 +347,23 @@ function threeLoadAsymAnalysis(Uf,Un){
       [vectorSum(b[0].vec,vectorFrom(b[2].value,b[2].angle+180)),vectorSum(b[1].vec,vectorFrom(b[0].value,b[0].angle+180)),vectorSum(b[2].vec,vectorFrom(b[1].value,b[1].angle+180))]
         .map((v,i)=>({phase:i+1,name:`Iₙ${i+1}.${group.index}`,sourceName:i===0?'I₁₂−I₃₁':i===1?'I₂₃−I₁₂':'I₃₁−I₂₃',group:group.index,connection:group.connection,value:v.mag,angle:v.angle,vec:v,color:colors[gIndex%colors.length]}));
     lines.forEach((lineCurrent,i)=>{groupLines.push(lineCurrent);lineVecs[i]=vectorSum(lineVecs[i],lineCurrent.vec);});
+    if(group.connection==='Y')b.forEach(branch=>neutralSourceVecs.push(branch.vec));
     group.branchCurrents=b;group.lineCurrents=lines;
   });
   const lines=lineVecs.map((v,i)=>({phase:i+1,name:`Iₙ${i+1}`,value:v.mag,angle:v.angle,vec:v,color:CURRENT_COLOR}));
+  const neutralSource=vectorSum(...neutralSourceVecs),neutralVec=vectorFrom(neutralSource.mag,neutralSource.angle+180),neutral={name:'I₀',value:neutralVec.mag,angle:neutralVec.angle,vec:neutralVec,color:CURRENT_COLOR};
   const S=Math.hypot(P,Q),phi=S?deg(Math.atan2(Q,P)):0,cos=S?P/S:1;
-  return {asym:true,parts:groups,groups,branches,groupLines,lines,P,Q,S,phi,cos,IfValues:branches.map(b=>b.value),InValues:lines.map(l=>l.value),Un,Uf};
+  return {asym:true,parts:groups,groups,branches,groupLines,lines,neutral,P,Q,S,phi,cos,IfValues:branches.map(b=>b.value),InValues:lines.map(l=>l.value),Un,Uf};
 }
 function drawThreeLoad(){
   if(threeLoadConnection==='M'){threeLoadInputMode='impedance';threeLoadVoltageType='line';}
   else if(threeLoadInputMode==='impedance')threeLoadInputMode='components';
-  const inputU=Math.max(0,num('threeLoadU')),mixed=threeLoadConnection==='M',Un=threeLoadVoltageType==='line'||mixed?inputU:threeLoadConnection==='Y'?inputU*Math.sqrt(3):inputU,Uf=threeLoadConnection==='D'?Un:Un/Math.sqrt(3),asym=threeLoadInputMode==='impedance';
+  const inputU=Math.max(0,num('threeLoadU')),mixed=threeLoadConnection==='M',Un=inputU,Uf=threeLoadConnection==='D'?Un:Un/Math.sqrt(3),asym=threeLoadInputMode==='impedance';
+  $('trefaset-belastning')?.classList.toggle('three-load-asym-layout',asym);
   const parts=asym?threeLoadImpedanceParts():threeLoadParts(),analysis=asym?threeLoadAsymAnalysis(Uf,Un):threeLoadSymAnalysis(Uf,Un,parts,threeLoadConnection),R=analysis.R,X=analysis.X,Z=analysis.Zmag,phi=analysis.phi,cosMagnitude=Math.abs(analysis.cos),signedCos=analysis.cos,If=analysis.If??Math.max(...analysis.IfValues),In=analysis.In??Math.max(...analysis.InValues),S=analysis.S,P=analysis.P,Q=analysis.Q;
-  $('threeLoadVoltageLabel').innerHTML=threeLoadVoltageType==='line'?'<b>Netspænding U<sub>n</sub></b><em>V</em>':'<b>Fasespænding U<sub>f</sub></b><em>V</em>';
+  $('threeLoadVoltageLabel').innerHTML='<b>Netspænding U<sub>n</sub></b><em>V</em>';
   $('threeLoadR').textContent=asym?'varierer':unit(R,'Ω');$('threeLoadX').textContent=asym?'varierer':unit(X,'Ω');$('threeLoadZ').textContent=asym?`${analysis.groups.length} gruppe${analysis.groups.length===1?'':'r'}`:unit(Z,'Ω');$('threeLoadIf').textContent=asym?`maks. ${unit(If,'A',2)}`:unit(If,'A',2);$('threeLoadIn').textContent=asym?`maks. ${unit(In,'A',2)}`:unit(In,'A',2);$('threeLoadP').textContent=power(P);$('threeLoadQ').textContent=power(Q,true);$('threeLoadCos').textContent=da(signedCos,3);$('threeLoadCosAngle').textContent=phiResultLabel(phi);
-  $('threeLoadIFormula').textContent=asym?'se Iₙ1, Iₙ2 og Iₙ3 i diagrammet':threeLoadConnection==='Y'?'Iₙ = I_f':`Iₙ = √3 · I_f (${da(If,2)} A)`;$('threeLoadPFormula').textContent=asym?'Σ(U_gren · I_gren · cosφ_gren)':threeLoadVoltageType==='line'?'√3 · Uₙ · Iₙ · |cosφ|':'3 · U_f · I_f · |cosφ|';
+  $('threeLoadIFormula').textContent=asym?'se Iₙ1, Iₙ2, Iₙ3 og I₀ i diagrammet':threeLoadConnection==='Y'?'Iₙ = I_f':`Iₙ = √3 · I_f (${da(If,2)} A)`;$('threeLoadPFormula').textContent=asym?'Σ(U_gren · I_gren · cosφ_gren)':'√3 · Uₙ · Iₙ · |cosφ|';
   $('threeLoadExplainer').innerHTML=asym?`<strong>Usymmetrisk</strong><p>Hver belastningsgruppe vælger Y eller Δ.<br>Alle grene angives direkte med Z og φ, og netstrømmene summeres vektorielt.</p>`:threeLoadConnection==='Y'?`<strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`:`<strong>Δ</strong><p>U<sub>f</sub> = U<sub>n</sub><br>I<sub>n</sub> = √3 · I<sub>f</sub><br>Z<sub>eq</sub>: R = ${da(R,1)} Ω, X = ${da(X,1)} Ω</p>`;
   $('threeLoadDiagramTitle').textContent=mixed?'Usymmetrisk: samlede netstrømme':threeLoadConnection==='Y'?'Stjerne: fasegrenstrømme på spændingstrekant':'Trekant: belastningsstrømme på spændingstrekant';$('threeLoadDiagramNote').textContent=asym?'Røde vektorer er de samlede netstrømme Iₙ1, Iₙ2 og Iₙ3.':'Strømmene er tegnet ved de tre fase-/netspændinger.';$('threeLoadType').textContent=Q<0?'Kapacitiv: strømmen er foran':Q>0?'Induktiv: strømmen er bagefter':'Resistiv: strøm og spænding i fase';
   drawThreeLoadPhasor($('threeLoadPhasor'),threeLoadConnection,phi,If,In,Uf,parts,analysis);drawThreeLoadCircuit(parts,threeLoadConnection,R,X,Z,If,In,analysis);if($('threeLoadKind'))$('threeLoadKind').textContent=$('threeLoadType').textContent;
@@ -373,7 +376,7 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
   text(root,top[0]+12,top[1]+12,connection==='Y'?'U₁₀':'U₁₂','vector-label',voltageColor);text(root,right[0]-10,right[1]+22,connection==='Y'?'U₂₀':'U₂₃','vector-label',voltageColor,'end');text(root,left[0]+8,left[1]-8,connection==='Y'?'U₃₀':'U₃₁','vector-label',voltageColor);
   const showBranches=threeLoadVectorMode==='branches';
   if(analysis?.asym){
-    const maxI=Math.max(...analysis.groupLines.map(b=>b.value),...analysis.lines.map(l=>l.value),.001),lineLen=86,branchLen=56;
+    const maxI=Math.max(...analysis.groupLines.map(b=>b.value),...analysis.lines.map(l=>l.value),analysis.neutral?.value||0,.001),lineLen=86,branchLen=56;
     pts.forEach((p,i)=>{
       const ref=refs[i],refEnd={x:p[0]+54*Math.cos(rad(ref)),y:p[1]-54*Math.sin(rad(ref))},lineCurrent=analysis.lines[i],phaseParts=analysis.groupLines.filter(g=>g.phase===i+1);
       root.append(svg('line',{x1:p[0],y1:p[1],x2:refEnd.x,y2:refEnd.y,class:'guide',stroke:'#8a98a3','stroke-dasharray':'7 6'}));
@@ -382,8 +385,9 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-10:18),`${lineCurrent.name}`,'vector-label',CURRENT_COLOR,anchor);
       const shownPhi=ref-lineCurrent.angle;if(Math.abs(shownPhi)>.2){const r=24,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(lineCurrent.angle)),y:p[1]-r*Math.sin(rad(lineCurrent.angle))},sweep=shownPhi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ = ${da(Math.abs(shownPhi),1)}°`,'vector-label','#8c9aa3','middle');}
     });
-    const values=showBranches?[...analysis.groupLines,...analysis.lines]:analysis.lines,lx=492,ly=58,row=16,rows=values.length;root.append(svg('rect',{x:lx-14,y:ly-18,width:200,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(b.angle,0)}°`,'vector-label',c);});
-    text(root,640,365,connection==='M'?'Usymmetrisk: hver gruppes netstrøm summeres til Iₙ1, Iₙ2 og Iₙ3.':connection==='D'?'Iₙ beregnes som vektorforskel: Iₙ1 = I₁₂ − I₃₁.':'Iₙ er den enkelte fasegrenstrøm i stjerne.','vector-label','#8f9da6','end');return;
+    if(analysis.neutral&&analysis.neutral.value>.01){const nEnd=arrow(root,neutral[0],neutral[1],Math.max(28,analysis.neutral.value/maxI*74),analysis.neutral.angle,CURRENT_COLOR,'',.72),nAnchor=nEnd.x<neutral[0]?'end':'start';text(root,nEnd.x+(nAnchor==='end'?-10:10),nEnd.y+18,'I₀','vector-label',CURRENT_COLOR,nAnchor);}
+    const values=showBranches?[...analysis.groupLines,...analysis.lines,analysis.neutral].filter(Boolean):[...analysis.lines,analysis.neutral].filter(Boolean),lx=492,ly=58,row=16,rows=values.length;root.append(svg('rect',{x:lx-14,y:ly-18,width:200,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(b.angle,0)}°`,'vector-label',c);});
+    text(root,640,365,connection==='M'?'Usymmetrisk: I₀ er nulstrømmen fra Y-grupperne.':connection==='D'?'Iₙ beregnes som vektorforskel: Iₙ1 = I₁₂ − I₃₁.':'Iₙ er den enkelte fasegrenstrøm i stjerne.','vector-label','#8f9da6','end');return;
   }
   const names=connection==='D'?['I₁₂','I₂₃','I₃₁']:['I₁₀','I₂₀','I₃₀'],value=connection==='D'?If:In;
   const branchCurrents=parts.map((part,i)=>{const z=Math.hypot(part.R,part.X),angle=z?-deg(Math.atan2(part.X,part.R)):0,val=z?Uf/z:0;return {...part,name:`I${subscriptNumber(part.index)}`,value:val,angle,color:branchColors[i%branchColors.length]};}),branchSumX=branchCurrents.reduce((sum,b)=>sum+b.value*Math.cos(rad(b.angle)),0),branchSumY=branchCurrents.reduce((sum,b)=>sum+b.value*Math.sin(rad(b.angle)),0),branchTotal=Math.hypot(branchSumX,branchSumY),branchPhi=branchTotal?deg(Math.atan2(branchSumY,branchSumX)):0,showComponentCurrents=showBranches&&branchCurrents.length>1;
@@ -409,7 +413,7 @@ function drawThreeLoadCircuit(parts,connection,R,X,Z,If,In,analysis=null){
   const ys=[42,76,110,144],lineNames=['L1','L2','L3','N'],end=1384,groupStep=parts.length>1?clamp(1085/(parts.length-1),112,360):0,groupStart=parts.length===1?610:165;
   lineNames.forEach((label,i)=>{circuitText(root,50,ys[i]+5,label,'overview-label','middle');root.append(svg('line',{x1:78,y1:ys[i],x2:i===3&&connection==='D'?155:end,y2:ys[i],class:'overview-wire'}));});
   ['Iₙ₁','Iₙ₂','Iₙ₃'].forEach((label,i)=>circuitArrow(root,96,ys[i],52,0,`${label} = ${da(analysis?.lines?.[i]?.value??In,2)} A`,CURRENT_COLOR));
-  if(connection==='Y'||(connection==='M'&&analysis?.groups?.some(g=>g.connection==='Y')))circuitArrow(root,96,ys[3],52,0,'I₀',CURRENT_COLOR);
+  if(connection==='Y'||(connection==='M'&&analysis?.groups?.some(g=>g.connection==='Y')))circuitArrow(root,96,ys[3],52,0,analysis?.neutral?`I₀ = ${da(analysis.neutral.value,2)} A`:'I₀',CURRENT_COLOR);
   const loadSymbol=(part,x,y)=>{drawCompactCircuitComponent(root,part.type,x,y,0);circuitText(root,x,y+25,componentSymbol(part.type,part.index),'overview-label tiny-label','middle');};
   const branchArrow=(x,y,len,label)=>{circuitArrow(root,x,y,len,-90,'',CURRENT_COLOR);circuitText(root,x+12,y-2,label,'circuit-current','start',CURRENT_COLOR);};
   const impedanceSeries=(branch,x1,x2,y,sub)=>{
