@@ -357,9 +357,10 @@
               <div class="component-builder impedance-phase-builder" id="threeLoadImpedanceFields" hidden></div>
               <div class="field-grid">
                 <label><span id="threeLoadVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeLoadU" type="number" value="400" min="0"></label>
+                <label><span><b>Fasespænding U<sub>f</sub></b><em>V</em></span><input id="threeLoadUf" type="number" value="230" min="0" step="0.1"></label>
                 <label><span>Frekvens f <em>Hz</em></span><input id="threeLoadF" type="number" value="50" min="0.1"></label>
               </div>
-              <div class="connection-explainer" id="threeLoadExplainer"><strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub></p></div>
+              <div class="connection-explainer" id="threeLoadExplainer"><strong>Y</strong><p>Indstil både U<sub>n</sub> og U<sub>f</sub> direkte.<br>I<sub>n</sub> = I<sub>f</sub></p></div>
             </article>
             <article class="card visual-card">
               <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeLoadDiagramTitle">Belastningens strømme</h3></div><div class="diagram-tools"><div class="segmented mini-toggle" id="threeLoadVectorMode"><button class="active" data-three-load-vector="total">Samlet</button><button data-three-load-vector="branches">Alle</button></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div></div>
@@ -510,7 +511,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=asym-380-220-facit-1"></script>
+  <script src="app.js?v=manual-line-phase-voltage-1"></script>
 </body>
 </html>
 
