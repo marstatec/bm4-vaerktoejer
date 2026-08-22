@@ -415,18 +415,19 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
 
 function drawThreeLoadPhaseFocus(root,analysis){
   if(!root)return;clear(root);if(!analysis?.asym)return;
-  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],cx=300,cy=252,W=860,H=382,voltageNames=['U₁₂ / U₁₀','U₂₃ / U₂₀','U₃₁ / U₃₀'];
-  drawAxisGrid(root,cx,cy,W,H);
-  const node={x:cx,y:cy-38},triScale=94;
-  line(root,node.x,node.y,node.x-triScale*.62,node.y+triScale,'guide','#cfd8de');
-  line(root,node.x,node.y,node.x+triScale*.62,node.y+triScale,'guide','#cfd8de');
+  const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],cx=365,cy=214,W=860,H=382,voltageNames=['U₁₂ / U₁₀','U₂₃ / U₂₀','U₃₁ / U₃₀'];
+  for(let x=70;x<=W;x+=55)line(root,x,42,x,H+20);
+  for(let y=52;y<=H+20;y+=55)line(root,58,y,W+15,y);
+  const node={x:cx,y:cy},tri=70,trianglePts=refs.map(a=>({x:cx+tri*Math.cos(rad(a-ref+90)),y:cy-tri*Math.sin(rad(a-ref+90))}));
+  line(root,node.x,node.y,trianglePts[(phaseIndex+1)%3].x,trianglePts[(phaseIndex+1)%3].y,'guide','#354754');
+  line(root,node.x,node.y,trianglePts[(phaseIndex+2)%3].x,trianglePts[(phaseIndex+2)%3].y,'guide','#354754');
   root.append(svg('circle',{cx:node.x,cy:node.y,r:3.2,fill:'#cfd8de'}));
-  line(root,node.x,node.y,node.x,node.y-118,'vector',VOLTAGE_COLOR);
-  text(root,node.x+14,node.y-98,`${voltageNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,'start');
-  text(root,node.x+14,node.y-78,'lokal spændingsreference','parallel-state',VOLTAGE_COLOR,'start');
+  const refEnd=arrow(root,node.x,node.y,118,ref,VOLTAGE_COLOR,'',.72),refLabelX=node.x+72*Math.cos(rad(ref)),refLabelY=node.y-72*Math.sin(rad(ref)),refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
+  text(root,refLabelX+(refAnchor==='end'?-12:12),refLabelY,`${voltageNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,refAnchor);
+  text(root,refLabelX+(refAnchor==='end'?-12:12),refLabelY+18,'lokal spændingsreference','parallel-state',VOLTAGE_COLOR,refAnchor);
   const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex];
   const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),scale=180/maxI;
-  const localPhi=b=>normalizeAngle(b.angle-ref),localAngle=b=>90+localPhi(b);
+  const localPhi=b=>normalizeAngle(b.angle-ref),localAngle=b=>b.angle;
   const drawFocusVector=(v,k,color,isTotal=false)=>{
     const angle=localAngle(v),len=Math.max(isTotal?70:54,Math.min(isTotal?190:156,v.value*scale*(isTotal?1:.92))),nearVertical=Math.abs(Math.cos(rad(angle)))<.18,branchCount=Math.max(1,phaseParts.length),offset=isTotal?0:(k-(branchCount-1)/2)*22,perp=nearVertical?{x:offset,y:0}:{x:-offset*Math.sin(rad(angle)),y:-offset*Math.cos(rad(angle))},sx=node.x+perp.x,sy=node.y+perp.y,end=arrow(root,sx,sy,len,angle,color,'',isTotal?1.02:.74),mx=sx+(end.x-sx)*.58,my=sy+(end.y-sy)*.58,anchor=Math.cos(rad(angle))<-.22?'end':'start',labelDx=nearVertical?14:(anchor==='end'?-12:12);
     text(root,mx+labelDx,my+(isTotal?-10:10),v.name,'vector-label',color,anchor);
