@@ -378,11 +378,14 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
   text(root,top[0]+12,top[1]+12,connection==='Y'?'U₁₀':'U₁₂','vector-label',voltageColor);text(root,right[0]-10,right[1]+22,connection==='Y'?'U₂₀':'U₂₃','vector-label',voltageColor,'end');text(root,left[0]+8,left[1]-8,connection==='Y'?'U₃₀':'U₃₁','vector-label',voltageColor);
   const showBranches=threeLoadVectorMode==='branches';
   if(analysis?.asym){
-    const maxI=Math.max(...analysis.groupLines.map(b=>b.value),...analysis.lines.map(l=>l.value),analysis.neutral?.value||0,.001),lineLen=86,branchLen=56;
+    const maxI=Math.max(...analysis.groupLines.map(b=>b.value),...analysis.lines.map(l=>l.value),analysis.neutral?.value||0,.001),lineLen=92,branchLen=72;
     pts.forEach((p,i)=>{
       const ref=refs[i],refEnd={x:p[0]+54*Math.cos(rad(ref)),y:p[1]-54*Math.sin(rad(ref))},lineCurrent=analysis.lines[i],phaseParts=analysis.groupLines.filter(g=>g.phase===i+1);
       root.append(svg('line',{x1:p[0],y1:p[1],x2:refEnd.x,y2:refEnd.y,class:'guide',stroke:'#8a98a3','stroke-dasharray':'7 6'}));
-      if(showBranches)phaseParts.forEach((part,k)=>{const endPart=arrow(root,p[0],p[1],Math.max(18,part.value/maxI*branchLen),part.angle,part.color,'',.42),anchor=endPart.x<p[0]?'end':'start';text(root,endPart.x+(anchor==='end'?-8:8),endPart.y+(k%2?-7:12),part.name,'vector-label',part.color,anchor);});
+      if(showBranches)phaseParts.forEach((part,k)=>{
+        const offset=(k-(phaseParts.length-1)/2)*9,nearVertical=Math.abs(Math.cos(rad(part.angle)))<.18,perp=nearVertical?{x:offset,y:0}:{x:-offset*Math.sin(rad(part.angle)),y:-offset*Math.cos(rad(part.angle))},sx=p[0]+perp.x,sy=p[1]+perp.y,len=Math.max(20,part.value/maxI*branchLen),endPart=arrow(root,sx,sy,len,part.angle,part.color,'',.48),mx=sx+(endPart.x-sx)*.55,my=sy+(endPart.y-sy)*.55,anchor=Math.cos(rad(part.angle))<-.22?'end':'start',dx=nearVertical?9:(anchor==='end'?-8:8);
+        text(root,mx+dx,my+(k%2?-7:9),part.name,'vector-label',part.color,anchor);
+      });
       const end=arrow(root,p[0],p[1],Math.max(34,lineCurrent.value/maxI*lineLen),lineCurrent.angle,CURRENT_COLOR,'',.82),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-10:18),`${lineCurrent.name}`,'vector-label',CURRENT_COLOR,anchor);
       const shownPhi=normalizeAngle(lineCurrent.angle-ref);if(Math.abs(shownPhi)>.2){const r=24,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(lineCurrent.angle)),y:p[1]-r*Math.sin(rad(lineCurrent.angle))},sweep=shownPhi<0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ = ${da(shownPhi,1)}°`,'vector-label','#8c9aa3','middle');}
