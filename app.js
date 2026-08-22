@@ -418,17 +418,21 @@ function drawThreeLoadPhaseFocus(root,analysis){
   if(!root)return;clear(root);if(!analysis?.asym)return;
   const phase=clamp(threeLoadFocusPhase,1,3),phaseIndex=phase-1,refs=[90,-30,-150],ref=refs[phaseIndex],cx=405,cy=228,W=900,H=410,voltageNames=['U₁₂ / U₁₀','U₂₃ / U₂₀','U₃₁ / U₃₀'];
   drawAxisGrid(root,cx,cy,W,H);
-  const node={x:cx,y:cy},cornerAngles=[[ -30,-150 ],[ 90,150 ],[ 30,90 ]][phaseIndex];
-  cornerAngles.forEach(a=>line(root,node.x,node.y,node.x+96*Math.cos(rad(a)),node.y-96*Math.sin(rad(a)),'guide','#354754'));
+  const node={x:cx,y:cy},bounds={minX:90,maxX:760,minY:68,maxY:352};
   root.append(svg('circle',{cx:node.x,cy:node.y,r:3.2,fill:'#cfd8de'}));
   const refEnd=arrow(root,node.x,node.y,128,ref,VOLTAGE_COLOR,'',.72),refLabelX=node.x+72*Math.cos(rad(ref)),refLabelY=node.y-72*Math.sin(rad(ref)),refAnchor=Math.cos(rad(ref))<-.2?'end':'start';
   text(root,refLabelX+(refAnchor==='end'?-12:12),refLabelY,`${voltageNames[phaseIndex]}`,'vector-label',VOLTAGE_COLOR,refAnchor);
   text(root,refLabelX+(refAnchor==='end'?-12:12),refLabelY+18,'lokal spændingsreference','parallel-state',VOLTAGE_COLOR,refAnchor);
   const phaseParts=analysis.groupLines.filter(g=>g.phase===phase),total=analysis.lines[phaseIndex];
-  const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),scale=250/maxI;
+  const visible=[...phaseParts,total].filter(Boolean),maxI=Math.max(...visible.map(v=>v.value),.001),maxLenForAngle=angle=>{
+    const c=Math.cos(rad(angle)),s=-Math.sin(rad(angle)),limits=[];
+    if(c>.001)limits.push((bounds.maxX-node.x)/c); if(c<-.001)limits.push((bounds.minX-node.x)/c);
+    if(s>.001)limits.push((bounds.maxY-node.y)/s); if(s<-.001)limits.push((bounds.minY-node.y)/s);
+    return Math.max(40,Math.min(...limits.filter(Number.isFinite)));
+  },fitScale=Math.min(210/maxI,...visible.map(v=>(maxLenForAngle(v.angle)-18)/(Math.max(v.value,.001)*(v===total?1:.92)))),scale=Math.max(.8,fitScale);
   const localPhi=b=>normalizeAngle(b.angle-ref),localAngle=b=>b.angle;
   const drawFocusVector=(v,k,color,isTotal=false)=>{
-    const angle=localAngle(v),len=Math.max(isTotal?92:72,Math.min(isTotal?260:218,v.value*scale*(isTotal?1:.92))),end=arrow(root,node.x,node.y,len,angle,color,'',isTotal?1.08:.78),t=isTotal?.72:(k+1)/(Math.max(phaseParts.length,1)+1),mx=node.x+(end.x-node.x)*t,my=node.y+(end.y-node.y)*t,anchor=Math.cos(rad(angle))<-.22?'end':'start',normal={x:-Math.sin(rad(angle)),y:-Math.cos(rad(angle))},side=(isTotal?-18:(k%2?16:-16));
+    const angle=localAngle(v),dirMax=maxLenForAngle(angle)-12,target=v.value*scale*(isTotal?1:.92),len=Math.min(dirMax,Math.max(isTotal?82:54,target)),end=arrow(root,node.x,node.y,len,angle,color,'',isTotal?1.08:.78),t=isTotal?.72:(k+1)/(Math.max(phaseParts.length,1)+1),mx=node.x+(end.x-node.x)*t,my=node.y+(end.y-node.y)*t,anchor=Math.cos(rad(angle))<-.22?'end':'start',normal={x:-Math.sin(rad(angle)),y:-Math.cos(rad(angle))},side=(isTotal?-18:(k%2?16:-16));
     text(root,mx+normal.x*side+(anchor==='end'?-10:10),my+normal.y*side,v.name,'vector-label',color,anchor);
     return {end,angle};
   };
