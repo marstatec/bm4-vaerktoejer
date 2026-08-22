@@ -459,7 +459,12 @@ function drawThreeLoadPhaseFocus(root,analysis){
     focusPhi=phi;
     if(Math.abs(phi)>.2){const r=35,from={x:node.x+r*Math.cos(rad(ref)),y:node.y-r*Math.sin(rad(ref))},to={x:node.x+r*Math.cos(rad(angle)),y:node.y-r*Math.sin(rad(angle))},sweep=phi<0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));}
   }
-  text(root,node.x-22,node.y+32,`φ = ${da(focusPhi,1)}°`,'vector-label','#8f9da6','end');
+  const phiLabelPositions=[
+    {x:node.x-22,y:node.y+32,anchor:'end'},
+    {x:node.x-22,y:node.y-28,anchor:'end'},
+    {x:node.x+22,y:node.y-28,anchor:'start'}
+  ],phiPos=phiLabelPositions[phaseIndex]||phiLabelPositions[0];
+  text(root,phiPos.x,phiPos.y,`φ = ${da(focusPhi,1)}°`,'vector-label','#8f9da6',phiPos.anchor);
   const values=visible,lx=626,ly=66,row=24;root.append(svg('rect',{x:lx-16,y:ly-20,width:300,height:66+row*values.length,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,`Værdier for fase ${phase}`,'parallel-state','#8f9da6');text(root,lx,ly+20,`Vinkler målt fra ${referenceName}`,'parallel-state',VOLTAGE_COLOR);
   values.forEach((b,k)=>{const y=ly+52+k*row,angle=localPhi(b),c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(angle,0)}°`,'vector-label',c);});
   $('threeLoadFocusTitle').textContent=`Fase ${phase}: zoom på strømvektorer`;
