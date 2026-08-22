@@ -330,6 +330,7 @@ function threeLoadImpedanceParts(){
 }
 function vectorFrom(mag,angle){return {x:mag*Math.cos(rad(angle)),y:mag*Math.sin(rad(angle)),mag,angle};}
 function vectorSum(...vectors){const x=vectors.reduce((s,v)=>s+v.x,0),y=vectors.reduce((s,v)=>s+v.y,0);return {x,y,mag:Math.hypot(x,y),angle:deg(Math.atan2(y,x))};}
+function normalizeAngle(angle){let a=((angle+180)%360+360)%360-180;return Math.abs(a)<.05?0:a;}
 function threeLoadSymAnalysis(Uf,Un,parts,connection){
   const sourceU=connection==='Y'?Uf:Un,branchCurrents=parts.map((part,i)=>{
     const Zmag=Math.max(.000000001,Math.hypot(part.R,part.X)),zAngle=deg(Math.atan2(part.X,part.R)),value=sourceU/Zmag,angle=-zAngle,vec=vectorFrom(value,angle);
@@ -385,8 +386,11 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-10:18),`${lineCurrent.name}`,'vector-label',CURRENT_COLOR,anchor);
       const shownPhi=ref-lineCurrent.angle;if(Math.abs(shownPhi)>.2){const r=24,from={x:p[0]+r*Math.cos(rad(ref)),y:p[1]-r*Math.sin(rad(ref))},to={x:p[0]+r*Math.cos(rad(lineCurrent.angle)),y:p[1]-r*Math.sin(rad(lineCurrent.angle))},sweep=shownPhi>0?1:0;root.append(svg('path',{d:`M ${from.x} ${from.y} A ${r} ${r} 0 0 ${sweep} ${to.x} ${to.y}`,class:'arc'}));text(root,p[0]+(i===1?36:-30),p[1]+(i===0?-18:20),`φ = ${da(Math.abs(shownPhi),1)}°`,'vector-label','#8c9aa3','middle');}
     });
-    if(analysis.neutral&&analysis.neutral.value>.01){const nEnd=arrow(root,neutral[0],neutral[1],Math.max(28,analysis.neutral.value/maxI*74),analysis.neutral.angle,CURRENT_COLOR,'',.72),nAnchor=nEnd.x<neutral[0]?'end':'start';text(root,nEnd.x+(nAnchor==='end'?-10:10),nEnd.y+18,'I₀','vector-label',CURRENT_COLOR,nAnchor);}
-    const values=showBranches?[...analysis.groupLines,...analysis.lines,analysis.neutral].filter(Boolean):[...analysis.lines,analysis.neutral].filter(Boolean),lx=556,ly=58,row=16,rows=values.length;root.append(svg('rect',{x:lx-14,y:ly-18,width:164,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(b.angle,0)}°`,'vector-label',c);});
+    if(analysis.neutral){
+      if(analysis.neutral.value>.01){const nEnd=arrow(root,neutral[0],neutral[1],Math.max(28,analysis.neutral.value/maxI*74),analysis.neutral.angle,CURRENT_COLOR,'',.72),nAnchor=nEnd.x<neutral[0]?'end':'start';text(root,nEnd.x+(nAnchor==='end'?-10:10),nEnd.y+18,`I₀ = ${da(analysis.neutral.value,2)} A`,'vector-label',CURRENT_COLOR,nAnchor);}
+      else{text(root,neutral[0]+10,neutral[1]+18,'I₀ = 0 A','vector-label',CURRENT_COLOR,'start');}
+    }
+    const values=showBranches?[...analysis.groupLines,...analysis.lines,analysis.neutral].filter(Boolean):[...analysis.lines,analysis.neutral].filter(Boolean),lx=556,ly=58,row=16,rows=values.length,phaseRefs=[90,-30,-150],displayAngle=b=>b.name==='I₀'?(b.value<.01?0:normalizeAngle(b.angle)):normalizeAngle((phaseRefs[(b.phase||1)-1]??0)-b.angle);root.append(svg('rect',{x:lx-14,y:ly-18,width:164,height:38+row*rows,rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,lx,ly,showBranches?'Gruppebidrag + total':'Samlede netstrømme','parallel-state','#8f9da6');values.forEach((b,k)=>{const y=ly+22+k*row,c=b.name.includes('.')?b.color:CURRENT_COLOR;root.append(svg('circle',{cx:lx-8,cy:y-4,r:3,fill:c}));text(root,lx,y,`${b.name} ${da(b.value,2)} A ∠${da(displayAngle(b),0)}°`,'vector-label',c);});
     text(root,640,365,connection==='M'?'Usymmetrisk: I₀ er nulstrømmen fra Y-grupperne.':connection==='D'?'Iₙ beregnes som vektorforskel: Iₙ1 = I₁₂ − I₃₁.':'Iₙ er den enkelte fasegrenstrøm i stjerne.','vector-label','#8f9da6','end');return;
   }
   const isDelta=connection==='D';
