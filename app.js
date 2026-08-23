@@ -406,9 +406,9 @@ function drawThreeLoadPhasor(root,connection,phi,If,In,Uf=0,parts=[],analysis=nu
     pts.forEach((p,i)=>{
       const ref=phaseRefs[i],refEnd={x:p[0]+54*Math.cos(rad(ref)),y:p[1]-54*Math.sin(rad(ref))},lineCurrent=displayTotals[i],phaseParts=showBranches?phaseContribsByPhase[i]:[];
       root.append(svg('line',{x1:p[0],y1:p[1],x2:refEnd.x,y2:refEnd.y,class:'guide',stroke:'#8a98a3','stroke-dasharray':'7 6'}));
-      if(showBranches)phaseParts.forEach((part,k)=>{
-        const len=Math.max(18,part.value/maxI*branchLen),endPart=arrow(root,p[0],p[1],len,part.angle,part.color,'',.44),t=(k+1)/(phaseParts.length+1),mx=p[0]+(endPart.x-p[0])*t,my=p[1]+(endPart.y-p[1])*t,anchor=Math.cos(rad(part.angle))<-.22?'end':'start',normal={x:-Math.sin(rad(part.angle)),y:-Math.cos(rad(part.angle))},side=(k%2?1:-1)*9;
-        text(root,mx+normal.x*side+(anchor==='end'?-7:7),my+normal.y*side,part.name,'vector-label',part.color,anchor);
+      if(showBranches)phaseParts.forEach(part=>{
+        const len=Math.max(18,part.value/maxI*branchLen);
+        arrow(root,p[0],p[1],len,part.angle,part.color,'',.44);
       });
       const end=arrow(root,p[0],p[1],Math.max(34,lineCurrent.value/maxI*lineLen),lineCurrent.angle,CURRENT_COLOR,'',.82),anchor=end.x<p[0]?'end':'start';
       text(root,end.x+(anchor==='end'?-10:10),end.y+(i===0?-10:18),`${lineCurrent.name}`,'vector-label',CURRENT_COLOR,anchor);
