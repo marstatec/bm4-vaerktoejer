@@ -315,17 +315,17 @@
             <article class="card controls-card">
               <div class="segmented" id="threeConnection"><button class="active" data-connection="Y">Y: Stjerne</button><button data-connection="D">Δ: Trekant</button></div>
               <div class="segmented voltage-selector" id="threeVoltageType"><button class="active" data-voltage="line">Netspænding U<sub>n</sub></button><button data-voltage="phase">Fasespænding U<sub>f</sub></button></div>
-              <div class="segmented current-selector" id="threeCurrentType"><button class="active" data-current="line"><span>Netstrøm I<sub>n</sub></span><strong id="threeLineCurrentButton">—</strong></button><button data-current="phase"><span>Fasestrøm I<sub>f</sub></span><strong id="threePhaseCurrentButton">—</strong></button></div>
+              <div class="segmented current-selector" id="threeCurrentType"><button class="active" data-current="line"><span>Netstrøm I<sub>n</sub></span><strong id="threeLineCurrentButton">—</strong></button><button data-current="phase"><span>Komponentstrøm I<sub>z</sub></span><strong id="threePhaseCurrentButton">—</strong></button></div>
               <div class="field-grid top-gap"><label><span id="threeVoltageLabel"><b>Netspænding U<sub>n</sub></b><em>V</em></span><input id="threeU" type="number" value="400" min="0"></label><label><span>Frekvens f <em>Hz</em></span><input id="threeF" type="number" value="50" min="0.1"></label><label><span>R pr. fase <em>Ω</em></span><input id="threeR" type="number" value="12" min="0"></label><label><span>X pr. fase <em>− = kapacitiv</em></span><input id="threeX" type="number" value="8" step="0.1"></label></div>
-              <div class="connection-explainer" id="connectionExplainer"><strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>f</sub></p></div>
+              <div class="connection-explainer" id="connectionExplainer"><strong>Y</strong><p>U<sub>f</sub> = U<sub>n</sub>/√3<br>I<sub>n</sub> = I<sub>z</sub></p></div>
             </article>
             <article class="card visual-card">
-              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeDiagramTitle">Stjerne: fase- og netvektorer</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
+              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeDiagramTitle">Stjerne: komponent- og netvektorer</h3></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div>
               <svg id="threePhasor" class="diagram" viewBox="0 0 520 320" role="img" aria-label="Trefaset vektordiagram"></svg>
-              <div class="visual-caption"><span id="threeDiagramNote">Y: Netstrømmen er lig fasestrømmen.</span><strong id="threeLoadType">—</strong></div>
+              <div class="visual-caption"><span id="threeDiagramNote">Y: Netstrømmen er lig komponentstrømmen.</span><strong id="threeLoadType">—</strong></div>
             </article>
           </div>
-          <div class="result-strip eight"><div><span>Netspænding U<sub>n</sub></span><strong id="threeUn">—</strong><small id="threeUnFormula">—</small></div><div><span>Fasespænding U<sub>f</sub></span><strong id="threeUf">—</strong><small id="threeUfFormula">—</small></div><div><span>Impedans Z<sub>f</sub></span><strong id="threeZ">—</strong><small>√(R² + X²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeI">—</strong><small id="threeIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeP">—</strong><small id="threePFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeQ">—</strong><small id="threeQFormula">—</small></div><div><span>Fortegnet cos φ</span><strong id="threeCos">—</strong><small id="threeCosAngle">φ = —</small></div></div>
+          <div class="result-strip eight"><div><span>Netspænding U<sub>n</sub></span><strong id="threeUn">—</strong><small id="threeUnFormula">—</small></div><div><span>Fasespænding U<sub>f</sub></span><strong id="threeUf">—</strong><small id="threeUfFormula">—</small></div><div><span>Impedans Z<sub>f</sub></span><strong id="threeZ">—</strong><small>√(R² + X²)</small></div><div><span>Komponentstrøm I<sub>z</sub></span><strong id="threeIf">—</strong><small>I<sub>z</sub> = U<sub>f</sub>/Z<sub>f</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeI">—</strong><small id="threeIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeP">—</strong><small id="threePFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeQ">—</strong><small id="threeQFormula">—</small></div><div><span>Fortegnet cos φ</span><strong id="threeCos">—</strong><small id="threeCosAngle">φ = —</small></div></div>
         </section>
 
         <section class="page" id="trefaset-belastning" data-title="3-faset belastning">
@@ -360,7 +360,7 @@
                 <label><span><b>Fasespænding U<sub>f</sub></b><em>V</em></span><input id="threeLoadUf" type="number" value="230" min="0" step="0.1"></label>
                 <label><span>Frekvens f <em>Hz</em></span><input id="threeLoadF" type="number" value="50" min="0.1"></label>
               </div>
-              <div class="connection-explainer" id="threeLoadExplainer"><strong>Y</strong><p>Indstil både U<sub>n</sub> og U<sub>f</sub> direkte.<br>I<sub>n</sub> = I<sub>f</sub></p></div>
+              <div class="connection-explainer" id="threeLoadExplainer"><strong>Y</strong><p>Indstil både U<sub>n</sub> og U<sub>f</sub> direkte.<br>I<sub>n</sub> = I<sub>z</sub></p></div>
             </article>
             <article class="card visual-card">
               <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3 id="threeLoadDiagramTitle">Belastningens strømme</h3></div><div class="diagram-tools"><div class="segmented mini-toggle" id="threeLoadVectorMode"><button class="active" data-three-load-vector="total">Samlet</button><button data-three-load-vector="branches">Alle</button></div><div class="legend"><span class="l1">L1</span><span class="l2">L2</span><span class="l3">L3</span></div></div></div>
@@ -373,7 +373,7 @@
               <div class="visual-caption"><span id="threeLoadFocusNote">Viser kun strømme for den valgte fase.</span><strong>U som lokal fasereference</strong></div>
             </article>
           </div>
-          <div class="result-strip eight"><div><span>R<sub>eq</sub> pr. fase</span><strong id="threeLoadR">—</strong><small>Ækvivalent R</small></div><div><span>X<sub>eq</sub> pr. fase</span><strong id="threeLoadX">—</strong><small>Ækvivalent X</small></div><div><span>Z<sub>eq</sub></span><strong id="threeLoadZ">—</strong><small>√(R<sub>eq</sub>² + X<sub>eq</sub>²)</small></div><div><span>Fasestrøm I<sub>f</sub></span><strong id="threeLoadIf">—</strong><small>I<sub>f</sub> = U<sub>f</sub>/Z<sub>eq</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeLoadIn">—</strong><small id="threeLoadIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeLoadP">—</strong><small id="threeLoadPFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeLoadQ">—</strong><small>+ induktiv&nbsp;&nbsp;|&nbsp;&nbsp;− kapacitiv</small></div><div><span>Fortegnet cos φ</span><strong id="threeLoadCos">—</strong><small id="threeLoadCosAngle">φ = —</small></div></div>
+          <div class="result-strip eight"><div><span>R<sub>eq</sub> pr. fase</span><strong id="threeLoadR">—</strong><small>Ækvivalent R</small></div><div><span>X<sub>eq</sub> pr. fase</span><strong id="threeLoadX">—</strong><small>Ækvivalent X</small></div><div><span>Z<sub>eq</sub></span><strong id="threeLoadZ">—</strong><small>√(R<sub>eq</sub>² + X<sub>eq</sub>²)</small></div><div><span>Komponentstrøm I<sub>z</sub></span><strong id="threeLoadIf">—</strong><small>I<sub>z</sub> = U<sub>f</sub>/Z<sub>eq</sub></small></div><div><span>Netstrøm I<sub>n</sub></span><strong id="threeLoadIn">—</strong><small id="threeLoadIFormula">—</small></div><div><span>Aktiv effekt P</span><strong id="threeLoadP">—</strong><small id="threeLoadPFormula">—</small></div><div><span>Reaktiv effekt Q</span><strong id="threeLoadQ">—</strong><small>+ induktiv&nbsp;&nbsp;|&nbsp;&nbsp;− kapacitiv</small></div><div><span>Fortegnet cos φ</span><strong id="threeLoadCos">—</strong><small id="threeLoadCosAngle">φ = —</small></div></div>
         </section>
 
         <section class="page" id="kompensering" data-title="Fasekompensering">
@@ -441,15 +441,15 @@
             <div class="table-head"><span>Størrelse</span><span>Stjerne (Y)</span><span>Trekant (Δ)</span><span>Δ / Y</span></div>
             <div><span>Netspænding U<sub>n</sub></span><strong id="connUnY">—</strong><strong id="connUnD">—</strong><b>1</b></div>
             <div><span>Fasespænding U<sub>f</sub></span><strong id="connUfY">—</strong><strong id="connUfD">—</strong><b>√3</b></div>
-            <div><span>Fasestrøm I<sub>f</sub></span><strong id="connIfY">—</strong><strong id="connIfD">—</strong><b>√3</b></div>
+            <div><span>Komponentstrøm I<sub>z</sub></span><strong id="connIfY">—</strong><strong id="connIfD">—</strong><b>√3</b></div>
             <div><span>Netstrøm I<sub>n</sub></span><strong id="connInY">—</strong><strong id="connInD">—</strong><b>3</b></div>
             <div><span>Aktiv effekt P</span><strong id="connPY">—</strong><strong id="connPD">—</strong><b>3</b></div>
             <div><span>Reaktiv effekt Q</span><strong id="connQY">—</strong><strong id="connQD">—</strong><b>3</b></div>
             <div><span>Tilsyneladende effekt S</span><strong id="connSY">—</strong><strong id="connSD">—</strong><b>3</b></div>
           </div>
           <div class="connection-formulas">
-            <article class="card formula-panel"><span class="step">STJERNE: Y</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub> / √3</p><p>I<sub>n</sub> = I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
-            <article class="card formula-panel"><span class="step">TREKANT: Δ</span><h3>Net- og fasestørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>f</sub> = U<sub>f</sub> / Z<sub>f</sub>&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>n</sub> = √3 · I<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>f</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>f</sub></p></div></article>
+            <article class="card formula-panel"><span class="step">STJERNE: Y</span><h3>Net- og komponentstørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub> / √3</p><p>I<sub>n</sub> = I<sub>z</sub> = U<sub>f</sub> / Z<sub>f</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>z</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>z</sub></p></div></article>
+            <article class="card formula-panel"><span class="step">TREKANT: Δ</span><h3>Net- og komponentstørrelser</h3><div class="formula-stack"><p>U<sub>f</sub> = U<sub>n</sub></p><p>I<sub>z</sub> = U<sub>f</sub> / Z<sub>f</sub>&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>n</sub> = √3 · I<sub>z</sub></p><p>P = √3 · U<sub>n</sub> · I<sub>n</sub> · cos φ = 3 · U<sub>f</sub> · I<sub>z</sub> · cos φ</p><p>Q = √3 · U<sub>n</sub> · I<sub>n</sub> · sin φ</p><p>S = √3 · U<sub>n</sub> · I<sub>n</sub> = 3 · U<sub>f</sub> · I<sub>z</sub></p></div></article>
           </div>
         </section>
 
@@ -511,7 +511,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=asym-input-modes-1"></script>
+  <script src="app.js?v=three-neutral-iz-2"></script>
 </body>
 </html>
 
