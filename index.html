@@ -21,6 +21,7 @@
         <button class="nav-item" data-page="serie"><span class="nav-icon">RLC</span><span>1-faset serie</span><kbd>2</kbd></button>
         <button class="nav-item" data-page="parallel"><span class="nav-icon">RLC</span><span>1-faset parallel</span><kbd>3</kbd></button>
         <button class="nav-item" data-page="effekt"><span class="nav-icon">△</span><span>Effekt & fase</span><kbd>4</kbd></button>
+        <button class="nav-item" data-page="trekanter"><span class="nav-icon">△</span><span>Trekanter</span><kbd>△</kbd></button>
         <button class="nav-item" data-page="trefaset"><span class="nav-icon">3Φ</span><span>3-faset</span><kbd>5</kbd></button>
         <button class="nav-item" data-page="trefaset-belastning"><span class="nav-icon">3~</span><span>3-faset belastning</span><kbd>6</kbd></button>
         <button class="nav-item" data-page="kompensering"><span class="nav-icon">C</span><span>Fasekompensering</span><kbd>7</kbd></button>
@@ -305,6 +306,26 @@
           </article>
         </section>
 
+        <section class="page" id="trekanter" data-title="Trekanter og φ">
+          <div class="intro-row">
+            <div><span class="chapter">05 | RETVINKLEDE TREKANTER</span><h2>Se sammenhængen mellem siderne</h2><p>Skift mellem den almindelige retvinklede trekant, impedans-, spændings- og effekttrekanten. Den samme geometri giver forskellige elektriske størrelser og formler.</p></div>
+            <div class="formula-badge">a² + b² = c²</div>
+          </div>
+          <article class="card triangle-explorer-card">
+            <div class="card-head"><div><span class="step">VÆLG TREKANT</span><h3 id="triangleExplorerTitle">Retvinklet trekant</h3></div><span class="angle-pill">tan φ = modstående / hosliggende</span></div>
+            <div class="segmented four triangle-selector" id="triangleSelector"><button class="active" data-triangle="general">Retvinklet</button><button data-triangle="impedance">Impedans</button><button data-triangle="voltage">Spænding</button><button data-triangle="power">Effekt</button></div>
+            <div class="triangle-explorer-layout">
+              <div class="triangle-diagram-panel"><svg id="triangleExplorerSvg" class="diagram triangle-explorer-svg" data-expandable-diagram viewBox="0 0 520 310" role="img" aria-label="Retvinklet trekant med sider og fasevinkel"></svg><p id="triangleExplorerTip" class="triangle-tip"></p></div>
+              <div class="triangle-formula-panel"><p id="triangleExplorerIntro" class="triangle-intro"></p><div class="formula-stack" id="trianglePrimaryFormula"></div><div class="triangle-formula-grid" id="triangleFormulaGrid"></div></div>
+            </div>
+          </article>
+          <div class="formula-library triangle-library">
+            <article><span>PYTHAGORAS</span><strong>Hypotenuse² = katete² + katete²</strong><p>Bruges til at finde den manglende side i alle fire trekanter.</p></article>
+            <article><span>VINKEL φ</span><strong>tan φ = modstående / hosliggende</strong><p>Brug sin⁻¹, cos⁻¹ eller tan⁻¹ når to sider er kendt.</p></article>
+            <article><span>VEKTORIELT</span><strong>A = B + C</strong><p>De to kateter er vinkelrette vektorkomponenter; hypotenusen er resultanten.</p></article>
+          </div>
+        </section>
+
         <section class="page" id="trefaset" data-title="3-fasede systemer">
           <div class="intro-row"><div><span class="chapter">05 | SYMMETRISK 3-FASE</span><h2>Tre faser med 120° imellem</h2><p>Vælg stjerne eller trekant. Diagrammet viser fasespændingerne og de tilhørende strømme forskudt med belastningens impedansvinkel.</p></div><div class="concept-chip"><span>√3</span><p><strong>Net ↔ fase</strong><br>Forbindelsen bestemmer omsætningen.</p></div></div>
           <article class="card circuit-strip three-circuit-strip">
@@ -511,7 +532,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=vector-arrow-1"></script>
+  <script src="app.js?v=triangle-explorer-1"></script>
 </body>
 </html>
 

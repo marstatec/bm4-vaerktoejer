@@ -104,7 +104,7 @@ function drawParallelCircuit(components){
 const defaults = {};
 $$('input').forEach(input => defaults[input.id] = input.value);
 const selectDefaults={};$$('select').forEach(select=>selectDefaults[select.id]=select.value);
-let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', threeLoadConnection='Y', threeLoadVoltageType='line', threeLoadInputMode='components', threeLoadAsymInputMode='z', threeLoadComponentCount=3, threeLoadVectorMode='total', threeLoadFocusPhase=1, ohmTarget='U', ohmPowerMode='simple', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta',seriesVoltageMode='total',seriesImpedanceMode='total',parallelVectorMode='total';
+let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', threeLoadConnection='Y', threeLoadVoltageType='line', threeLoadInputMode='components', threeLoadAsymInputMode='z', threeLoadComponentCount=3, threeLoadVectorMode='total', threeLoadFocusPhase=1, ohmTarget='U', ohmPowerMode='simple', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta',seriesVoltageMode='total',seriesImpedanceMode='total',parallelVectorMode='total',triangleMode='general';
 
 function drawAc(){
   const U=num('acU'), I=num('acI'), f=Math.max(.1,num('acF')), phi=clamp(Number($('acPhi').value)||0,-90,90);
@@ -842,8 +842,33 @@ function switchThreeLoadInputMode(next){
   if(next===threeLoadInputMode)return;const omega=2*Math.PI*Math.max(.1,num('threeLoadF'));for(let i=1;i<=MAX_COMPONENTS;i++){const type=$(`threeLoadCompType${i}`).value,value=num(`threeLoadCompValue${i}`);$(`threeLoadCompValue${i}`).value=convertComponentValue(type,value,threeLoadInputMode,next,omega).toFixed(3);}
   threeLoadInputMode=next;syncInputModeUI();drawThreeLoad();
 }
-function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();applyElectricalColorConvention();}
+function drawTriangleExplorer(){
+  const root=$('triangleExplorerSvg');if(!root)return;
+  const modes={
+    general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel','φ = cos⁻¹(a/c) = sin⁻¹(b/c) = tan⁻¹(b/a)']]},
+    impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['R','X','Z'],symbols:['R','X','Z'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = √(Z² − R²)'],['Vinkel','φ = cos⁻¹(R/Z) = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
+    voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['Uᴿ','Uˣ','U'],symbols:['Uᴿ','Uˣ','U'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel','φ = cos⁻¹(Uᴿ/U) = sin⁻¹(Uˣ/U) = tan⁻¹(Uˣ/Uᴿ)']]},
+    power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['P','Q','S'],symbols:['P','Q','S'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel','φ = cos⁻¹(P/S) = sin⁻¹(Q/S) = tan⁻¹(Q/P)']]}
+  };
+  const m=modes[triangleMode]||modes.general;
+  $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;
+  $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;
+  $('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');
+  clear(root);
+  const A={x:110,y:245},B={x:395,y:245},C={x:395,y:68};
+  for(let x=70;x<=450;x+=48)line(root,x,34,x,270,'triangle-guide');for(let y=34;y<=270;y+=48)line(root,70,y,450,y,'triangle-guide');
+  root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));
+  root.append(svg('path',{d:`M ${B.x-22} ${B.y} L ${B.x-22} ${B.y-22} L ${B.x} ${B.y-22}`,class:'triangle-right-angle'}));
+  root.append(svg('path',{d:`M ${A.x+40} ${A.y} A 40 40 0 0 0 ${A.x+31} ${A.y-25}`,class:'triangle-angle'}));
+  text(root,238,263,m.symbols[0],'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');
+  text(root,414,157,m.symbols[1],'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');
+  text(root,234,148,m.symbols[2],'triangle-symbol','#dce7ea','middle');
+  text(root,160,218,'φ','triangle-symbol','#aab8c0','middle');
+  text(root,238,283,m.sides[0],'triangle-dimension','#71828d','middle');text(root,424,177,m.sides[1],'triangle-dimension','#71828d');text(root,237,130,m.sides[2],'triangle-dimension','#71828d','middle');
+}
+function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
 $$('input').forEach(input=>input.addEventListener('input',()=>{ if(input.id==='acPhi') $('acPhiRange').value=input.value; if(input.id==='powerCos') $('powerCosRange').value=input.value; updateAll(); }));
+$$('#triangleSelector button').forEach(button=>button.addEventListener('click',()=>{triangleMode=button.dataset.triangle;$$('#triangleSelector button').forEach(b=>b.classList.toggle('active',b===button));drawTriangleExplorer();}));
 $('acPhiRange').addEventListener('input',e=>{$('acPhi').value=e.target.value;drawAc();});$('powerCosRange').addEventListener('input',e=>{$('powerCos').value=e.target.value;drawPower();});
 $$('#seriesInputMode button').forEach(b=>b.addEventListener('click',()=>switchSeriesInputMode(b.dataset.seriesMode)));
 $$('#parallelInputMode button').forEach(b=>b.addEventListener('click',()=>switchParallelInputMode(b.dataset.parallelMode)));
