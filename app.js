@@ -119,6 +119,10 @@ function drawAc(){
   $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'+'+da(phi,0):'−'+da(Math.abs(phi),0)}°`;
   $('acWaveCaption').textContent=phi<0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms efter spændingen.`:phi>0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms før spændingen.`:'Der er ingen tidsforskel: strøm og spænding passerer samme punkt samtidig.';
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
+  const Uhat=U*Math.SQRT2,Ihat=I*Math.SQRT2,Umean=2/Math.PI*Uhat,Imean=2/Math.PI*Ihat;
+  $('acPeakValues').textContent=`Û = ${da(Uhat,1)} V  |  Î = ${da(Ihat,1)} A`;
+  $('acMeanValues').textContent=`Ū = ${da(Umean,1)} V  |  Ī = ${da(Imean,1)} A`;
+  $('acRmsValues').textContent=`Uₑff = ${da(U,1)} V  |  Iₑff = ${da(I,1)} A`;
   const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,uAngle,VOLTAGE_COLOR,`U = ${da(U,0)} V`);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,1)} A`);
   if(phi!==0){const r=42,sweep=phi>0?0:1,endX=cx+r*Math.cos(rad(iAngle)),endY=cy-r*Math.sin(rad(iAngle)),midAngle=90+phi/2;root.append(svg('path',{d:`M ${cx} ${cy-r} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,cx+58*Math.cos(rad(midAngle)),cy-58*Math.sin(rad(midAngle))+4,`φ = ${da(Math.abs(phi),0)}°`,'vector-label','#778791','middle');}

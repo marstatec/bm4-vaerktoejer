@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=triangle-explorer-1">
+  <link rel="stylesheet" href="styles.css?v=ac-values-1">
 </head>
 <body>
   <div class="app-shell">
@@ -95,6 +95,11 @@
             <div><span class="step">FORMELSAMMENHÆNG</span><h3>Øjebliksværdier</h3><p id="acWaveCaption">Maksimalværdien er √2 gange effektivværdien. Kurverne viser to perioder.</p></div>
             <div class="formula-main"><span>u(t) =</span><b id="acUhatFormula">325,3</b><span> · sin(2π · </span><b id="acFFormula">50</b><span> · t)</span></div>
             <svg id="waveDiagram" class="wave-diagram" viewBox="0 0 850 180" role="img" aria-label="Sinuskurver for spænding og strøm"></svg>
+            <div class="ac-value-formulas">
+              <div><span>Maksimalværdi</span><strong id="acPeakValues">—</strong><small>Û = √2 · U<sub>eff</sub>&nbsp;&nbsp;|&nbsp;&nbsp;Î = √2 · I<sub>eff</sub></small></div>
+              <div><span>Middelværdi · positiv halvbølge</span><strong id="acMeanValues">—</strong><small>Ū = 2/π · Û&nbsp;&nbsp;|&nbsp;&nbsp;Ī = 2/π · Î</small></div>
+              <div><span>Effektivværdi</span><strong id="acRmsValues">—</strong><small>U<sub>eff</sub> = Û/√2&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>eff</sub> = Î/√2</small></div>
+            </div>
           </article>
         </section>
 
@@ -532,7 +537,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=wave-grid-5ms-1"></script>
+  <script src="app.js?v=ac-values-1"></script>
 </body>
 </html>
 
