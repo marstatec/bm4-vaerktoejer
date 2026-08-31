@@ -855,7 +855,7 @@ function drawTriangleExplorer(){
   $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;
   $('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');
   clear(root);
-  const A={x:110,y:245},B={x:395,y:245},C={x:395,y:68};
+  const A={x:118,y:226},B={x:406,y:226},C={x:406,y:82};
   for(let x=70;x<=450;x+=48)line(root,x,34,x,270,'triangle-guide');for(let y=34;y<=270;y+=48)line(root,70,y,450,y,'triangle-guide');
   root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));
   root.append(svg('path',{d:`M ${B.x-22} ${B.y} L ${B.x-22} ${B.y-22} L ${B.x} ${B.y-22}`,class:'triangle-right-angle'}));
