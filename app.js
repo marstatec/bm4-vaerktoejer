@@ -882,17 +882,21 @@ function drawTriangleExplorer(activeKey=''){
   if($('triangleValueInputs').dataset.mode!==triangleMode){renderTriangleInputs();$('triangleValueInputs').dataset.mode=triangleMode;}
   $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;
   $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;$('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');syncTriangleInputs(activeKey);
-  clear(root);const A={x:118,y:226};
-  for(let x=70;x<=450;x+=48)line(root,x,34,x,270,'triangle-guide');for(let y=34;y<=270;y+=48)line(root,70,y,450,y,'triangle-guide');
-  const scale=Math.min(328/Math.max(s.a,.001),176/Math.max(s.b,.001)),width=s.a*scale,height=s.b*scale,B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
+  clear(root);const A={x:115,y:185};
+  baseGrid(root,A.x,A.y,480,240);
+  const scale=Math.min(330/Math.max(s.a,.001),128/Math.max(s.b,.001)),width=s.a*scale,height=s.b*scale,B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
   const angleRadius=clamp(Math.min(width,height)*.28,18,40),angleEnd={x:A.x+Math.cos(rad(s.phi))*angleRadius,y:A.y-Math.sin(rad(s.phi))*angleRadius},rightSize=clamp(Math.min(width,height)*.16,12,22);
-  root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));
+  const aColor=m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0',bColor=m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1',cColor=VOLTAGE_COLOR;
+  line(root,A.x,C.y,B.x,C.y,'guide');
+  arrow(root,A.x,A.y,width,0,aColor,'',.75);
+  arrow(root,B.x,B.y,height,90,bColor,'',.75);
+  arrowTo(root,A.x,A.y,C.x,C.y,cColor,'',.85);
   root.append(svg('path',{d:`M ${B.x-rightSize} ${B.y} L ${B.x-rightSize} ${B.y-rightSize} L ${B.x} ${B.y-rightSize}`,class:'triangle-right-angle'}));
   root.append(svg('path',{d:`M ${A.x+angleRadius} ${A.y} A ${angleRadius} ${angleRadius} 0 0 0 ${angleEnd.x} ${angleEnd.y}`,class:'triangle-angle'}));
   const sideValue=(index,key)=>`${m.symbols[index]} = ${da(s[key],1)}${m.units[index]?` ${m.units[index]}`:''}`;
-  text(root,A.x+width*.5,A.y+38,sideValue(0,'a'),'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');text(root,B.x+12,B.y-height*.5+4,sideValue(1,'b'),'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');text(root,A.x+width*.5-10,A.y-height*.5-8,sideValue(2,'c'),'triangle-symbol','#dce7ea','middle');
+  text(root,A.x+width*.5,A.y+25,sideValue(0,'a'),'triangle-symbol',aColor,'middle');text(root,B.x+13,B.y-height*.5+4,sideValue(1,'b'),'triangle-symbol',bColor);text(root,A.x+width*.5-10,A.y-height*.5-13,sideValue(2,'c'),'triangle-symbol',cColor,'middle');
   line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y-9,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
-  text(root,A.x+width*.5,A.y+58,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+24,B.y-height*.5+24,m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5-26,m.sides[2],'triangle-dimension','#71828d','middle');
+  text(root,A.x+width*.5,A.y+44,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+22,B.y-height*.5+23,m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5-30,m.sides[2],'triangle-dimension','#71828d','middle');
 }
 function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
 $$('input').forEach(input=>input.addEventListener('input',()=>{ if(input.id==='acPhi') $('acPhiRange').value=input.value; if(input.id==='powerCos') $('powerCosRange').value=input.value; updateAll(); }));
