@@ -885,7 +885,9 @@ function drawTriangleExplorer(activeKey=''){
   clear(root);const A={x:118,y:226},B={x:406,y:226},C={x:406,y:82};
   for(let x=70;x<=450;x+=48)line(root,x,34,x,270,'triangle-guide');for(let y=34;y<=270;y+=48)line(root,70,y,450,y,'triangle-guide');
   root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));root.append(svg('path',{d:`M ${B.x-22} ${B.y} L ${B.x-22} ${B.y-22} L ${B.x} ${B.y-22}`,class:'triangle-right-angle'}));root.append(svg('path',{d:`M ${A.x+40} ${A.y} A 40 40 0 0 0 ${A.x+31} ${A.y-25}`,class:'triangle-angle'}));
-  text(root,238,263,m.symbols[0],'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');text(root,414,157,m.symbols[1],'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');text(root,234,148,m.symbols[2],'triangle-symbol','#dce7ea','middle');text(root,172,218,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
+  const sideValue=(index,key)=>`${m.symbols[index]} = ${da(s[key],1)}${m.units[index]?` ${m.units[index]}`:''}`;
+  text(root,238,263,sideValue(0,'a'),'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');text(root,414,157,sideValue(1,'b'),'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');text(root,234,148,sideValue(2,'c'),'triangle-symbol','#dce7ea','middle');
+  line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y-9,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
   text(root,238,283,m.sides[0],'triangle-dimension','#71828d','middle');text(root,424,177,m.sides[1],'triangle-dimension','#71828d');text(root,237,130,m.sides[2],'triangle-dimension','#71828d','middle');
 }
 function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
