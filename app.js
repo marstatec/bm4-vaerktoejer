@@ -126,7 +126,8 @@ function drawAc(){
 }
 function drawWaves(U,I,f,phi){
   const root=$('waveDiagram'); clear(root); const W=850,H=180,mid=90; line(root,20,mid,830,mid,'axis');
-  for(let x=20;x<=830;x+=81) line(root,x,15,x,165);
+  const durationMs=2000/f;
+  for(let ms=0;ms<=durationMs+.001;ms+=5){const x=20+ms/durationMs*810;line(root,x,15,x,165);}
   const path=(phase,amp)=>{let d='';for(let x=20;x<=830;x+=3){const t=(x-20)/810*4*Math.PI;const y=mid-amp*Math.sin(t+rad(phase));d+=(x===20?'M':'L')+` ${x} ${y}`;}return d;};
   root.append(svg('path',{d:path(0,60),fill:'none',stroke:VOLTAGE_COLOR,'stroke-width':2.2}));root.append(svg('path',{d:path(phi,42),fill:'none',stroke:CURRENT_COLOR,'stroke-width':2}));
   const periodPx=405,refX=425,currentX=refX-phi/360*periodPx,dtY=153,left=Math.min(refX,currentX),right=Math.max(refX,currentX),dt=Math.abs(phi)/360/f*1000;
