@@ -105,6 +105,8 @@ const defaults = {};
 $$('input').forEach(input => defaults[input.id] = input.value);
 const selectDefaults={};$$('select').forEach(select=>selectDefaults[select.id]=select.value);
 let powerMode=1, threeConnection='Y', threeVoltageType='line', threeCurrentView='line', threeLoadConnection='Y', threeLoadVoltageType='line', threeLoadInputMode='components', threeLoadAsymInputMode='z', threeLoadComponentCount=3, threeLoadVectorMode='total', threeLoadFocusPhase=1, ohmTarget='U', ohmPowerMode='simple', seriesInputMode='components', parallelInputMode='components',seriesComponentCount=3,parallelComponentCount=3,transformDirection='delta-star',transformSymDirection='star-delta',seriesVoltageMode='total',seriesImpedanceMode='total',parallelVectorMode='total',triangleMode='general';
+const triangleStates={general:{a:3,b:4,c:5,phi:53.13},impedance:{a:12,b:9,c:15,phi:36.87},voltage:{a:184,b:138,c:230,phi:36.87},power:{a:800,b:600,c:1000,phi:36.87}};
+const triangleEdited={general:['a','b'],impedance:['a','b'],voltage:['a','b'],power:['a','b']};
 
 function drawAc(){
   const U=num('acU'), I=num('acI'), f=Math.max(.1,num('acF')), phi=clamp(Number($('acPhi').value)||0,-90,90);
@@ -847,28 +849,43 @@ function switchThreeLoadInputMode(next){
   if(next===threeLoadInputMode)return;const omega=2*Math.PI*Math.max(.1,num('threeLoadF'));for(let i=1;i<=MAX_COMPONENTS;i++){const type=$(`threeLoadCompType${i}`).value,value=num(`threeLoadCompValue${i}`);$(`threeLoadCompValue${i}`).value=convertComponentValue(type,value,threeLoadInputMode,next,omega).toFixed(3);}
   threeLoadInputMode=next;syncInputModeUI();drawThreeLoad();
 }
-function drawTriangleExplorer(){
-  const root=$('triangleExplorerSvg');if(!root)return;
-  const modes={
-    general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel','φ = cos⁻¹(a/c) = sin⁻¹(b/c) = tan⁻¹(b/a)']]},
-    impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['R','X','Z'],symbols:['R','X','Z'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = √(Z² − R²)'],['Vinkel','φ = cos⁻¹(R/Z) = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
-    voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['Uᴿ','Uˣ','U'],symbols:['Uᴿ','Uˣ','U'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel','φ = cos⁻¹(Uᴿ/U) = sin⁻¹(Uˣ/U) = tan⁻¹(Uˣ/Uᴿ)']]},
-    power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['P','Q','S'],symbols:['P','Q','S'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel','φ = cos⁻¹(P/S) = sin⁻¹(Q/S) = tan⁻¹(Q/P)']]}
-  };
-  const m=modes[triangleMode]||modes.general;
+function triangleModes(){return {
+  general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],units:['','',''],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel','φ = cos⁻¹(a/c) = sin⁻¹(b/c) = tan⁻¹(b/a)']]},
+  impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['modstand','reaktans','impedans'],symbols:['R','X','Z'],units:['Ω','Ω','Ω'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = √(Z² − R²)'],['Vinkel','φ = cos⁻¹(R/Z) = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
+  voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['resistiv spænding','reaktiv spænding','spænding'],symbols:['Uᴿ','Uˣ','U'],units:['V','V','V'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel','φ = cos⁻¹(Uᴿ/U) = sin⁻¹(Uˣ/U) = tan⁻¹(Uˣ/Uᴿ)']]},
+  power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['aktiv effekt','reaktiv effekt','tilsyneladende effekt'],symbols:['P','Q','S'],units:['W','var','VA'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel','φ = cos⁻¹(P/S) = sin⁻¹(Q/S) = tan⁻¹(Q/P)']]}
+};}
+function renderTriangleInputs(){
+  const root=$('triangleValueInputs');if(!root)return;const m=triangleModes()[triangleMode],s=triangleStates[triangleMode];
+  root.innerHTML=['a','b','c'].map((key,index)=>`<label><span>${m.symbols[index]} · ${m.sides[index]}${m.units[index]?` <em>${m.units[index]}</em>`:''}</span><input data-triangle-key="${key}" type="number" min="0.001" step="0.1" value="${s[key]}"></label>`).join('')+`<label><span>φ <em>°</em></span><input data-triangle-key="phi" type="number" min="0.1" max="89.9" step="0.1" value="${s.phi}"></label>`;
+  $$('input[data-triangle-key]',root).forEach(input=>{input.addEventListener('input',()=>updateTriangleValue(input.dataset.triangleKey,input.value));input.addEventListener('change',()=>drawTriangleExplorer());});
+}
+function solveTriangle(){
+  const s=triangleStates[triangleMode],pair=triangleEdited[triangleMode],has=(x,y)=>pair.includes(x)&&pair.includes(y),toDeg=r=>deg(r),toRad=v=>rad(v);
+  if(has('a','b')){s.c=Math.hypot(s.a,s.b);s.phi=toDeg(Math.atan2(s.b,s.a));}
+  else if(has('a','c')){s.b=Math.sqrt(Math.max(0,s.c*s.c-s.a*s.a));s.phi=toDeg(Math.acos(clamp(s.a/s.c,-1,1)));}
+  else if(has('b','c')){s.a=Math.sqrt(Math.max(0,s.c*s.c-s.b*s.b));s.phi=toDeg(Math.asin(clamp(s.b/s.c,-1,1)));}
+  else if(has('a','phi')){const p=toRad(s.phi);s.b=s.a*Math.tan(p);s.c=s.a/Math.cos(p);}
+  else if(has('b','phi')){const p=toRad(s.phi);s.a=s.b/Math.tan(p);s.c=s.b/Math.sin(p);}
+  else if(has('c','phi')){const p=toRad(s.phi);s.a=s.c*Math.cos(p);s.b=s.c*Math.sin(p);}
+}
+function updateTriangleValue(key,raw){
+  const value=Number(raw);if(!Number.isFinite(value)||(key==='phi'?(value<=0||value>=90):value<=0))return;
+  const s=triangleStates[triangleMode];s[key]=key==='phi'?clamp(value,.1,89.9):value;triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer(key);
+}
+function syncTriangleInputs(activeKey=''){
+  const s=triangleStates[triangleMode];$$('input[data-triangle-key]').forEach(input=>{if(input.dataset.triangleKey!==activeKey)input.value=da(s[input.dataset.triangleKey],1);});
+  const labels={a:'første katete',b:'anden katete',c:'hypotenusen',phi:'φ'};const pair=triangleEdited[triangleMode];$('triangleInputStatus').textContent=`Inddata: ${labels[pair[0]]} og ${labels[pair[1]]}.`;
+}
+function drawTriangleExplorer(activeKey=''){
+  const root=$('triangleExplorerSvg');if(!root)return;const modes=triangleModes(),m=modes[triangleMode]||modes.general,s=triangleStates[triangleMode];
+  if($('triangleValueInputs').dataset.mode!==triangleMode){renderTriangleInputs();$('triangleValueInputs').dataset.mode=triangleMode;}
   $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;
-  $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;
-  $('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');
-  clear(root);
-  const A={x:118,y:226},B={x:406,y:226},C={x:406,y:82};
+  $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;$('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');syncTriangleInputs(activeKey);
+  clear(root);const A={x:118,y:226},B={x:406,y:226},C={x:406,y:82};
   for(let x=70;x<=450;x+=48)line(root,x,34,x,270,'triangle-guide');for(let y=34;y<=270;y+=48)line(root,70,y,450,y,'triangle-guide');
-  root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));
-  root.append(svg('path',{d:`M ${B.x-22} ${B.y} L ${B.x-22} ${B.y-22} L ${B.x} ${B.y-22}`,class:'triangle-right-angle'}));
-  root.append(svg('path',{d:`M ${A.x+40} ${A.y} A 40 40 0 0 0 ${A.x+31} ${A.y-25}`,class:'triangle-angle'}));
-  text(root,238,263,m.symbols[0],'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');
-  text(root,414,157,m.symbols[1],'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');
-  text(root,234,148,m.symbols[2],'triangle-symbol','#dce7ea','middle');
-  text(root,160,218,'φ','triangle-symbol','#aab8c0','middle');
+  root.append(svg('path',{d:`M ${A.x} ${A.y} L ${B.x} ${B.y} L ${C.x} ${C.y} Z`,class:'triangle-side'}));root.append(svg('path',{d:`M ${B.x-22} ${B.y} L ${B.x-22} ${B.y-22} L ${B.x} ${B.y-22}`,class:'triangle-right-angle'}));root.append(svg('path',{d:`M ${A.x+40} ${A.y} A 40 40 0 0 0 ${A.x+31} ${A.y-25}`,class:'triangle-angle'}));
+  text(root,238,263,m.symbols[0],'triangle-symbol',m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0','middle');text(root,414,157,m.symbols[1],'triangle-symbol',m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1');text(root,234,148,m.symbols[2],'triangle-symbol','#dce7ea','middle');text(root,172,218,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
   text(root,238,283,m.sides[0],'triangle-dimension','#71828d','middle');text(root,424,177,m.sides[1],'triangle-dimension','#71828d');text(root,237,130,m.sides[2],'triangle-dimension','#71828d','middle');
 }
 function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
