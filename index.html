@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=triangle-inputs-1">
+  <link rel="stylesheet" href="styles.css?v=triangle-series-look-1">
 </head>
 <body>
   <div class="app-shell">
@@ -318,6 +318,7 @@
           <article class="card triangle-explorer-card">
             <div class="card-head"><div><span class="step">VÆLG TREKANT</span><h3 id="triangleExplorerTitle">Retvinklet trekant</h3></div><span class="angle-pill">tan φ = modstående / hosliggende</span></div>
             <div class="segmented four triangle-selector" id="triangleSelector"><button class="active" data-triangle="general">Retvinklet</button><button data-triangle="impedance">Impedans</button><button data-triangle="voltage">Spænding</button><button data-triangle="power">Effekt</button></div>
+            <div class="segmented triangle-reactance-selector" id="triangleReactanceType"><button class="active" data-triangle-reactance="inductive">X<sub>L</sub>: Induktiv <small>+90°</small></button><button data-triangle-reactance="capacitive">X<sub>C</sub>: Kapacitiv <small>−90°</small></button></div>
             <div class="triangle-explorer-layout">
               <div class="triangle-diagram-panel"><svg id="triangleExplorerSvg" class="diagram triangle-explorer-svg" data-expandable-diagram viewBox="0 0 520 310" role="img" aria-label="Retvinklet trekant med sider og fasevinkel"></svg><p id="triangleExplorerTip" class="triangle-tip"></p></div>
               <div class="triangle-formula-panel"><p id="triangleExplorerIntro" class="triangle-intro"></p><div class="triangle-input-area"><p>Redigér to værdier — resten beregnes automatisk.</p><div class="triangle-value-inputs" id="triangleValueInputs"></div><small id="triangleInputStatus"></small></div><div class="formula-stack" id="trianglePrimaryFormula"></div><div class="triangle-formula-grid" id="triangleFormulaGrid"></div></div>
@@ -536,7 +537,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=triangle-series-style-1"></script>
+  <script src="app.js?v=triangle-series-look-1"></script>
 </body>
 </html>
 

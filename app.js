@@ -894,7 +894,7 @@ function drawTriangleExplorer(activeKey=''){
   root.append(svg('path',{d:`M ${B.x-rightSize} ${B.y} L ${B.x-rightSize} ${B.y-rightSize} L ${B.x} ${B.y-rightSize}`,class:'triangle-right-angle'}));
   root.append(svg('path',{d:`M ${A.x+angleRadius} ${A.y} A ${angleRadius} ${angleRadius} 0 0 0 ${angleEnd.x} ${angleEnd.y}`,class:'triangle-angle'}));
   const sideValue=(index,key)=>`${m.symbols[index]} = ${da(s[key],1)}${m.units[index]?` ${m.units[index]}`:''}`;
-  text(root,A.x+width*.5,A.y+25,sideValue(0,'a'),'triangle-symbol',aColor,'middle');text(root,B.x+13,B.y-height*.5+4,sideValue(1,'b'),'triangle-symbol',bColor);text(root,A.x+width*.5-10,A.y-height*.5-13,sideValue(2,'c'),'triangle-symbol',cColor,'middle');
+  text(root,A.x+width*.5,A.y+25,sideValue(0,'a'),'vector-label',aColor,'middle');text(root,B.x+13,B.y-height*.5+4,sideValue(1,'b'),'vector-label',bColor);text(root,A.x+width*.5-10,A.y-height*.5-13,sideValue(2,'c'),'vector-label',cColor,'middle');
   line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y-9,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
   text(root,A.x+width*.5,A.y+44,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+22,B.y-height*.5+23,m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5-30,m.sides[2],'triangle-dimension','#71828d','middle');
 }
