@@ -857,20 +857,16 @@ function triangleModes(){return {
 };}
 function renderTriangleInputs(){
   const root=$('triangleValueInputs');if(!root)return;const m=triangleModes()[triangleMode],s=triangleStates[triangleMode];
-  const inputFor=(key,label,value,unit='')=>`<label><span>${label}${unit?` <em>${unit}</em>`:''}</span><div class="triangle-stepper"><button type="button" data-triangle-key="${key}" data-triangle-step="-0.1" aria-label="Formindsk ${label}">−</button><input data-triangle-key="${key}" type="text" inputmode="decimal" value="${da(value,1)}"><button type="button" data-triangle-key="${key}" data-triangle-step="0.1" aria-label="Forøg ${label}">+</button></div></label>`;
+  const inputFor=(key,label,value,unit='')=>`<label><span>${label}${unit?` <em>${unit}</em>`:''}</span><input data-triangle-key="${key}" type="number" value="${triangleInputValue(value)}" step="0.1"${triangleAllowsNegative(key)?'':' min="0.1"'}${key==='phi'?' max="89.9"':''}></label>`;
   root.innerHTML=['a','b','c'].map((key,index)=>inputFor(key,`${m.symbols[index]} · ${m.sides[index]}`,s[key],m.units[index])).join('')+inputFor('phi','φ',s.phi,'°');
   $$('input[data-triangle-key]',root).forEach(input=>{input.addEventListener('input',()=>updateTriangleValue(input.dataset.triangleKey,input.value));input.addEventListener('change',()=>drawTriangleExplorer());});
-  $$('button[data-triangle-step]',root).forEach(button=>button.addEventListener('click',()=>nudgeTriangleValue(button.dataset.triangleKey,Number(button.dataset.triangleStep))));
 }
 function triangleAllowsNegative(key){return triangleMode==='impedance'&&(key==='b'||key==='phi');}
+function triangleInputValue(value){return Number.isFinite(value)?String(Math.round(value*10)/10):'';}
 function clampTriangleValue(key,value){
   if(key==='phi')return triangleAllowsNegative(key)?clamp(value,-89.9,89.9):clamp(value,.1,89.9);
   if(triangleAllowsNegative(key))return value;
   return Math.max(.1,value);
-}
-function nudgeTriangleValue(key,delta){
-  const s=triangleStates[triangleMode],current=Number(s[key])||0,next=Math.round((current+delta)*10)/10;
-  s[key]=clampTriangleValue(key,next);triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer();
 }
 function solveTriangle(){
   const s=triangleStates[triangleMode],pair=triangleEdited[triangleMode],has=(x,y)=>pair.includes(x)&&pair.includes(y),toDeg=r=>deg(r),toRad=v=>rad(v),signed=triangleMode==='impedance',verticalSign=()=>signed&&((pair.includes('b')&&s.b<0)||(pair.includes('phi')&&s.phi<0)||(!pair.includes('b')&&!pair.includes('phi')&&(s.b<0||s.phi<0)))?-1:1;
@@ -888,7 +884,7 @@ function updateTriangleValue(key,raw){
   const s=triangleStates[triangleMode];s[key]=clampTriangleValue(key,value);triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer(key);
 }
 function syncTriangleInputs(activeKey=''){
-  const s=triangleStates[triangleMode];$$('input[data-triangle-key]').forEach(input=>{const key=input.dataset.triangleKey;if(key!==activeKey||document.activeElement!==input)input.value=da(s[key],1);});
+  const s=triangleStates[triangleMode];$$('input[data-triangle-key]').forEach(input=>{const key=input.dataset.triangleKey;if(key!==activeKey||document.activeElement!==input)input.value=triangleInputValue(s[key]);});
   const labels={a:'første katete',b:'anden katete',c:'hypotenusen',phi:'φ'};const pair=triangleEdited[triangleMode];$('triangleInputStatus').textContent=`Inddata: ${labels[pair[0]]} og ${labels[pair[1]]}.`;
 }
 function drawTriangleExplorer(activeKey=''){
