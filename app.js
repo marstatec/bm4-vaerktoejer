@@ -13,6 +13,46 @@ const power = (watts, reactive = false) => {
   const suffix = reactive ? 'var' : 'W';
   return Math.abs(watts) >= 1000 ? unit(watts / 1000, reactive ? 'kvar' : 'kW', 2) : unit(watts, suffix, 1);
 };
+const frac = (top, bottom) => `<span class="math-frac"><span>${top}</span><span>${bottom}</span></span>`;
+function fractionizeFormulaHtml(html){
+  const pairs=[
+    ['P / S',frac('P','S')],
+    ['|φ|/360°',frac('|φ|','360°')],
+    ['U<sub>eff</sub> = Û/√2',`U<sub>eff</sub> = ${frac('Û','√2')}`],
+    ['I<sub>eff</sub> = Î/√2',`I<sub>eff</sub> = ${frac('Î','√2')}`],
+    ['I = U / Z',`I = ${frac('U','Z')}`],
+    ['−atan(X/R)',`−atan(${frac('X','R')})`],
+    ['tan⁻¹(X/R)',`tan⁻¹(${frac('X','R')})`],
+    ['R/Z',frac('R','Z')],
+    ['1/(2πfC)',frac('1','2πfC')],
+    ['1/(2πfX<sub>C</sub>)',frac('1','2πfX<sub>C</sub>')],
+    ['Q<sub>C</sub>/(√3 U<sub>n</sub>)',frac('Q<sub>C</sub>','√3 U<sub>n</sub>')],
+    ['P/(√3 U<sub>n</sub> cosφ₁)',frac('P','√3 U<sub>n</sub> cosφ₁')],
+    ['P/cosφ₁',frac('P','cosφ₁')],
+    ['P/cosφ₂',frac('P','cosφ₂')],
+    ['U<sub>n</sub> / √3',frac('U<sub>n</sub>','√3')],
+    ['U<sub>f</sub> / Z<sub>f</sub>',frac('U<sub>f</sub>','Z<sub>f</sub>')],
+    ['R<sub>12</sub>R<sub>31</sub> / ΣR<sub>Δ</sub>',frac('R<sub>12</sub>R<sub>31</sub>','ΣR<sub>Δ</sub>')],
+    ['R<sub>23</sub>R<sub>12</sub> / ΣR<sub>Δ</sub>',frac('R<sub>23</sub>R<sub>12</sub>','ΣR<sub>Δ</sub>')],
+    ['R<sub>31</sub>R<sub>23</sub> / ΣR<sub>Δ</sub>',frac('R<sub>31</sub>R<sub>23</sub>','ΣR<sub>Δ</sub>')],
+    ['N / R<sub>30</sub>',frac('N','R<sub>30</sub>')],
+    ['N / R<sub>10</sub>',frac('N','R<sub>10</sub>')],
+    ['N / R<sub>20</sub>',frac('N','R<sub>20</sub>')],
+    ['R<sub>Δ</sub> / 3',frac('R<sub>Δ</sub>','3')],
+    ['U/R',frac('U','R')],
+    ['U/I',frac('U','I')],
+    ['U²/R',frac('U²','R')],
+    ['1/R<sub>tot</sub>',frac('1','R<sub>tot</sub>')],
+    ['1/R',frac('1','R')],
+    ['modstående / hosliggende',frac('modstående','hosliggende')]
+  ];
+  return pairs.reduce((text,[from,to])=>text.replaceAll(from,to),html);
+}
+function applyFormulaFractions(root=document){
+  $$('.formula-badge,.formula-main,.formula-stack p,.transform-formula-columns p,.formula-grid strong,.formula-grid small,.result-strip small,.formula-library strong,.formula-library p,.triangle-library strong,.triangle-library p,.symmetric-equation,.formula-foot,.angle-pill',root).forEach(el=>{
+    el.innerHTML=fractionizeFormulaHtml(el.innerHTML);
+  });
+}
 const phiResultLabel = phi => Math.abs(phi) < .05 ? 'φ = 0,0°  |  resistiv' : `φ = ${phi > 0 ? '+' : ''}${da(phi,1)}°  |  ${phi < 0 ? 'kapacitiv' : 'induktiv'}`;
 const themeSurface = () => document.body.classList.contains('light-theme') ? '#ffffff' : '#111b24';
 const svg = (tag, attrs = {}, text = '') => {
@@ -117,7 +157,7 @@ function drawAc(){
   if(loadType==='resistive'){$('acLoadTitle').textContent='Resistiv last';$('acLoadExplanation').textContent='Strøm og spænding er i fase';$('acSignNote').innerHTML='<strong>Resistiv:</strong> Strøm og spænding følges ad.';}
   const S=U*I, P=S*Math.cos(rad(phi)), Q=-S*Math.sin(rad(phi)),T=1/f,dt=Math.abs(phi)/360*T;
   $('acP').textContent=power(P); $('acQ').textContent=power(Q,true); $('acS').textContent=Math.abs(S)>=1000?unit(S/1000,'kVA',2):unit(S,'VA'); $('acCos').textContent=da(Math.cos(rad(phi)),3);
-  $('acDt').textContent=`${da(dt*1000,2)} ms`;$('acDtNote').textContent=`Δt = |${da(phi,0)}°| / 360° · ${da(T*1000,1)} ms`;
+  $('acDt').textContent=`${da(dt*1000,2)} ms`;$('acDtNote').innerHTML=`Δt = ${frac(`|${da(phi,0)}°|`,'360°')} · ${da(T*1000,1)} ms`;
   $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'+'+da(phi,0):'−'+da(Math.abs(phi),0)}°`;
   $('acWaveCaption').textContent=phi<0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms efter spændingen.`:phi>0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms før spændingen.`:'Der er ingen tidsforskel: strøm og spænding passerer samme punkt samtidig.';
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
@@ -217,8 +257,8 @@ function drawImpedanceTriangle(R,XL,XC,X,Z,phi,components=[],f=50){
   const isResonant=XL>.00001&&XC>.00001&&Math.abs(X)<.05;$('impedanceType').textContent=isResonant?'Resonans':Math.abs(X)<.05?'Resistiv':X>0?'Induktiv':'Kapacitiv';
   $('impedanceXFormula').textContent=`X = ${da(XL,1)} − ${da(XC,1)} = ${da(X,1)} Ω`;
   $('impedanceZFormula').textContent=`Z = √(${da(R,1)}² + (${da(X,1)})²) = ${da(Z,1)} Ω`;
-  $('impedancePhiFormula').textContent=R>0?`∠Z = tan⁻¹(${da(X,1)} / ${da(R,1)}) = ${phi>0?'+':''}${da(phi,1)}°`:`∠Z = ${phi>0?'+':''}${da(phi,1)}°`;
-  $('impedanceCosFormula').textContent=Z>0?`cos(∠Z) = ${da(R,1)} / ${da(Z,1)} = ${da(R/Z,3)}`:'cos(∠Z) = —';
+  $('impedancePhiFormula').innerHTML=R>0?`∠Z = tan⁻¹(${frac(da(X,1),da(R,1))}) = ${phi>0?'+':''}${da(phi,1)}°`:`∠Z = ${phi>0?'+':''}${da(phi,1)}°`;
+  $('impedanceCosFormula').innerHTML=Z>0?`cos(∠Z) = ${frac(da(R,1),da(Z,1))} = ${da(R/Z,3)}`:'cos(∠Z) = —';
   const root=$('impedanceTriangle');clear(root);
   if(seriesImpedanceMode==='parts'&&components.length){
     const omega=2*Math.PI*f,parts=seriesComponentParts(components,1,omega),x0=115,y0=185,W=680,H=310;drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
@@ -254,7 +294,7 @@ function drawParallel(){
   $('parallelBranchEquations').innerHTML=branches.map(b=>directCurrents?`<span>${b.name} = I<sub>${b.index}</sub>∠θ<sub>${b.index}</sub></span>`:b.type==='R'?`<span>${b.name} = U/R<sub>${b.index}</sub></span>`:b.type==='L'?`<span>${b.name} = U/X<sub>L${b.index}</sub></span>`:`<span>${b.name} = U/X<sub>C${b.index}</sub></span>`).join('');
   $('parXL').textContent=Number.isFinite(XL)?unit(XL,'Ω'):'—';$('parXC').textContent=Number.isFinite(XC)?unit(XC,'Ω'):'—';$('parXLNote').textContent=directCurrents?'Ikke anvendt':Number.isFinite(XL)?'Ækvivalent induktiv reaktans':'Ingen L-gren';$('parXCNote').textContent=directCurrents?'Ikke anvendt':Number.isFinite(XC)?'Ækvivalent kapacitiv reaktans':'Ingen C-gren';$('parBranchName1').innerHTML='ΣI<sub>R</sub>';$('parBranchName2').innerHTML='ΣI<sub>L</sub>';$('parBranchName3').innerHTML='ΣI<sub>C</sub>';$('parIR').textContent=unit(IRsum,'A',2);$('parIL').textContent=unit(ILsum,'A',2);$('parIC').textContent=unit(ICsum,'A',2);$('parIRNote').textContent='Samlet resistiv strøm';$('parILNote').textContent='Samlet induktiv strøm';$('parICNote').textContent='Samlet kapacitiv strøm';$('parI').textContent=unit(I,'A',2);
   $('parZ').textContent=unit(Z,'Ω');$('parPhi').textContent=unit(phi,'°');$('parCos').textContent=da(cos,3);$('parP').textContent=power(P);$('parQ').textContent=power(state==='resistive'?0:Q,true);$('parallelPhiText').textContent=`I∠${Math.abs(currentAngle)<.05?'0':currentAngle>0?'+'+da(currentAngle,1):da(currentAngle,1)}°`;$('parIFormulaTitle').innerHTML='I = |Σ I̲<sub>gren</sub>|';$('parIFormula').textContent=directCurrents?`I = |Σ I̲_gren| = ${da(I,2)} A`:`I = √(${da(IRsum,2)}² + (${da(ILsum,2)} − ${da(ICsum,2)})²) = ${da(I,2)} A`;
-  $('parPhiNote').innerHTML='φ = −arg(ΣI̲<sub>gren</sub>)';$('parCosNote').innerHTML='cos φ = P/(U · I)';$('parPNote').innerHTML=directCurrents?'P = U · Σ(I<sub>k</sub> cos θ<sub>k</sub>)':'P = U · ΣI<sub>R</sub>';$('parQNote').innerHTML=directCurrents?'Q = −U · Σ(I<sub>k</sub> sin θ<sub>k</sub>)':'Q = U · (ΣI<sub>L</sub>−ΣI<sub>C</sub>)';$('parResFormula').textContent=f0?`f₀ = ${da(f0,2)} Hz`:'Kræver både L- og C-gren';$('parZFormula').textContent=`Z = ${da(U,1)} / ${da(I,2)} = ${da(Z,2)} Ω`;$('parallelType').textContent=state==='inductive'?'Induktiv':state==='capacitive'?'Kapacitiv':isResonant?'Parallelresonans':'Resistiv';
+  $('parPhiNote').innerHTML='φ = −arg(ΣI̲<sub>gren</sub>)';$('parCosNote').innerHTML=`cos φ = ${frac('P','U · I')}`;$('parPNote').innerHTML=directCurrents?'P = U · Σ(I<sub>k</sub> cos θ<sub>k</sub>)':'P = U · ΣI<sub>R</sub>';$('parQNote').innerHTML=directCurrents?'Q = −U · Σ(I<sub>k</sub> sin θ<sub>k</sub>)':'Q = U · (ΣI<sub>L</sub>−ΣI<sub>C</sub>)';$('parResFormula').textContent=f0?`f₀ = ${da(f0,2)} Hz`:'Kræver både L- og C-gren';$('parZFormula').innerHTML=`Z = ${frac(da(U,1),da(I,2))} = ${da(Z,2)} Ω`;$('parallelType').textContent=state==='inductive'?'Induktiv':state==='capacitive'?'Kapacitiv':isResonant?'Parallelresonans':'Resistiv';
   const angleHelp=directCurrents?' Positiv grenvinkel er foran U&nbsp;&nbsp;|&nbsp;&nbsp;negativ er bagefter U.':'';if(state==='inductive')$('parallelNatureText').innerHTML=`<strong>Induktiv:</strong> Resultatstrømmen er ${da(Math.abs(currentAngle),1)}° bagefter spændingen.${angleHelp}`;if(state==='capacitive')$('parallelNatureText').innerHTML=`<strong>Kapacitiv:</strong> Resultatstrømmen er ${da(Math.abs(currentAngle),1)}° foran spændingen.${angleHelp}`;if(state==='resistive')$('parallelNatureText').innerHTML=isResonant?'<strong>Parallelresonans:</strong> De induktive og kapacitive grenstrømme ophæver hinanden.':`<strong>Resistiv:</strong> Resultatstrømmen er i fase med spændingen.${angleHelp}`;
   drawParallelVectorDiagram(branches,I,currentAngle,phi,state);
   if(directCurrents){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Grenstrømme indtastet direkte';$('parResonanceText').textContent='Vektorsummen, fasevinklen, P, Q og Z beregnes direkte ud fra de aktive grenstrømme.';}else if(!f0){$('parResonanceNeedle').style.left='50%';$('parResonanceTitle').textContent='Parallelresonans kræver både L og C';$('parResonanceText').textContent='Vælg mindst én induktiv og én kapacitiv gren for at beregne resonans.';}else{const resRatio=clamp((1-f/f0)*.5,-.5,.5);$('parResonanceNeedle').style.left=`${50+resRatio*92}%`;$('parResonanceTitle').textContent=isResonant?'Kredsen er i parallelresonans':'Afstand til parallelresonans';$('parResonanceText').textContent=`Resonansfrekvens f₀ = ${da(f0,2)} Hz. Ved resonans ophæver de samlede L- og C-strømme hinanden.`;}
@@ -706,7 +746,7 @@ function drawSymmetricTransformation(){
   const value=Math.max(0,num('trSymY'));
   const starToDelta=transformSymDirection==='star-delta';
   $('trSymInputLabel').innerHTML=starToDelta?'Stjernemodstand R<sub>Y</sub> <em>Ω</em>':'Trekantmodstand R<sub>Δ</sub> <em>Ω</em>';
-  $('trSymEquation').innerHTML=starToDelta?'R<sub>Δ</sub> = 3 · R<sub>Y</sub>':'R<sub>Y</sub> = R<sub>Δ</sub> / 3';
+  $('trSymEquation').innerHTML=starToDelta?'R<sub>Δ</sub> = 3 · R<sub>Y</sub>':`R<sub>Y</sub> = ${frac('R<sub>Δ</sub>','3')}`;
   $('trSymDelta').textContent=unit(starToDelta?value*3:value/3,'Ω',2);
   $('trSymHelp').innerHTML=starToDelta?'Samme symmetriske belastning i trekant skal have tre gange så stor modstand.':'Samme symmetriske belastning i stjerne skal have en tredjedel af trekantmodstanden.';
 }
@@ -753,10 +793,10 @@ function renderOhmInputs(){
 function drawOhm(){
   let r=0,formula='',u='',tip='Klik på U, I, R eller P i vælgeren';
   if(ohmTarget==='U'){const I=ohmValue('ohmI'),R=ohmValue('ohmR');r=I*R;u='V';formula='U = I · R';}
-  if(ohmTarget==='I'){const U=ohmValue('ohmU'),R=ohmValue('ohmR');r=R?U/R:0;u='A';formula='I = U / R';}
-  if(ohmTarget==='R'){const U=ohmValue('ohmU'),I=ohmValue('ohmI');r=I?U/I:0;u='Ω';formula='R = U / I';}
+  if(ohmTarget==='I'){const U=ohmValue('ohmU'),R=ohmValue('ohmR');r=R?U/R:0;u='A';formula=`I = ${frac('U','R')}`;}
+  if(ohmTarget==='R'){const U=ohmValue('ohmU'),I=ohmValue('ohmI');r=I?U/I:0;u='Ω';formula=`R = ${frac('U','I')}`;}
   if(ohmTarget==='P'){const cfg=ohmPowerConfigs[ohmPowerMode],values={U:ohmValue('ohmU'),I:ohmValue('ohmI'),Cos:ohmValue('ohmCos',1)};r=cfg.calc(values);u='W';formula=cfg.formula;tip=cfg.tip;}
-  $('ohmResult').textContent=u==='W'?power(r):unit(r,u,2);$('ohmUsedFormula').textContent=formula;const root=$('ohmWheel');clear(root);const items=[['U',260,55],['I',130,220],['R',390,220],['P',260,245]];line(root,260,70,145,205,'guide');line(root,260,70,375,205,'guide');line(root,145,220,375,220,'guide');items.forEach(([k,x,y])=>{const active=k===ohmTarget;root.append(svg('circle',{cx:x,cy:y,r:active?40:32,fill:active?'#17333b':'#121d25',stroke:active?'#35d3e3':'#344550','stroke-width':active?2:1}));text(root,x,y+6,k,'vector-label',active?'#35d3e3':'#94a2ac','middle');});text(root,260,135,formula,'vector-label','#c5d2d8','middle');text(root,260,155,tip,'vector-label','#596873','middle');
+  $('ohmResult').textContent=u==='W'?power(r):unit(r,u,2);$('ohmUsedFormula').innerHTML=formula;const root=$('ohmWheel');clear(root);const items=[['U',260,55],['I',130,220],['R',390,220],['P',260,245]];line(root,260,70,145,205,'guide');line(root,260,70,375,205,'guide');line(root,145,220,375,220,'guide');items.forEach(([k,x,y])=>{const active=k===ohmTarget;root.append(svg('circle',{cx:x,cy:y,r:active?40:32,fill:active?'#17333b':'#121d25',stroke:active?'#35d3e3':'#344550','stroke-width':active?2:1}));text(root,x,y+6,k,'vector-label',active?'#35d3e3':'#94a2ac','middle');});text(root,260,135,formula.replace(/<[^>]+>/g,''),'vector-label','#c5d2d8','middle');text(root,260,155,tip,'vector-label','#596873','middle');
 }
 
 function recolorArrowGroup(group,color){if(!group)return;const vector=group.querySelector('line.vector');const head=group.querySelector('polygon');const label=group.querySelector('text');if(vector)vector.setAttribute('stroke',color);if(head)head.setAttribute('fill',color);if(label)label.setAttribute('fill',color);}
@@ -850,10 +890,10 @@ function switchThreeLoadInputMode(next){
   threeLoadInputMode=next;syncInputModeUI();drawThreeLoad();
 }
 function triangleModes(){return {
-  general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],units:['','',''],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel','φ = cos⁻¹(a/c) = sin⁻¹(b/c) = tan⁻¹(b/a)']]},
-  impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['modstand','reaktans','impedans'],symbols:['R','X','Z'],units:['Ω','Ω','Ω'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = ±√(Z² − R²)'],['Vinkel','φ = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
-  voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['resistiv spænding','reaktiv spænding','spænding'],symbols:['Uᴿ','Uˣ','U'],units:['V','V','V'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel','φ = cos⁻¹(Uᴿ/U) = sin⁻¹(Uˣ/U) = tan⁻¹(Uˣ/Uᴿ)']]},
-  power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['aktiv effekt','reaktiv effekt','tilsyneladende effekt'],symbols:['P','Q','S'],units:['W','var','VA'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel','φ = cos⁻¹(P/S) = sin⁻¹(Q/S) = tan⁻¹(Q/P)']]}
+  general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],units:['','',''],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel',`φ = cos⁻¹(${frac('a','c')}) = sin⁻¹(${frac('b','c')}) = tan⁻¹(${frac('b','a')})`]]},
+  impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['modstand','reaktans','impedans'],symbols:['R','X','Z'],units:['Ω','Ω','Ω'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = ±√(Z² − R²)'],['Vinkel',`φ = sin⁻¹(${frac('X','Z')}) = tan⁻¹(${frac('X','R')})`]]},
+  voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['resistiv spænding','reaktiv spænding','spænding'],symbols:['Uᴿ','Uˣ','U'],units:['V','V','V'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel',`φ = cos⁻¹(${frac('Uᴿ','U')}) = sin⁻¹(${frac('Uˣ','U')}) = tan⁻¹(${frac('Uˣ','Uᴿ')})`]]},
+  power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['aktiv effekt','reaktiv effekt','tilsyneladende effekt'],symbols:['P','Q','S'],units:['W','var','VA'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel',`φ = cos⁻¹(${frac('P','S')}) = sin⁻¹(${frac('Q','S')}) = tan⁻¹(${frac('Q','P')})`]]}
 };}
 function renderTriangleInputs(){
   const root=$('triangleValueInputs');if(!root)return;const m=triangleModes()[triangleMode],s=triangleStates[triangleMode];
@@ -960,7 +1000,7 @@ $('scaleDown').addEventListener('click',()=>{const current=scaleMode==='auto'?au
 $('scaleUp').addEventListener('click',()=>{const current=scaleMode==='auto'?automaticScale():manualScale;scaleMode='manual';manualScale=clamp(Math.round((current+.1)*100)/100,.85,1.35);saveScale(String(manualScale));applyDisplayScale();});
 $('scaleAuto').addEventListener('click',()=>{scaleMode='auto';saveScale('auto');applyDisplayScale();});
 window.addEventListener('resize',()=>{if(scaleMode==='auto')applyDisplayScale();});
-applyTheme();applyDisplayScale();renderOhmInputs();syncInputModeUI();activatePage(location.hash.slice(1)||'vekselstroem',false);updateAll();installDiagramExpanders();window.addEventListener('load',()=>window.scrollTo({top:0,behavior:'auto'}),{once:true});setTimeout(()=>window.scrollTo(0,0),350);
+applyTheme();applyDisplayScale();renderOhmInputs();syncInputModeUI();activatePage(location.hash.slice(1)||'vekselstroem',false);updateAll();applyFormulaFractions();installDiagramExpanders();window.addEventListener('load',()=>window.scrollTo({top:0,behavior:'auto'}),{once:true});setTimeout(()=>window.scrollTo(0,0),350);
 
 
 
