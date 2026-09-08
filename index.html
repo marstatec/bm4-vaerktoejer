@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=triangle-series-look-1">
+  <link rel="stylesheet" href="styles.css?v=triangle-training-1">
 </head>
 <body>
   <div class="app-shell">
@@ -331,6 +331,34 @@
             <div class="formula-stack" id="trianglePrimaryFormula"></div>
             <div class="triangle-formula-grid" id="triangleFormulaGrid"></div>
           </article>
+          <article class="card triangle-teaching-card">
+            <div class="card-head"><div><span class="step">OPLÆRING</span><h3>Cos, sin og tan i en retvinklet trekant</h3></div></div>
+            <div class="triangle-teaching-grid">
+              <div>
+                <span>Navne på siderne</span>
+                <p><b>Hypotenusen</b> er altid den skrå og længste side, modsat den rette vinkel.</p>
+                <p><b>Hosliggende</b> ligger ved siden af φ. <b>Modstående</b> ligger overfor φ.</p>
+              </div>
+              <div>
+                <span>SOH CAH TOA</span>
+                <p><b>sin φ</b> = modstående / hypotenuse</p>
+                <p><b>cos φ</b> = hosliggende / hypotenuse</p>
+                <p><b>tan φ</b> = modstående / hosliggende</p>
+              </div>
+              <div>
+                <span>Find siderne fra φ</span>
+                <p>Hosliggende = hypotenuse · cos φ</p>
+                <p>Modstående = hypotenuse · sin φ</p>
+                <p>Modstående = hosliggende · tan φ</p>
+              </div>
+              <div>
+                <span>Find den manglende side</span>
+                <p>Hypotenuse = √(hosliggende² + modstående²)</p>
+                <p>Hosliggende = √(hypotenuse² − modstående²)</p>
+                <p>Modstående = √(hypotenuse² − hosliggende²)</p>
+              </div>
+            </div>
+          </article>
           <div class="formula-library triangle-library">
             <article><span>PYTHAGORAS</span><strong>Hypotenuse² = katete² + katete²</strong><p>Bruges til at finde den manglende side i alle fire trekanter.</p></article>
             <article><span>VINKEL φ</span><strong>tan φ = modstående / hosliggende</strong><p>Brug sin⁻¹, cos⁻¹ eller tan⁻¹ når to sider er kendt.</p></article>
@@ -544,7 +572,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=triangle-series-look-1"></script>
+  <script src="app.js?v=triangle-training-1"></script>
 </body>
 </html>
 
