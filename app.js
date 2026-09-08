@@ -851,27 +851,41 @@ function switchThreeLoadInputMode(next){
 }
 function triangleModes(){return {
   general:{title:'Retvinklet trekant',intro:'En retvinklet trekant har to kateter og en hypotenuse. Vinklen φ måles mellem den hosliggende katete og hypotenusen.',sides:['hosliggende','modstående','hypotenuse'],symbols:['a','b','c'],units:['','',''],tip:'Brug trekanten som grundmodel for de elektriske trekanter.',main:'c² = a² + b²',formulas:[['Hypotenuse','c = √(a² + b²)'],['Hosliggende','a = c · cos φ = √(c² − b²)'],['Modstående','b = c · sin φ = √(c² − a²)'],['Vinkel','φ = cos⁻¹(a/c) = sin⁻¹(b/c) = tan⁻¹(b/a)']]},
-  impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['modstand','reaktans','impedans'],symbols:['R','X','Z'],units:['Ω','Ω','Ω'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = √(Z² − R²)'],['Vinkel','φ = cos⁻¹(R/Z) = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
+  impedance:{title:'Impedanstrekant',intro:'Modstanden R og reaktansen X er vinkelrette impedanskomponenter. Impedansen Z er den vektorielle resultant.',sides:['modstand','reaktans','impedans'],symbols:['R','X','Z'],units:['Ω','Ω','Ω'],tip:'X er positiv ved induktiv og negativ ved kapacitiv reaktans.',main:'Z² = R² + X²',formulas:[['Impedans','Z = √(R² + X²)'],['Modstand','R = Z · cos φ = √(Z² − X²)'],['Reaktans','X = Z · sin φ = ±√(Z² − R²)'],['Vinkel','φ = sin⁻¹(X/Z) = tan⁻¹(X/R)']]},
   voltage:{title:'Spændingstrekant',intro:'Den resistive spænding Uᴿ og reaktive spænding Uˣ står vinkelret. Forsyningsspændingen U er resultanten.',sides:['resistiv spænding','reaktiv spænding','spænding'],symbols:['Uᴿ','Uˣ','U'],units:['V','V','V'],tip:'I en seriekreds er Uᴿ i fase med strømmen, mens Uˣ er forskudt 90°.',main:'U² = Uᴿ² + Uˣ²',formulas:[['Spænding','U = √(Uᴿ² + Uˣ²)'],['Resistiv del','Uᴿ = U · cos φ = √(U² − Uˣ²)'],['Reaktiv del','Uˣ = U · sin φ = √(U² − Uᴿ²)'],['Vinkel','φ = cos⁻¹(Uᴿ/U) = sin⁻¹(Uˣ/U) = tan⁻¹(Uˣ/Uᴿ)']]},
   power:{title:'Effekttrekant',intro:'Aktiv effekt P og reaktiv effekt Q er vinkelrette. Den tilsyneladende effekt S er resultanten.',sides:['aktiv effekt','reaktiv effekt','tilsyneladende effekt'],symbols:['P','Q','S'],units:['W','var','VA'],tip:'Q er positiv for induktiv last og negativ for kapacitiv last.',main:'S² = P² + Q²',formulas:[['Tilsyneladende','S = √(P² + Q²)'],['Aktiv effekt','P = S · cos φ = √(S² − Q²)'],['Reaktiv effekt','Q = S · sin φ = √(S² − P²)'],['Vinkel','φ = cos⁻¹(P/S) = sin⁻¹(Q/S) = tan⁻¹(Q/P)']]}
 };}
 function renderTriangleInputs(){
   const root=$('triangleValueInputs');if(!root)return;const m=triangleModes()[triangleMode],s=triangleStates[triangleMode];
-  root.innerHTML=['a','b','c'].map((key,index)=>`<label><span>${m.symbols[index]} · ${m.sides[index]}${m.units[index]?` <em>${m.units[index]}</em>`:''}</span><input data-triangle-key="${key}" type="text" inputmode="decimal" value="${da(s[key],1)}"></label>`).join('')+`<label><span>φ <em>°</em></span><input data-triangle-key="phi" type="text" inputmode="decimal" value="${da(s.phi,1)}"></label>`;
+  const inputFor=(key,label,value,unit='')=>`<label><span>${label}${unit?` <em>${unit}</em>`:''}</span><div class="triangle-stepper"><button type="button" data-triangle-key="${key}" data-triangle-step="-0.1" aria-label="Formindsk ${label}">−</button><input data-triangle-key="${key}" type="text" inputmode="decimal" value="${da(value,1)}"><button type="button" data-triangle-key="${key}" data-triangle-step="0.1" aria-label="Forøg ${label}">+</button></div></label>`;
+  root.innerHTML=['a','b','c'].map((key,index)=>inputFor(key,`${m.symbols[index]} · ${m.sides[index]}`,s[key],m.units[index])).join('')+inputFor('phi','φ',s.phi,'°');
   $$('input[data-triangle-key]',root).forEach(input=>{input.addEventListener('input',()=>updateTriangleValue(input.dataset.triangleKey,input.value));input.addEventListener('change',()=>drawTriangleExplorer());});
+  $$('button[data-triangle-step]',root).forEach(button=>button.addEventListener('click',()=>nudgeTriangleValue(button.dataset.triangleKey,Number(button.dataset.triangleStep))));
+}
+function triangleAllowsNegative(key){return triangleMode==='impedance'&&(key==='b'||key==='phi');}
+function clampTriangleValue(key,value){
+  if(key==='phi')return triangleAllowsNegative(key)?clamp(value,-89.9,89.9):clamp(value,.1,89.9);
+  if(triangleAllowsNegative(key))return value;
+  return Math.max(.1,value);
+}
+function nudgeTriangleValue(key,delta){
+  const s=triangleStates[triangleMode],current=Number(s[key])||0,next=Math.round((current+delta)*10)/10;
+  s[key]=clampTriangleValue(key,next);triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer();
 }
 function solveTriangle(){
-  const s=triangleStates[triangleMode],pair=triangleEdited[triangleMode],has=(x,y)=>pair.includes(x)&&pair.includes(y),toDeg=r=>deg(r),toRad=v=>rad(v);
+  const s=triangleStates[triangleMode],pair=triangleEdited[triangleMode],has=(x,y)=>pair.includes(x)&&pair.includes(y),toDeg=r=>deg(r),toRad=v=>rad(v),signed=triangleMode==='impedance',verticalSign=()=>signed&&((pair.includes('b')&&s.b<0)||(pair.includes('phi')&&s.phi<0)||(!pair.includes('b')&&!pair.includes('phi')&&(s.b<0||s.phi<0)))?-1:1;
   if(has('a','b')){s.c=Math.hypot(s.a,s.b);s.phi=toDeg(Math.atan2(s.b,s.a));}
-  else if(has('a','c')){s.b=Math.sqrt(Math.max(0,s.c*s.c-s.a*s.a));s.phi=toDeg(Math.acos(clamp(s.a/s.c,-1,1)));}
+  else if(has('a','c')){const sign=verticalSign();s.b=sign*Math.sqrt(Math.max(0,s.c*s.c-s.a*s.a));s.phi=sign*toDeg(Math.acos(clamp(s.a/s.c,-1,1)));}
   else if(has('b','c')){s.a=Math.sqrt(Math.max(0,s.c*s.c-s.b*s.b));s.phi=toDeg(Math.asin(clamp(s.b/s.c,-1,1)));}
-  else if(has('a','phi')){const p=toRad(s.phi);s.b=s.a*Math.tan(p);s.c=s.a/Math.cos(p);}
-  else if(has('b','phi')){const p=toRad(s.phi);s.a=s.b/Math.tan(p);s.c=s.b/Math.sin(p);}
-  else if(has('c','phi')){const p=toRad(s.phi);s.a=s.c*Math.cos(p);s.b=s.c*Math.sin(p);}
+  else if(has('a','phi')){const p=toRad(s.phi);s.b=s.a*Math.tan(p);s.c=Math.abs(s.a/Math.cos(p));}
+  else if(has('b','phi')){if(Math.abs(s.phi)<.001){s.a=Math.max(s.a,.1);s.c=Math.hypot(s.a,s.b);}else{const p=toRad(s.phi);s.a=Math.abs(s.b/Math.tan(p));s.c=Math.abs(s.b/Math.sin(p));}}
+  else if(has('c','phi')){const p=toRad(s.phi);s.a=Math.abs(s.c*Math.cos(p));s.b=s.c*Math.sin(p);}
+  if(!signed){s.b=Math.abs(s.b);s.phi=Math.abs(s.phi);}
 }
 function updateTriangleValue(key,raw){
-  const value=Number(String(raw).replace(',','.'));if(!Number.isFinite(value)||(key==='phi'?(value<=0||value>=90):value<=0))return;
-  const s=triangleStates[triangleMode];s[key]=key==='phi'?clamp(value,.1,89.9):value;triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer(key);
+  const value=Number(String(raw).replace(',','.'));if(!Number.isFinite(value)||(!triangleAllowsNegative(key)&&key!=='phi'&&value<=0))return;
+  if(key==='phi'&&!triangleAllowsNegative(key)&&(value<=0||value>=90))return;
+  const s=triangleStates[triangleMode];s[key]=clampTriangleValue(key,value);triangleEdited[triangleMode]=[...triangleEdited[triangleMode].filter(k=>k!==key),key].slice(-2);solveTriangle();drawTriangleExplorer(key);
 }
 function syncTriangleInputs(activeKey=''){
   const s=triangleStates[triangleMode];$$('input[data-triangle-key]').forEach(input=>{const key=input.dataset.triangleKey;if(key!==activeKey||document.activeElement!==input)input.value=da(s[key],1);});
@@ -882,21 +896,21 @@ function drawTriangleExplorer(activeKey=''){
   if($('triangleValueInputs').dataset.mode!==triangleMode){renderTriangleInputs();$('triangleValueInputs').dataset.mode=triangleMode;}
   $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;
   $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;$('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');syncTriangleInputs(activeKey);
-  clear(root);const A={x:115,y:185};
+  const isNegativeVertical=s.b<0;clear(root);const A={x:115,y:isNegativeVertical?128:185};
   baseGrid(root,A.x,A.y,480,240);
-  const scale=Math.min(330/Math.max(s.a,.001),128/Math.max(s.b,.001)),width=s.a*scale,height=s.b*scale,B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
-  const angleRadius=clamp(Math.min(width,height)*.28,18,40),angleEnd={x:A.x+Math.cos(rad(s.phi))*angleRadius,y:A.y-Math.sin(rad(s.phi))*angleRadius},rightSize=clamp(Math.min(width,height)*.16,12,22);
+  const scale=Math.min(330/Math.max(s.a,.001),128/Math.max(Math.abs(s.b),.001)),width=s.a*scale,height=s.b*scale,B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
+  const angleRadius=clamp(Math.min(width,Math.abs(height))*.28,18,40),angleEnd={x:A.x+Math.cos(rad(s.phi))*angleRadius,y:A.y-Math.sin(rad(s.phi))*angleRadius},rightSize=clamp(Math.min(width,Math.abs(height))*.16,12,22),verticalDir=height<0?1:-1;
   const aColor=m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0',bColor=m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1',cColor=VOLTAGE_COLOR;
   line(root,A.x,C.y,B.x,C.y,'guide');
   arrow(root,A.x,A.y,width,0,aColor,'',.75);
-  arrow(root,B.x,B.y,height,90,bColor,'',.75);
+  arrow(root,B.x,B.y,Math.abs(height),height<0?-90:90,bColor,'',.75);
   arrowTo(root,A.x,A.y,C.x,C.y,cColor,'',.85);
-  root.append(svg('path',{d:`M ${B.x-rightSize} ${B.y} L ${B.x-rightSize} ${B.y-rightSize} L ${B.x} ${B.y-rightSize}`,class:'triangle-right-angle'}));
-  root.append(svg('path',{d:`M ${A.x+angleRadius} ${A.y} A ${angleRadius} ${angleRadius} 0 0 0 ${angleEnd.x} ${angleEnd.y}`,class:'triangle-angle'}));
+  root.append(svg('path',{d:`M ${B.x-rightSize} ${B.y} L ${B.x-rightSize} ${B.y+verticalDir*rightSize} L ${B.x} ${B.y+verticalDir*rightSize}`,class:'triangle-right-angle'}));
+  root.append(svg('path',{d:`M ${A.x+angleRadius} ${A.y} A ${angleRadius} ${angleRadius} 0 0 ${s.phi<0?1:0} ${angleEnd.x} ${angleEnd.y}`,class:'triangle-angle'}));
   const sideValue=(index,key)=>`${m.symbols[index]} = ${da(s[key],1)}${m.units[index]?` ${m.units[index]}`:''}`;
-  text(root,A.x+width*.5,A.y+25,sideValue(0,'a'),'vector-label',aColor,'middle');text(root,B.x+13,B.y-height*.5+4,sideValue(1,'b'),'vector-label',bColor);text(root,A.x+width*.5-10,A.y-height*.5-13,sideValue(2,'c'),'vector-label',cColor,'middle');
-  line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y-9,`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
-  text(root,A.x+width*.5,A.y+44,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+22,B.y-height*.5+23,m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5-30,m.sides[2],'triangle-dimension','#71828d','middle');
+  text(root,A.x+width*.5,A.y+25,sideValue(0,'a'),'vector-label',aColor,'middle');text(root,B.x+13,B.y-height*.5+4,sideValue(1,'b'),'vector-label',bColor);text(root,A.x+width*.5-10,A.y-height*.5+(height<0?27:-13),sideValue(2,'c'),'vector-label',cColor,'middle');
+  line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y+(s.phi<0?18:-9),`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
+  text(root,A.x+width*.5,A.y+44,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+22,B.y-height*.5+(height<0?-18:23),m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5+(height<0?44:-30),m.sides[2],'triangle-dimension','#71828d','middle');
 }
 function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
 $$('input').forEach(input=>input.addEventListener('input',()=>{ if(input.id==='acPhi') $('acPhiRange').value=input.value; if(input.id==='powerCos') $('powerCosRange').value=input.value; updateAll(); }));
