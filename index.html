@@ -315,13 +315,21 @@
           <div class="intro-row">
             <div><span class="chapter">05 | RETVINKLEDE TREKANTER</span><h2>Se sammenhængen mellem siderne</h2><p>Skift mellem den almindelige retvinklede trekant, impedans-, spændings- og effekttrekanten. Den samme geometri giver forskellige elektriske størrelser og formler.</p></div>
           </div>
-          <article class="card triangle-explorer-card">
-            <div class="card-head"><div><span class="step">VÆLG TREKANT</span><h3 id="triangleExplorerTitle">Retvinklet trekant</h3></div><span class="angle-pill">tan φ = modstående / hosliggende</span></div>
-            <div class="segmented four triangle-selector" id="triangleSelector"><button class="active" data-triangle="general">Retvinklet</button><button data-triangle="impedance">Impedans</button><button data-triangle="voltage">Spænding</button><button data-triangle="power">Effekt</button></div>
-            <div class="triangle-explorer-layout">
-              <div class="triangle-diagram-panel"><svg id="triangleExplorerSvg" class="diagram triangle-explorer-svg" data-expandable-diagram viewBox="0 0 520 310" role="img" aria-label="Retvinklet trekant med sider og fasevinkel"></svg><p id="triangleExplorerTip" class="triangle-tip"></p></div>
-              <div class="triangle-formula-panel"><p id="triangleExplorerIntro" class="triangle-intro"></p><div class="triangle-input-area"><p>Redigér to værdier — resten beregnes automatisk.</p><div class="triangle-value-inputs" id="triangleValueInputs"></div><small id="triangleInputStatus"></small></div><div class="formula-stack" id="trianglePrimaryFormula"></div><div class="triangle-formula-grid" id="triangleFormulaGrid"></div></div>
-            </div>
+          <div class="workspace-grid triangle-workspace">
+            <article class="card controls-card triangle-controls-card">
+              <div class="card-head"><div><span class="step">INDDATA</span><h3 id="triangleExplorerTitle">Retvinklet trekant</h3></div><span class="live-dot">LIVE</span></div>
+              <div class="segmented four triangle-selector" id="triangleSelector"><button class="active" data-triangle="general">Retvinklet</button><button data-triangle="impedance">Impedans</button><button data-triangle="voltage">Spænding</button><button data-triangle="power">Effekt</button></div>
+              <div class="triangle-input-area"><p id="triangleExplorerIntro" class="triangle-intro"></p><div class="triangle-value-inputs field-grid top-gap" id="triangleValueInputs"></div><small id="triangleInputStatus"></small></div>
+            </article>
+            <article class="card visual-card triangle-visual-card">
+              <div class="card-head"><div><span class="step">TREKANTDIAGRAM</span><h3>Sider og fasevinkel</h3></div><span class="angle-pill">tan φ = modstående / hosliggende</span></div>
+              <div class="triangle-diagram-panel"><svg id="triangleExplorerSvg" class="diagram triangle-explorer-svg" data-expandable-diagram viewBox="0 0 520 310" role="img" aria-label="Retvinklet trekant med sider og fasevinkel"></svg></div>
+              <div class="visual-caption"><span id="triangleExplorerTip"></span><strong id="triangleAngleReadout">φ = —</strong></div>
+            </article>
+          </div>
+          <article class="card formula-panel triangle-formula-card">
+            <div class="formula-stack" id="trianglePrimaryFormula"></div>
+            <div class="triangle-formula-grid" id="triangleFormulaGrid"></div>
           </article>
           <div class="formula-library triangle-library">
             <article><span>PYTHAGORAS</span><strong>Hypotenuse² = katete² + katete²</strong><p>Bruges til at finde den manglende side i alle fire trekanter.</p></article>

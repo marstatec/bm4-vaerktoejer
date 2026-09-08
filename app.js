@@ -890,7 +890,7 @@ function syncTriangleInputs(activeKey=''){
 function drawTriangleExplorer(activeKey=''){
   const root=$('triangleExplorerSvg');if(!root)return;const modes=triangleModes(),m=modes[triangleMode]||modes.general,s=triangleStates[triangleMode];
   if($('triangleValueInputs').dataset.mode!==triangleMode){renderTriangleInputs();$('triangleValueInputs').dataset.mode=triangleMode;}
-  $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;
+  $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;if($('triangleAngleReadout'))$('triangleAngleReadout').textContent=`φ = ${da(s.phi,1)}°`;
   $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;$('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');syncTriangleInputs(activeKey);
   const isNegativeVertical=s.b<0;clear(root);const A={x:115,y:isNegativeVertical?128:185};
   baseGrid(root,A.x,A.y,480,240);
