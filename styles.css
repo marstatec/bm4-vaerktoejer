@@ -99,7 +99,7 @@ body.light-theme .mini-input-label,body.light-theme .mini-input-label em{color:#
 .iron-circuit-svg{height:180px}
 .iron-workspace{grid-template-columns:minmax(420px,.85fr) minmax(520px,1.15fr)}
 .iron-results{margin-bottom:18px}
-.iron-diagram-grid{display:grid;grid-template-columns:minmax(420px,.85fr) minmax(560px,1.15fr);gap:18px;margin-bottom:18px}
+.iron-diagram-grid{display:grid;grid-template-columns:repeat(3,minmax(320px,1fr));gap:18px;margin-bottom:18px}
 .iron-reference-svg{height:340px}
 .iron-vector-svg{height:360px}
 .iron-hysteresis-card{padding:22px;margin-bottom:18px}
