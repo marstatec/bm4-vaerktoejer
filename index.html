@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=triangle-training-1">
+  <link rel="stylesheet" href="styles.css?v=iron-core-coil-1">
 </head>
 <body>
   <div class="app-shell">
@@ -20,6 +20,7 @@
         <button class="nav-item active" data-page="vekselstroem"><span class="nav-icon">∿</span><span>Vekselstrøm</span><kbd>1</kbd></button>
         <button class="nav-item" data-page="trekanter"><span class="nav-icon">△</span><span>Trekanter</span><kbd>△</kbd></button>
         <button class="nav-item" data-page="serie"><span class="nav-icon">RLC</span><span>1-faset serie</span><kbd>2</kbd></button>
+        <button class="nav-item" data-page="spoler-jernkerne"><span class="nav-icon">Fe</span><span>Spoler med jernkerne</span><kbd>J</kbd></button>
         <button class="nav-item" data-page="parallel"><span class="nav-icon">RLC</span><span>1-faset parallel</span><kbd>3</kbd></button>
         <button class="nav-item" data-page="effekt"><span class="nav-icon">△</span><span>Effekt & fase</span><kbd>4</kbd></button>
         <button class="nav-item" data-page="trefaset"><span class="nav-icon">3Φ</span><span>3-faset</span><kbd>5</kbd></button>
@@ -185,6 +186,77 @@
               <p class="formula-foot"><b>Polar/trekant:</b> Z findes af R og X, hvor X = X<sub>L</sub> − X<sub>C</sub>. Et negativt X giver en kapacitiv fasevinkel.</p>
             </article>
           </div>
+        </section>
+
+        <section class="page" id="spoler-jernkerne" data-title="Spoler med jernkerne">
+          <div class="intro-row">
+            <div><span class="chapter">03 | JERNKERNESPOLE</span><h2>Jerntab som en del af den effektive impedans</h2><p>En spole med jernkerne vises som en fast serieækvivalent: trådmodstanden R<sub>Cu</sub>, jerntabet R<sub>Fe</sub> og den effektive induktive reaktans X<sub>L,eff</sub>. Komponenterne kan ikke udskiftes her, men størrelserne følger dine målinger.</p></div>
+            <div class="formula-badge">P = P<sub>Cu</sub> + P<sub>Fe</sub></div>
+          </div>
+
+          <article class="card circuit-strip iron-circuit-strip">
+            <div><span class="step">ENSTREGSDIAGRAM</span><h3>Fast ækvivalent jernkernespole</h3><p>R<sub>Cu</sub> er kobbertabet i viklingen. R<sub>Fe</sub> repræsenterer jerntabet, og X<sub>L,eff</sub> er den effektive induktive del.</p></div>
+            <svg id="ironCircuit" class="circuit-svg diagram iron-circuit-svg" viewBox="0 0 720 180" role="img" aria-label="Enstregsdiagram for spole med jernkerne"></svg>
+          </article>
+
+          <div class="workspace-grid iron-workspace">
+            <article class="card controls-card">
+              <div class="card-head"><div><span class="step">INDDATA</span><h3>Målte værdier og jernparametre</h3></div><span class="live-dot">LIVE</span></div>
+              <div class="field-grid">
+                <label><span>Spænding U <em>V</em></span><input id="ironU" type="number" value="230" min="0.1" step="1"></label>
+                <label><span>Strøm I <em>A</em></span><input id="ironI" type="number" value="2.0" min="0.001" step="0.1"></label>
+                <label><span>Aktiv effekt P <em>W</em></span><input id="ironP" type="number" value="180" min="0" step="1"></label>
+                <label><span>Trådmodstand R<sub>Cu</sub> <em>Ω</em></span><input id="ironRCu" type="number" value="18" min="0" step="0.1"></label>
+                <label><span>Frekvens f <em>Hz</em></span><input id="ironF" type="number" value="50" min="0.1" step="1"></label>
+                <label><span>Mætning B<sub>sat</sub> <em>T</em></span><input id="ironBs" type="number" value="1.5" min="0.1" step="0.1"></label>
+                <label><span>Remanens B<sub>r</sub> <em>T</em></span><input id="ironBr" type="number" value="0.8" min="0" step="0.1"></label>
+                <label><span>Coercitivkraft H<sub>c</sub> <em>A/m</em></span><input id="ironHc" type="number" value="500" min="0" step="10"></label>
+              </div>
+              <div class="mini-note"><span>i</span><p id="ironInputNote">Indtast U, I og P fra målingen. Resten beregnes som den effektive serieækvivalent for spolen.</p></div>
+            </article>
+
+            <article class="card visual-card">
+              <div class="card-head"><div><span class="step">IMPEDANSTREKANT</span><h3>R<sub>eff</sub>, X<sub>L,eff</sub> og Z</h3></div><span class="angle-pill" id="ironPhiBadge">φ = —</span></div>
+              <svg id="ironTriangle" class="diagram high-res-diagram" viewBox="0 0 720 360" role="img" aria-label="Impedanstrekant for spole med jernkerne"></svg>
+              <div class="triangle-values"><span><i class="dot r-dot"></i>R<sub>eff</sub> <strong id="ironTriR">—</strong></span><span><i class="dot x-dot"></i>X<sub>L,eff</sub> <strong id="ironTriX">—</strong></span><span><i class="dot z-dot"></i>Z <strong id="ironTriZ">—</strong></span></div>
+            </article>
+          </div>
+
+          <div class="result-strip eight iron-results">
+            <div><span>S = U · I</span><strong id="ironS">—</strong><small>Tilsyneladende effekt</small></div>
+            <div><span>Q</span><strong id="ironQ">—</strong><small>√(S² − P²)</small></div>
+            <div><span>P<sub>Cu</sub></span><strong id="ironPCu">—</strong><small>I² · R<sub>Cu</sub></small></div>
+            <div><span>P<sub>Fe</sub></span><strong id="ironPFe">—</strong><small>P − P<sub>Cu</sub></small></div>
+            <div><span>R<sub>Fe</sub></span><strong id="ironRFe">—</strong><small>P<sub>Fe</sub>/I²</small></div>
+            <div><span>R<sub>eff</sub></span><strong id="ironReff">—</strong><small>P/I²</small></div>
+            <div><span>X<sub>L,eff</sub></span><strong id="ironXeff">—</strong><small>Q/I²</small></div>
+            <div><span>Z</span><strong id="ironZ">—</strong><small>U/I</small></div>
+          </div>
+
+          <article class="card iron-hysteresis-card">
+            <div class="card-head"><div><span class="step">HYSTERESESLØJFE</span><h3>B-H kurve og jerntab</h3></div><div class="legend"><span class="u">B</span><span class="i">H</span></div></div>
+            <div class="iron-hysteresis-layout">
+              <svg id="ironHysteresis" class="diagram iron-hysteresis-svg" viewBox="0 0 900 360" role="img" aria-label="Dynamisk hysteresesløjfe for jernkerne"></svg>
+              <div class="iron-hysteresis-info">
+                <div><span>Relativ hysteresepåvirkning</span><strong id="ironHystIndex">—</strong><small>Stiger med B<sub>r</sub>, H<sub>c</sub> og f.</small></div>
+                <div><span>Remanens</span><strong id="ironBrOut">—</strong><small>B når H = 0.</small></div>
+                <div><span>Coercitivkraft</span><strong id="ironHcOut">—</strong><small>H der bringer B til 0.</small></div>
+              </div>
+            </div>
+            <p class="formula-foot">Sløjfens areal illustrerer hysterresetabet. Jo bredere og højere sløjfen bliver, desto større bliver energitabet i jernkernen pr. periode.</p>
+          </article>
+
+          <article class="card formula-card iron-formula-card">
+            <div><span class="step">TEORI</span><h3>Fra måling til ækvivalent kreds</h3><p>Jerntabet består af hysterese- og hvirvelstrømstab. I den praktiske beregning samles de som R<sub>Fe</sub>, mens den reaktive del bliver X<sub>L,eff</sub>.</p></div>
+            <div class="formula-grid iron-formula-grid">
+              <div><span>Samlet effekt</span><strong>P = P<sub>Cu</sub> + P<sub>Fe</sub></strong><small>Kobbertab plus jerntab.</small></div>
+              <div><span>Kobbertab</span><strong>P<sub>Cu</sub> = I² · R<sub>Cu</sub></strong><small>Varmetab i viklingen.</small></div>
+              <div><span>Jerntab</span><strong>P<sub>Fe</sub> = P − P<sub>Cu</sub></strong><small>Hysterese- og hvirvelstrømstab.</small></div>
+              <div><span>Effektiv modstand</span><strong>R<sub>eff</sub> = P / I²</strong><small>R<sub>eff</sub> = R<sub>Cu</sub> + R<sub>Fe</sub>.</small></div>
+              <div><span>Reaktiv effekt</span><strong>Q = √(S² − P²)</strong><small>S = U · I.</small></div>
+              <div><span>Effektiv reaktans</span><strong>X<sub>L,eff</sub> = Q / I²</strong><small>Den induktive del i impedanstrekanten.</small></div>
+            </div>
+          </article>
         </section>
 
         <section class="page" id="parallel" data-title="1-faset parallelforbindelse">
@@ -572,7 +644,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=triangle-training-1"></script>
+  <script src="app.js?v=iron-core-coil-1"></script>
 </body>
 </html>
 

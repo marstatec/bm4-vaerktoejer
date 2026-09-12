@@ -13,6 +13,7 @@ const power = (watts, reactive = false) => {
   const suffix = reactive ? 'var' : 'W';
   return Math.abs(watts) >= 1000 ? unit(watts / 1000, reactive ? 'kvar' : 'kW', 2) : unit(watts, suffix, 1);
 };
+const apparentPower = va => Math.abs(va) >= 1000 ? unit(va / 1000, 'kVA', 2) : unit(va, 'VA', 1);
 const phiResultLabel = phi => Math.abs(phi) < .05 ? 'φ = 0,0°  |  resistiv' : `φ = ${phi > 0 ? '+' : ''}${da(phi,1)}°  |  ${phi < 0 ? 'kapacitiv' : 'induktiv'}`;
 const themeSurface = () => document.body.classList.contains('light-theme') ? '#ffffff' : '#111b24';
 const svg = (tag, attrs = {}, text = '') => {
@@ -908,7 +909,48 @@ function drawTriangleExplorer(activeKey=''){
   line(root,70,A.y,A.x-12,A.y,'triangle-angle');text(root,94,A.y+(s.phi<0?18:-9),`φ = ${da(s.phi,1)}°`,'triangle-dimension','#aab8c0','middle');
   text(root,A.x+width*.5,A.y+44,m.sides[0],'triangle-dimension','#71828d','middle');text(root,B.x+22,B.y-height*.5+(height<0?-18:23),m.sides[1],'triangle-dimension','#71828d');text(root,A.x+width*.5-10,A.y-height*.5+(height<0?44:-30),m.sides[2],'triangle-dimension','#71828d','middle');
 }
-function updateAll(){drawAc();drawRlc();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
+function drawIronCore(){
+  const circuit=$('ironCircuit'),triangle=$('ironTriangle'),hyst=$('ironHysteresis');if(!circuit||!triangle||!hyst)return;
+  const U=Math.max(.1,num('ironU',230)),I=Math.max(.001,num('ironI',2)),rawP=Math.max(0,num('ironP',180)),RCu=Math.max(0,num('ironRCu',18)),f=Math.max(.1,num('ironF',50));
+  const Br=Math.max(0,num('ironBr',.8)),Hc=Math.max(0,num('ironHc',500)),Bs=Math.max(Br+.05,num('ironBs',1.5));
+  const S=U*I,P=Math.min(rawP,S),Q=Math.sqrt(Math.max(0,S*S-P*P)),PCu=I*I*RCu,PFe=Math.max(0,P-PCu),Reff=P/(I*I),RFe=PFe/(I*I),Xeff=Q/(I*I),Z=U/I,phi=deg(Math.atan2(Q,P||.000001)),cos=P/S;
+  const warn=[];if(rawP>S+.001)warn.push(`P er begrænset til S = ${apparentPower(S)} i beregningen.`);if(PCu>P+.001)warn.push('R_Cu giver større kobbertab end den målte aktive effekt. Jerntabet sættes derfor til 0.');
+  $('ironInputNote').textContent=warn.length?warn.join(' '):'Indtast U, I og P fra målingen. Resten beregnes som den effektive serieækvivalent for spolen.';
+  $('ironS').textContent=apparentPower(S);$('ironQ').textContent=power(Q,true);$('ironPCu').textContent=power(PCu);$('ironPFe').textContent=power(PFe);$('ironRFe').textContent=unit(RFe,'Ω',2);$('ironReff').textContent=unit(Reff,'Ω',2);$('ironXeff').textContent=unit(Xeff,'Ω',2);$('ironZ').textContent=unit(Z,'Ω',2);
+  $('ironTriR').textContent=unit(Reff,'Ω',2);$('ironTriX').textContent=unit(Xeff,'Ω',2);$('ironTriZ').textContent=unit(Z,'Ω',2);$('ironPhiBadge').textContent=`φ = ${da(phi,1)}°  |  cos φ = ${da(cos,3)}`;
+  drawIronCircuit(circuit,U,I,RCu,RFe,Xeff,Reff);
+  drawIronTriangle(triangle,Reff,Xeff,Z,phi);
+  drawIronHysteresis(hyst,Br,Hc,Bs,f);
+}
+function drawIronCircuit(root,U,I,RCu,RFe,Xeff,Reff){
+  clear(root);circuitWire(root,32,55,655,55);circuitWire(root,655,55,655,135);circuitWire(root,655,135,32,135);circuitWire(root,32,135,32,55);
+  circuitNode(root,32,55);circuitNode(root,32,135);circuitText(root,17,100,`U = ${unit(U,'V',0)}`,'circuit-label','middle');circuitArrow(root,58,55,52,0,`I = ${unit(I,'A',2)}`,CURRENT_COLOR);
+  const items=[{x:205,label:'R_Cu',value:unit(RCu,'Ω',2),type:'R'},{x:360,label:'R_Fe',value:unit(RFe,'Ω',2),type:'R'},{x:520,label:'X_L,eff',value:unit(Xeff,'Ω',2),type:'L'}];
+  items.forEach(item=>{item.type==='R'?circuitResistor(root,item.x,55):circuitInductor(root,item.x,55);circuitText(root,item.x,28,item.label,'circuit-label','middle');circuitText(root,item.x,85,item.value,'circuit-label','middle');});
+  root.append(svg('path',{d:'M 164 112 L 164 125 L 401 125 L 401 112',class:'guide'}));circuitText(root,282,145,`R_eff = ${unit(Reff,'Ω',2)}`,'circuit-label','middle');
+  circuitText(root,594,28,'fast serieækvivalent','circuit-label','middle');circuitText(root,594,84,'spole med jernkerne','circuit-label','middle');
+}
+function drawIronTriangle(root,R,X,Z,phi){
+  clear(root);const A={x:130,y:255};baseGrid(root,A.x,A.y,630,300);
+  const scale=Math.min(440/Math.max(R,.001),175/Math.max(X,.001)),w=R*scale,h=X*scale,B={x:A.x+w,y:A.y},C={x:B.x,y:A.y-h};
+  arrow(root,A.x,A.y,w,0,'#9b87f5','',.9);arrow(root,B.x,B.y,h,90,'#ff9f43','',.9);arrowTo(root,A.x,A.y,C.x,C.y,VOLTAGE_COLOR,'',1);
+  root.append(svg('path',{d:`M ${B.x-24} ${B.y} L ${B.x-24} ${B.y-24} L ${B.x} ${B.y-24}`,class:'triangle-right-angle'}));
+  const r=44,end={x:A.x+r*Math.cos(rad(phi)),y:A.y-r*Math.sin(rad(phi))};root.append(svg('path',{d:`M ${A.x+r} ${A.y} A ${r} ${r} 0 0 0 ${end.x} ${end.y}`,class:'arc'}));
+  text(root,A.x+w*.5,A.y+29,`R_eff = ${da(R,2)} Ω`,'vector-label','#9b87f5','middle');text(root,B.x+16,B.y-h*.5,`X_L,eff = ${da(X,2)} Ω`,'vector-label','#ff9f43');text(root,A.x+w*.5-12,A.y-h*.5-13,`Z = ${da(Z,2)} Ω`,'vector-label',VOLTAGE_COLOR,'middle');text(root,A.x+35,A.y-10,`φ = ${da(phi,1)}°`,'vector-label','#aab8c0','middle');
+  text(root,A.x+w*.5,A.y+52,'effektiv modstand','triangle-dimension','#71828d','middle');text(root,B.x+18,B.y-h*.5+22,'induktiv reaktans','triangle-dimension','#71828d');
+}
+function drawIronHysteresis(root,Br,Hc,Bs,f){
+  clear(root);const cx=430,cy=178,w=720,h=265,xScale=w/2,yScale=h/2,Hmax=Math.max(Hc*2.8,900),toX=H=>cx+(H/Hmax)*xScale,toY=B=>cy-(B/Math.max(Bs,.1))*yScale;
+  for(let i=-4;i<=4;i++){line(root,cx+i*xScale/4,42,cx+i*xScale/4,314,'grid-line');line(root,70,cy+i*yScale/4,790,cy+i*yScale/4,'grid-line');}
+  line(root,70,cy,810,cy,'axis');line(root,cx,36,cx,322,'axis');text(root,814,cy-8,'H','vector-label','#aab8c0');text(root,cx+10,34,'B','vector-label','#aab8c0');
+  const widthFactor=clamp(Hc/Hmax,.08,.34),phase=widthFactor*Math.PI*1.55,pts=[];for(let i=0;i<=220;i++){const t=i/220*Math.PI*2,H=Hmax*.92*Math.sin(t),B=Bs*Math.tanh(1.85*Math.sin(t+phase));pts.push([toX(H),toY(B)]);}
+  root.append(svg('path',{d:pts.map((p,i)=>`${i?'L':'M'} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' '),fill:'none',stroke:VOLTAGE_COLOR,'stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round'}));
+  const virgin=[];for(let i=0;i<=80;i++){const H=Hmax*.88*i/80,B=Bs*Math.tanh(2.1*i/80);virgin.push([toX(H),toY(B)]);}root.append(svg('path',{d:virgin.map((p,i)=>`${i?'L':'M'} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' '),fill:'none',stroke:'#8b98a1','stroke-width':1.5,'stroke-dasharray':'6 6'}));
+  const brY=toY(Br),hcX=toX(Hc),mhcX=toX(-Hc),bsY=toY(Bs);line(root,cx,brY,toX(Hmax*.58),brY,'guide');line(root,hcX,cy,hcX,brY,'guide');line(root,mhcX,cy,mhcX,toY(-Br),'guide');line(root,cx,bsY,toX(Hmax*.85),bsY,'guide');
+  text(root,cx+12,brY-7,`B_r = ${da(Br,2)} T`,'vector-label','#55d6a1');text(root,hcX+8,cy+18,`H_c = ${da(Hc,0)} A/m`,'vector-label','#ff9f43');text(root,mhcX-8,cy-10,`−H_c`,'vector-label','#ff9f43','end');text(root,toX(Hmax*.86),bsY+4,`B_sat = ${da(Bs,2)} T`,'vector-label',VOLTAGE_COLOR);
+  const index=Br*Hc*(f/50);$('ironHystIndex').textContent=da(index,0);$('ironBrOut').textContent=unit(Br,'T',2);$('ironHcOut').textContent=unit(Hc,'A/m',0);
+}
+function updateAll(){drawAc();drawRlc();drawIronCore();drawParallel();drawPower();drawThreeLoad();drawThree();drawComp();drawConnections();drawTransformation();drawOhm();drawTriangleExplorer();applyElectricalColorConvention();}
 $$('input').forEach(input=>input.addEventListener('input',()=>{ if(input.id==='acPhi') $('acPhiRange').value=input.value; if(input.id==='powerCos') $('powerCosRange').value=input.value; updateAll(); }));
 $$('#triangleSelector button').forEach(button=>button.addEventListener('click',()=>{triangleMode=button.dataset.triangle;$$('#triangleSelector button').forEach(b=>b.classList.toggle('active',b===button));drawTriangleExplorer();}));
 $('acPhiRange').addEventListener('input',e=>{$('acPhi').value=e.target.value;drawAc();});$('powerCosRange').addEventListener('input',e=>{$('powerCos').value=e.target.value;drawPower();});

@@ -95,3 +95,21 @@ body.light-theme .overview-current{fill:#c6283a;stroke:#fff}
 body.light-theme .impedance-phase-cell,body.light-theme .impedance-phase-cell input,body.light-theme .impedance-phase-connection select{background:#fff;color:#263946;border-color:#cbd8e1}
 body.light-theme .mini-input-label,body.light-theme .mini-input-label em{color:#607380}
 @media(max-width:760px){.diagram-modal-canvas{min-height:360px}.diagram-modal-canvas svg{height:78vh;min-height:360px}.three-load-circuit{height:260px}}
+.iron-circuit-strip{grid-template-columns:minmax(250px,.42fr) minmax(620px,1.58fr)}
+.iron-circuit-svg{height:180px}
+.iron-workspace{grid-template-columns:minmax(420px,.85fr) minmax(520px,1.15fr)}
+.iron-results{margin-bottom:18px}
+.iron-hysteresis-card{padding:22px;margin-bottom:18px}
+.iron-hysteresis-layout{display:grid;grid-template-columns:minmax(520px,1fr) minmax(220px,300px);gap:18px;align-items:stretch}
+.iron-hysteresis-svg{height:360px;border:1px solid #263946;border-radius:12px;background:#0d171e}
+.iron-hysteresis-info{display:grid;gap:10px;align-content:start}
+.iron-hysteresis-info>div{border-left:2px solid #2d4652;background:#101920;border-radius:0 8px 8px 0;padding:13px}
+.iron-hysteresis-info span{display:block;color:#647580;font:9px 'DM Mono';margin-bottom:7px}
+.iron-hysteresis-info strong{display:block;color:#e4eef1;font:500 18px 'DM Mono';margin-bottom:6px}
+.iron-hysteresis-info small{color:#758590;font-size:10px;line-height:1.5}
+.iron-formula-card{display:block;margin-bottom:18px}
+.iron-formula-card .formula-grid{margin-top:16px;grid-template-columns:repeat(3,1fr)}
+body.light-theme .iron-hysteresis-svg{background:#fff;border-color:#cbd8e1}
+body.light-theme .iron-hysteresis-info>div{background:#fff}
+@media(max-width:1050px){.iron-circuit-strip,.iron-workspace,.iron-hysteresis-layout{grid-template-columns:1fr}.iron-formula-card .formula-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.iron-hysteresis-svg{height:290px}.iron-formula-card .formula-grid{grid-template-columns:1fr}.iron-circuit-svg{height:170px}}
