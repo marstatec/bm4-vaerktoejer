@@ -203,13 +203,13 @@
             <article class="card controls-card">
               <div class="card-head"><div><span class="step">INDDATA</span><h3>Målte værdier og jernparametre</h3></div><span class="live-dot">LIVE</span></div>
               <div class="field-grid">
-                <label><span>Spænding U <em>V</em></span><input id="ironU" type="number" value="230" min="0.1" step="1"></label>
                 <label><span>Strøm I <em>A</em></span><input id="ironI" type="number" value="2.0" min="0.001" step="0.1"></label>
-                <label><span>Aktiv effekt P <em>W</em></span><input id="ironP" type="number" value="180" min="0" step="1"></label>
                 <label><span>Trådmodstand R<sub>Cu</sub> <em>Ω</em></span><input id="ironRCu" type="number" value="18" min="0" step="0.1"></label>
-                <label><span>Frekvens f <em>Hz</em></span><input id="ironF" type="number" value="50" min="0.1" step="1"></label>
+                <label><span>Jerntabsmodstand R<sub>Fe</sub> <em>Ω</em></span><input id="ironRFeInput" type="number" value="27" min="0" step="0.1"></label>
+                <label><span>Effektiv reaktans X<sub>L,eff</sub> <em>Ω</em></span><input id="ironXeffInput" type="number" value="105.83" min="0" step="0.1"></label>
+                <label class="field-wide"><span>Impedans Z <em>Ω</em></span><input id="ironZInput" type="number" value="115" min="0.001" step="0.1"></label>
               </div>
-              <div class="mini-note"><span>i</span><p id="ironInputNote">Indtast U, I og P fra målingen. Resten beregnes som den effektive serieækvivalent for spolen.</p></div>
+              <div class="mini-note"><span>i</span><p id="ironInputNote">Indtast I, R<sub>Cu</sub>, R<sub>Fe</sub>, X<sub>L,eff</sub> og Z. Diagrammerne tegnes direkte ud fra disse værdier.</p></div>
             </article>
 
             <article class="card visual-card">
@@ -220,14 +220,14 @@
           </div>
 
           <div class="result-strip eight iron-results">
-            <div><span>S = U · I</span><strong id="ironS">—</strong><small>Tilsyneladende effekt</small></div>
-            <div><span>Q</span><strong id="ironQ">—</strong><small>√(S² − P²)</small></div>
+            <div><span>S = I² · Z</span><strong id="ironS">—</strong><small>Tilsyneladende effekt</small></div>
+            <div><span>Q</span><strong id="ironQ">—</strong><small>I² · X<sub>L,eff</sub></small></div>
             <div><span>P<sub>Cu</sub></span><strong id="ironPCu">—</strong><small>I² · R<sub>Cu</sub></small></div>
             <div><span>P<sub>Fe</sub></span><strong id="ironPFe">—</strong><small>P − P<sub>Cu</sub></small></div>
             <div><span>R<sub>Fe</sub></span><strong id="ironRFe">—</strong><small>P<sub>Fe</sub>/I²</small></div>
             <div><span>R<sub>eff</sub></span><strong id="ironReff">—</strong><small>P/I²</small></div>
             <div><span>X<sub>L,eff</sub></span><strong id="ironXeff">—</strong><small>Q/I²</small></div>
-            <div><span>Z</span><strong id="ironZ">—</strong><small>U/I</small></div>
+            <div><span>Z</span><strong id="ironZ">—</strong><small>Indtastet impedans</small></div>
           </div>
 
           <div class="iron-diagram-grid">

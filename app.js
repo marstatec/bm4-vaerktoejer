@@ -911,13 +911,13 @@ function drawTriangleExplorer(activeKey=''){
 }
 function drawIronCore(){
   const circuit=$('ironCircuit'),triangle=$('ironTriangle'),hyst=$('ironHysteresis');if(!circuit||!triangle||!hyst)return;
-  const U=Math.max(.1,num('ironU',230)),I=Math.max(.001,num('ironI',2)),rawP=Math.max(0,num('ironP',180)),RCu=Math.max(0,num('ironRCu',18)),f=Math.max(.1,num('ironF',50));
-  const S=U*I,P=Math.min(rawP,S),Q=Math.sqrt(Math.max(0,S*S-P*P)),PCu=I*I*RCu,PFe=Math.max(0,P-PCu),Reff=P/(I*I),RFe=PFe/(I*I),Xeff=Q/(I*I),Z=U/I,phi=deg(Math.atan2(Q,P||.000001)),cos=P/S;
-  const warn=[];if(rawP>S+.001)warn.push(`P er begrænset til S = ${apparentPower(S)} i beregningen.`);if(PCu>P+.001)warn.push('R_Cu giver større kobbertab end den målte aktive effekt. Jerntabet sættes derfor til 0.');
-  $('ironInputNote').textContent=warn.length?warn.join(' '):'Indtast U, I og P fra målingen. Resten beregnes som den effektive serieækvivalent for spolen.';
+  const I=Math.max(.001,num('ironI',2)),RCu=Math.max(0,num('ironRCu',18)),RFe=Math.max(0,num('ironRFeInput',27)),Xeff=Math.max(0,num('ironXeffInput',105.83)),Zin=Math.max(.001,num('ironZInput',115));
+  const Reff=RCu+RFe,Zcalc=Math.hypot(Reff,Xeff),Z=Zin,PCu=I*I*RCu,PFe=I*I*RFe,P=I*I*Reff,Q=I*I*Xeff,S=I*I*Z,phi=deg(Math.atan2(Xeff,Reff||.000001)),cos=Reff/Z;
+  const mismatch=Math.abs(Z-Zcalc);
+  $('ironInputNote').textContent=mismatch>.15?`Z passer ikke helt med √(R_eff² + X_L,eff²). Beregnet Z er ${unit(Zcalc,'Ω',2)}; diagrammet bruger R_eff og X_L,eff som geometri og viser din Z-værdi i resultaterne.`:'Diagrammerne tegnes direkte ud fra I, R_Cu, R_Fe, X_L,eff og Z.';
   $('ironS').textContent=apparentPower(S);$('ironQ').textContent=power(Q,true);$('ironPCu').textContent=power(PCu);$('ironPFe').textContent=power(PFe);$('ironRFe').textContent=unit(RFe,'Ω',2);$('ironReff').textContent=unit(Reff,'Ω',2);$('ironXeff').textContent=unit(Xeff,'Ω',2);$('ironZ').textContent=unit(Z,'Ω',2);
   $('ironTriR').textContent=unit(Reff,'Ω',2);$('ironTriX').textContent=unit(Xeff,'Ω',2);$('ironTriZ').textContent=unit(Z,'Ω',2);$('ironPhiBadge').textContent=`φ = ${da(phi,1)}°  |  cos φ = ${da(cos,3)}`;
-  drawIronCircuit(circuit,U,I,RCu,RFe,Xeff,Reff);
+  drawIronCircuit(circuit,I*Z,I,RCu,RFe,Xeff,Reff);
   drawIronTriangle(triangle,Reff,Xeff,Z,phi);
   drawIronPowerTriangle($('ironPowerTriangle'),PCu,PFe,P,Q,S,phi);
   drawIronVectorDiagram($('ironVectorDiagram'),I,RCu,RFe,Xeff,Reff,Z,phi);
@@ -950,7 +950,8 @@ function drawIronPowerTriangle(root,PCu,PFe,P,Q,S,phi){
 }
 function drawIronVectorDiagram(root,I,RCu,RFe,Xeff,Reff,Z,phi){
   if(!root)return;clear(root);
-  const left={x:70,y:255},ur=170,ufe=70,ux=155,xl=128,right={x:515,y:255},rw=95,rfew=55,xh=150;
+  const vScale=Math.min(240/Math.max(Reff,.001),155/Math.max(Xeff,.001)),left={x:70,y:255},ur=Math.max(26,RCu*vScale),ufe=Math.max(18,RFe*vScale),ux=Math.max(30,Xeff*vScale),xl=Math.max(18,ux*.83);
+  const zScale=Math.min(165/Math.max(Reff,.001),150/Math.max(Xeff,.001)),right={x:515,y:255},rw=Math.max(28,RCu*zScale),rfew=Math.max(18,RFe*zScale),xh=Math.max(30,Xeff*zScale);
   line(root,left.x-18,left.y,left.x+ur+ufe+76,left.y,'axis',CURRENT_COLOR);
   arrow(root,left.x+ur+ufe+8,left.y,62,0,CURRENT_COLOR,'',.55);text(root,left.x+ur+ufe+86,left.y+5,'I','vector-label',CURRENT_COLOR);
   line(root,left.x,left.y,left.x+ur,left.y,'vector','#d6e1e5');line(root,left.x+ur,left.y,left.x+ur+ufe,left.y,'vector','#d6e1e5');line(root,left.x+ur,left.y,left.x+ur,left.y-xl,'vector','#d6e1e5');line(root,left.x+ur+ufe,left.y,left.x+ur+ufe,left.y-ux,'vector','#d6e1e5');line(root,left.x,left.y,left.x+ur+ufe,left.y-ux,'vector','#d6e1e5');
