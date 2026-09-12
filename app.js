@@ -9,6 +9,7 @@ const VOLTAGE_COLOR = '#48dff0';
 const CURRENT_COLOR = '#ff5f6d';
 const da = (value, digits = 1) => Number.isFinite(value) ? value.toLocaleString('da-DK', {maximumFractionDigits: digits, minimumFractionDigits: digits}) : '—';
 const unit = (value, suffix, digits = 1) => `${da(value, digits)} ${suffix}`;
+const inputNumber = (value, digits = 3) => Number.isFinite(value) ? String(Number(value.toFixed(digits))) : '';
 const power = (watts, reactive = false) => {
   const suffix = reactive ? 'var' : 'W';
   return Math.abs(watts) >= 1000 ? unit(watts / 1000, reactive ? 'kvar' : 'kW', 2) : unit(watts, suffix, 1);
@@ -911,17 +912,24 @@ function drawTriangleExplorer(activeKey=''){
 }
 function drawIronCore(){
   const circuit=$('ironCircuit'),triangle=$('ironTriangle'),hyst=$('ironHysteresis');if(!circuit||!triangle||!hyst)return;
-  const I=Math.max(.001,num('ironI',2)),RCu=Math.max(0,num('ironRCu',18)),RFe=Math.max(0,num('ironRFeInput',27)),Xeff=Math.max(0,num('ironXeffInput',105.83)),Zin=Math.max(.001,num('ironZInput',115));
-  const Reff=RCu+RFe,Zcalc=Math.hypot(Reff,Xeff),Z=Zin,Zgeo=Zcalc,PCu=I*I*RCu,PFe=I*I*RFe,P=I*I*Reff,Q=I*I*Xeff,S=I*I*Z,Sgeo=I*I*Zgeo,phi=deg(Math.atan2(Xeff,Reff||.000001)),cos=Reff/Zgeo;
-  const mismatch=Math.abs(Z-Zcalc);
-  $('ironInputNote').textContent=mismatch>.15?`Z passer ikke helt med √(R_eff² + X_L,eff²). Beregnet Z er ${unit(Zcalc,'Ω',2)}; diagrammet bruger R_eff og X_L,eff som geometri og viser din Z-værdi i resultaterne.`:'Diagrammerne tegnes direkte ud fra I, R_Cu, R_Fe, X_L,eff og Z.';
+  const activeId=document.activeElement?.id,I=Math.max(.001,num('ironI',2)),RCu=Math.max(0,num('ironRCu',18)),RFe=Math.max(0,num('ironRFeInput',27)),Reff=RCu+RFe;
+  let Xeff=Math.max(0,num('ironXeffInput',105.83)),Z=Math.max(.001,num('ironZInput',115));
+  if(activeId==='ironZInput'){
+    Xeff=Math.sqrt(Math.max(0,Z*Z-Reff*Reff));
+    if($('ironXeffInput'))$('ironXeffInput').value=inputNumber(Xeff);
+  }else{
+    Z=Math.hypot(Reff,Xeff);
+    if($('ironZInput'))$('ironZInput').value=inputNumber(Z);
+  }
+  const PCu=I*I*RCu,PFe=I*I*RFe,P=I*I*Reff,Q=I*I*Xeff,S=I*I*Z,phi=deg(Math.atan2(Xeff,Reff||.000001)),cos=Reff/Z;
+  $('ironInputNote').textContent=activeId==='ironZInput'?'X_L,eff beregnes ud fra Z og R_eff, så trekanten passer.':'Z beregnes ud fra R_eff og X_L,eff, så trekanten passer.';
   $('ironS').textContent=apparentPower(S);$('ironQ').textContent=power(Q,true);$('ironPCu').textContent=power(PCu);$('ironPFe').textContent=power(PFe);$('ironRFe').textContent=unit(RFe,'Ω',2);$('ironReff').textContent=unit(Reff,'Ω',2);$('ironXeff').textContent=unit(Xeff,'Ω',2);$('ironZ').textContent=unit(Z,'Ω',2);
-  $('ironTriR').textContent=unit(Reff,'Ω',2);$('ironTriX').textContent=unit(Xeff,'Ω',2);$('ironTriZ').textContent=unit(Zgeo,'Ω',2);$('ironPhiBadge').textContent=`φ = ${da(phi,1)}°  |  cos φ = ${da(cos,3)}`;
+  $('ironTriR').textContent=unit(Reff,'Ω',2);$('ironTriX').textContent=unit(Xeff,'Ω',2);$('ironTriZ').textContent=unit(Z,'Ω',2);$('ironPhiBadge').textContent=`φ = ${da(phi,1)}°  |  cos φ = ${da(cos,3)}`;
   drawIronCircuit(circuit,I*Z,I,RCu,RFe,Xeff,Reff);
-  drawIronTriangle(triangle,Reff,Xeff,Zgeo,phi);
-  drawIronPowerTriangle($('ironPowerTriangle'),PCu,PFe,P,Q,Sgeo,phi);
-  drawIronVectorDiagram($('ironVectorDiagram'),I,RCu,RFe,Xeff,Reff,Zgeo,phi);
-  drawIronImpedanceDetail($('ironImpedanceDetail'),RCu,RFe,Xeff,Reff,Zgeo,phi);
+  drawIronTriangle(triangle,Reff,Xeff,Z,phi);
+  drawIronPowerTriangle($('ironPowerTriangle'),PCu,PFe,P,Q,S,phi);
+  drawIronVectorDiagram($('ironVectorDiagram'),I,RCu,RFe,Xeff,Reff,Z,phi);
+  drawIronImpedanceDetail($('ironImpedanceDetail'),RCu,RFe,Xeff,Reff,Z,phi);
   drawIronHysteresis(hyst);
 }
 function drawIronCircuit(root,U,I,RCu,RFe,Xeff,Reff){
