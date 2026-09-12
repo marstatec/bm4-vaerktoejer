@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktivt undervisningsværktøj til 1- og 3-fasede vektordiagrammer.">
   <title>VektorLab | AC-beregninger</title>
-  <link rel="stylesheet" href="styles.css?v=iron-core-coil-1">
+  <link rel="stylesheet" href="styles.css?v=iron-core-coil-2">
 </head>
 <body>
   <div class="app-shell">
@@ -208,9 +208,6 @@
                 <label><span>Aktiv effekt P <em>W</em></span><input id="ironP" type="number" value="180" min="0" step="1"></label>
                 <label><span>Trådmodstand R<sub>Cu</sub> <em>Ω</em></span><input id="ironRCu" type="number" value="18" min="0" step="0.1"></label>
                 <label><span>Frekvens f <em>Hz</em></span><input id="ironF" type="number" value="50" min="0.1" step="1"></label>
-                <label><span>Mætning B<sub>sat</sub> <em>T</em></span><input id="ironBs" type="number" value="1.5" min="0.1" step="0.1"></label>
-                <label><span>Remanens B<sub>r</sub> <em>T</em></span><input id="ironBr" type="number" value="0.8" min="0" step="0.1"></label>
-                <label><span>Coercitivkraft H<sub>c</sub> <em>A/m</em></span><input id="ironHc" type="number" value="500" min="0" step="10"></label>
               </div>
               <div class="mini-note"><span>i</span><p id="ironInputNote">Indtast U, I og P fra målingen. Resten beregnes som den effektive serieækvivalent for spolen.</p></div>
             </article>
@@ -233,14 +230,27 @@
             <div><span>Z</span><strong id="ironZ">—</strong><small>U/I</small></div>
           </div>
 
+          <div class="iron-diagram-grid">
+            <article class="card visual-card">
+              <div class="card-head"><div><span class="step">EFFEKTTREKANT</span><h3>P<sub>Cu</sub>, P<sub>Fe</sub>, Q og S</h3></div></div>
+              <svg id="ironPowerTriangle" class="diagram iron-reference-svg" viewBox="0 0 720 320" role="img" aria-label="Effekttrekant for spole med jernkerne"></svg>
+              <div class="visual-caption"><span>Aktiv effekt deles i kobbertab og jerntab</span><strong>S² = P² + Q²</strong></div>
+            </article>
+            <article class="card visual-card">
+              <div class="card-head"><div><span class="step">VEKTORDIAGRAM</span><h3>Spole med jernkerne samlet</h3></div></div>
+              <svg id="ironVectorDiagram" class="diagram iron-reference-svg" viewBox="0 0 880 320" role="img" aria-label="Vektordiagram og impedanstrekant for spole med jernkerne"></svg>
+              <div class="visual-caption"><span>Venstre: spændingsvektorer. Højre: effektiv impedanstrekant.</span><strong>Fig. 12.2.2 + 12.2.4</strong></div>
+            </article>
+          </div>
+
           <article class="card iron-hysteresis-card">
             <div class="card-head"><div><span class="step">HYSTERESESLØJFE</span><h3>B-H kurve og jerntab</h3></div><div class="legend"><span class="u">B</span><span class="i">H</span></div></div>
             <div class="iron-hysteresis-layout">
-              <svg id="ironHysteresis" class="diagram iron-hysteresis-svg" viewBox="0 0 900 360" role="img" aria-label="Dynamisk hysteresesløjfe for jernkerne"></svg>
+              <svg id="ironHysteresis" class="diagram iron-hysteresis-svg" viewBox="0 0 900 500" role="img" aria-label="Hysteresesløjfe for jernkerne"></svg>
               <div class="iron-hysteresis-info">
-                <div><span>Relativ hysteresepåvirkning</span><strong id="ironHystIndex">—</strong><small>Stiger med B<sub>r</sub>, H<sub>c</sub> og f.</small></div>
-                <div><span>Remanens</span><strong id="ironBrOut">—</strong><small>B når H = 0.</small></div>
-                <div><span>Coercitivkraft</span><strong id="ironHcOut">—</strong><small>H der bringer B til 0.</small></div>
+                <div><span>Remanens</span><strong>B<sub>r</sub></strong><small>Fluxen er stadig tilbage, når magnetiseringsfeltet H er 0.</small></div>
+                <div><span>Coercitivkraft</span><strong>H<sub>c</sub></strong><small>Den modsatte H-værdi, der skal til for at få B ned på 0.</small></div>
+                <div><span>Tab</span><strong>Areal</strong><small>Sløjfens areal illustrerer hysterresetabet pr. periode.</small></div>
               </div>
             </div>
             <p class="formula-foot">Sløjfens areal illustrerer hysterresetabet. Jo bredere og højere sløjfen bliver, desto større bliver energitabet i jernkernen pr. periode.</p>
@@ -644,7 +654,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=iron-core-coil-1"></script>
+  <script src="app.js?v=iron-core-coil-2"></script>
 </body>
 </html>
 
