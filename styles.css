@@ -126,7 +126,7 @@ body.light-theme .iron-hysteresis-info>div{background:#fff}
 .triangle-visual-card .visual-caption{display:none}
 
 /* Seriediagram 1: spændingsvektorer */
-.series-voltage-card{padding:12px 16px}
+.series-voltage-card{align-self:start;padding:12px 16px}
 .series-voltage-card .card-head{align-items:center;margin-bottom:0}
 .series-voltage-card .card-head .step{display:none}
 .series-voltage-card .card-head h3{margin:0}
