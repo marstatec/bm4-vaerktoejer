@@ -124,3 +124,21 @@ body.light-theme .iron-hysteresis-info>div{background:#fff}
 .triangle-visual-card .card-head h3{margin:0}
 .triangle-visual-card .triangle-explorer-svg{height:auto;min-height:240px}
 .triangle-visual-card .visual-caption{display:none}
+
+/* Seriediagram 1: spændingsvektorer */
+.series-voltage-card{padding:12px 16px}
+.series-voltage-card .card-head{align-items:center;margin-bottom:0}
+.series-voltage-card .card-head .step{display:none}
+.series-voltage-card .card-head h3{margin:0}
+.series-voltage-card #rlcPhasor{height:360px}
+.series-voltage-card .visual-caption{padding-top:7px}
+.series-voltage-card .embedded-resonance{grid-template-columns:minmax(150px,1fr) minmax(230px,320px);gap:10px;padding:8px 0 0}
+.series-voltage-card .embedded-resonance .insight-icon,.series-voltage-card .embedded-resonance .step,.series-voltage-card .embedded-resonance p{display:none}
+.series-voltage-card .embedded-resonance h3{margin:0;font-size:11px;color:#87959f}
+
+@media(max-width:760px){
+  .series-voltage-card #rlcPhasor{height:300px}
+  .series-voltage-card .card-head{align-items:flex-start;gap:8px}
+  .series-voltage-card .embedded-resonance{grid-template-columns:1fr;padding-bottom:4px}
+  .series-voltage-card .embedded-resonance .resonance-meter{grid-column:auto;margin:6px 4px 4px}
+}
