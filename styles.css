@@ -147,11 +147,13 @@ body.light-theme .iron-hysteresis-info>div{background:#fff}
 .series-impedance-card{align-self:start;padding:12px 16px}
 .series-impedance-card .card-head{align-items:center;margin-bottom:0}
 .series-impedance-card .card-head .step{display:none}
-.series-impedance-card .card-head h3{margin:0}
+.series-impedance-card .card-head h3{margin:0;white-space:nowrap}
+.series-impedance-card .mini-toggle{width:170px}
 .series-impedance-card #impedanceTriangle{height:300px}
 .series-impedance-card .triangle-values{display:none}
 
 @media(max-width:760px){
   .series-impedance-card #impedanceTriangle{height:280px}
   .series-impedance-card .card-head{align-items:flex-start;gap:8px}
+  .series-impedance-card .mini-toggle{width:100%}
 }
