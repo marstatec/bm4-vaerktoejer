@@ -125,7 +125,7 @@ function drawAc(){
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
   const Uhat=U*Math.SQRT2,Ihat=I*Math.SQRT2,Umean=2/Math.PI*Uhat,Imean=2/Math.PI*Ihat;
   $('acPeakValues').innerHTML=`U<sub>max</sub> = ${da(Uhat,1)} V&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>max</sub> = ${da(Ihat,1)} A`;
-  $('acMeanValues').textContent=`Ū = ${da(Umean,1)} V  |  Ī = ${da(Imean,1)} A`;
+  $('acMeanValues').innerHTML=`U<sub>mid</sub> = ${da(Umean,1)} V&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>mid</sub> = ${da(Imean,1)} A`;
   $('acRmsValues').textContent=`Uₑff = ${da(U,1)} V  |  Iₑff = ${da(I,1)} A`;
   const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
   arrow(root,cx,cy,145,uAngle,VOLTAGE_COLOR,`U = ${da(U,0)} V`);arrow(root,cx,cy,125,iAngle,CURRENT_COLOR,`I = ${da(I,1)} A`);
