@@ -116,3 +116,36 @@ body.light-theme .iron-hysteresis-svg{background:#fff;border-color:#cbd8e1}
 body.light-theme .iron-hysteresis-info>div{background:#fff}
 @media(max-width:1050px){.iron-circuit-strip,.iron-workspace,.iron-diagram-grid,.iron-hysteresis-layout{grid-template-columns:1fr}.iron-formula-card .formula-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.iron-reference-svg,.iron-vector-svg{height:340px}.iron-hysteresis-svg{height:340px}.iron-formula-card .formula-grid{grid-template-columns:1fr}.iron-circuit-svg{height:170px}}
+
+/* Større og mere ensartede diagramflader */
+.visual-card{padding:15px 18px 13px}
+.visual-card .card-head{margin-bottom:8px}
+.visual-card .visual-caption{padding-top:9px}
+.visual-card>.diagram{height:clamp(360px,35vw,440px)}
+.visual-card>.high-res-diagram{height:clamp(390px,37vw,470px)}
+.series-ui-card{padding:15px 18px 13px}
+.series-ui-card .card-head{margin-bottom:8px}
+.series-ui-card .diagram{height:420px}
+.impedance-visual{padding:15px 18px 13px}
+.impedance-visual .card-head{margin-bottom:8px}
+.impedance-visual .diagram{height:420px}
+.power-wave-card{padding:15px 18px 13px}
+.power-wave-card .card-head{margin-bottom:8px}
+.power-wave-card .power-wave{height:380px}
+.comp-diagram-grid .visual-card .diagram{height:400px}
+.circuit-strip .circuit-svg:not(.three-load-circuit):not(.iron-circuit-svg){height:200px}
+.circuit-strip .three-circuit-svg{height:230px}
+.iron-circuit-svg{height:220px}
+.triangle-visual-card{padding:13px 16px 11px}
+.triangle-visual-card .card-head{margin-bottom:2px}
+.triangle-visual-card .triangle-explorer-svg{height:auto;min-height:420px;max-height:680px}
+.triangle-visual-card .visual-caption{padding-top:7px}
+
+@media(max-width:760px){
+  .visual-card>.diagram{height:320px}
+  .visual-card>.high-res-diagram{height:350px}
+  .series-ui-card .diagram,.impedance-visual .diagram{height:330px}
+  .power-wave-card .power-wave,.comp-diagram-grid .visual-card .diagram{height:320px}
+  .triangle-visual-card .triangle-explorer-svg{height:auto;min-height:330px;max-height:520px}
+  .circuit-strip .circuit-svg:not(.three-load-circuit):not(.iron-circuit-svg),.circuit-strip .three-circuit-svg,.iron-circuit-svg{height:190px}
+}

@@ -894,9 +894,12 @@ function drawTriangleExplorer(activeKey=''){
   if($('triangleValueInputs').dataset.mode!==triangleMode){renderTriangleInputs();$('triangleValueInputs').dataset.mode=triangleMode;}
   $('triangleExplorerTitle').textContent=m.title;$('triangleExplorerIntro').textContent=m.intro;$('triangleExplorerTip').textContent=m.tip;if($('triangleAngleReadout'))$('triangleAngleReadout').textContent=`φ = ${da(s.phi,1)}°`;
   $('trianglePrimaryFormula').innerHTML=`<p>${m.main}</p>`;$('triangleFormulaGrid').innerHTML=m.formulas.map(([label,formula])=>`<div><span>${label}</span><strong>${formula}</strong></div>`).join('');syncTriangleInputs(activeKey);
-  const isNegativeVertical=s.b<0;clear(root);const A={x:115,y:isNegativeVertical?128:185};
-  baseGrid(root,A.x,A.y,480,240);
-  const scale=Math.min(330/Math.max(s.a,.001),128/Math.max(Math.abs(s.b),.001)),width=s.a*scale,height=s.b*scale,B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
+  const isNegativeVertical=s.b<0;clear(root);
+  const scale=330/Math.max(s.a,.001),width=s.a*scale,height=s.b*scale;
+  const canvasHeight=clamp(Math.abs(height)+90,300,560),A={x:125,y:isNegativeVertical?55:canvasHeight-55};
+  root.setAttribute('viewBox',`0 0 620 ${canvasHeight}`);root.style.aspectRatio=`620 / ${canvasHeight}`;
+  baseGrid(root,A.x,A.y,580,canvasHeight-50);
+  const B={x:A.x+width,y:A.y},C={x:A.x+width,y:A.y-height};
   const angleRadius=clamp(Math.min(width,Math.abs(height))*.28,18,40),angleEnd={x:A.x+Math.cos(rad(s.phi))*angleRadius,y:A.y-Math.sin(rad(s.phi))*angleRadius},rightSize=clamp(Math.min(width,Math.abs(height))*.16,12,22),verticalDir=height<0?1:-1;
   const aColor=m.symbols[0]==='R'||m.symbols[0]==='P'?'#9b87f5':'#48dff0',bColor=m.symbols[1]==='X'||m.symbols[1]==='Q'?'#ff9f43':'#55d6a1',cColor=VOLTAGE_COLOR;
   line(root,A.x,C.y,B.x,C.y,'guide');
