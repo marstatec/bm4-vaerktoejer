@@ -381,8 +381,8 @@
           <div class="workspace-grid">
             <article class="card controls-card">
               <div class="segmented" id="powerMode"><button class="active" data-mode="1">1-faset</button><button data-mode="3">3-faset</button></div>
-              <div class="field-grid top-gap"><label><span>Spænding U <em>V</em></span><input id="powerU" type="number" value="230" min="0"></label><label><span>Strøm I <em>A</em></span><input id="powerI" type="number" value="16" min="0" step="0.1"></label><label class="field-wide"><span>Fortegnet fasefaktor sin φ <em>0 = resistiv</em></span><input id="powerCos" type="number" value="0.57" min="-1" max="1" step="0.01"></label></div>
-              <label class="range-wrap signed-range"><span>Kapacitiv (−1) <b id="powerCosLabel">0,57 — induktiv</b> Induktiv (+1)</span><input id="powerCosRange" type="range" min="-1" max="1" value="0.57" step="0.01"></label>
+              <div class="field-grid top-gap"><label><span>Spænding U <em>V</em></span><input id="powerU" type="number" value="230" min="0"></label><label><span>Strøm I <em>A</em></span><input id="powerI" type="number" value="16" min="0" step="0.1"></label><label class="field-wide"><span>Fortegnet effektfaktor cos φ <em>− kapacitiv | + induktiv</em></span><input id="powerCos" type="number" value="0.82" min="-1" max="1" step="0.01"></label></div>
+              <label class="range-wrap signed-range"><span>Kapacitiv (−) <b id="powerCosLabel">cos φ = 0,82 | induktiv</b> Induktiv (+)</span><input id="powerCosRange" type="range" min="-1" max="1" value="0.82" step="0.01"></label>
               <div class="formula-stack"><p id="powerPFormula">P = U · I · cos φ</p><p id="powerQFormula">Q = U · I · sin φ</p><p id="powerSFormula">S = U · I</p></div>
             </article>
             <article class="card visual-card">
@@ -659,7 +659,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=iron-core-coil-2"></script>
+  <script src="app.js?v=cos-phi-input-1"></script>
 </body>
 </html>
 
