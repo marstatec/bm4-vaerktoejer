@@ -124,7 +124,7 @@ function drawAc(){
   $('acWaveCaption').textContent=phi<0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms efter spændingen.`:phi>0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms før spændingen.`:'Der er ingen tidsforskel: strøm og spænding passerer samme punkt samtidig.';
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
   const Uhat=U*Math.SQRT2,Ihat=I*Math.SQRT2,Umean=2/Math.PI*Uhat,Imean=2/Math.PI*Ihat;
-  $('acPeakValues').textContent=`Û = ${da(Uhat,1)} V  |  Î = ${da(Ihat,1)} A`;
+  $('acPeakValues').innerHTML=`U<sub>max</sub> = ${da(Uhat,1)} V&nbsp;&nbsp;|&nbsp;&nbsp;I<sub>max</sub> = ${da(Ihat,1)} A`;
   $('acMeanValues').textContent=`Ū = ${da(Umean,1)} V  |  Ī = ${da(Imean,1)} A`;
   $('acRmsValues').textContent=`Uₑff = ${da(U,1)} V  |  Iₑff = ${da(I,1)} A`;
   const root=$('acPhasor'),cx=260,cy=190,uAngle=90,iAngle=90+phi;clear(root);baseGrid(root,cx,cy,480,240);root.append(svg('circle',{cx,cy,r:110,class:'guide'}));
@@ -142,7 +142,7 @@ function drawWaves(U,I,f,phi){
   line(root,refX,mid,refX,166,'guide',VOLTAGE_COLOR);line(root,currentX,mid,currentX,166,'guide',CURRENT_COLOR);
   if(Math.abs(phi)>.05){line(root,left,dtY,right,dtY,'vector','#82909a');root.append(svg('polygon',{points:`${left},${dtY} ${left+7},${dtY-4} ${left+7},${dtY+4}`,fill:'#82909a'}));root.append(svg('polygon',{points:`${right},${dtY} ${right-7},${dtY-4} ${right-7},${dtY+4}`,fill:'#82909a'}));text(root,(left+right)/2,dtY-8,`Δt = ${da(dt,2)} ms`,'vector-label','#82909a','middle');text(root,(left+right)/2,170,phi<0?'I bagefter U':'I foran U','vector-label',CURRENT_COLOR,'middle');}
   else text(root,425,153,'Δt = 0 ms — i fase','vector-label','#55d6a1','middle');
-  text(root,28,27,`û = ${da(U*Math.SQRT2,1)} V`,'vector-label',VOLTAGE_COLOR); text(root,28,44,`î = ${da(I*Math.SQRT2,1)} A`,'vector-label',CURRENT_COLOR); text(root,824,107,`${da(2/f*1000,1)} ms`,'vector-label','#596873','end');
+  text(root,28,27,`Umax = ${da(U*Math.SQRT2,1)} V`,'vector-label',VOLTAGE_COLOR); text(root,28,44,`Imax = ${da(I*Math.SQRT2,1)} A`,'vector-label',CURRENT_COLOR); text(root,824,107,`${da(2/f*1000,1)} ms`,'vector-label','#596873','end');
 }
 
 function seriesValues(){
