@@ -119,7 +119,7 @@ function drawAc(){
   if(loadType==='resistive'){$('acLoadTitle').textContent='Resistiv last';$('acLoadExplanation').textContent='Strøm og spænding er i fase';$('acSignNote').innerHTML='<strong>Resistiv:</strong> Strøm og spænding følges ad.';}
   const S=U*I, P=S*Math.cos(rad(phi)), Q=-S*Math.sin(rad(phi)),T=1/f,dt=Math.abs(phi)/360*T;
   $('acP').textContent=power(P); $('acQ').textContent=power(Q,true); $('acS').textContent=Math.abs(S)>=1000?unit(S/1000,'kVA',2):unit(S,'VA'); $('acCos').textContent=da(Math.cos(rad(phi)),3);
-  $('acDt').textContent=`${da(dt*1000,2)} ms`;$('acDtNote').innerHTML=`Δt = |φ| / 360° · T = |φ| / (360° · f)<br>Δt = |${da(phi,0)}°| / 360° · ${da(T*1000,1)} ms = ${da(dt*1000,2)} ms`;
+  $('acDt').textContent=`${da(dt*1000,2)} ms`;$('acDtNote').textContent='Δt = |φ| / 360° · T = |φ| / (360° · f)';
   $('acVectorText').textContent=`I∠${phi===0?'0':phi>0?'+'+da(phi,0):'−'+da(Math.abs(phi),0)}°`;
   $('acWaveCaption').textContent=phi<0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms efter spændingen.`:phi>0?`Fasevinklen svarer til en tidsforskel: strømmen kommer ${da(dt*1000,2)} ms før spændingen.`:'Der er ingen tidsforskel: strøm og spænding passerer samme punkt samtidig.';
   $('acUhatFormula').textContent=da(U*Math.SQRT2,1); $('acFFormula').textContent=da(f,0);
