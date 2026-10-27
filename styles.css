@@ -116,3 +116,11 @@ body.light-theme .iron-hysteresis-svg{background:#fff;border-color:#cbd8e1}
 body.light-theme .iron-hysteresis-info>div{background:#fff}
 @media(max-width:1050px){.iron-circuit-strip,.iron-workspace,.iron-diagram-grid,.iron-hysteresis-layout{grid-template-columns:1fr}.iron-formula-card .formula-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.iron-reference-svg,.iron-vector-svg{height:340px}.iron-hysteresis-svg{height:340px}.iron-formula-card .formula-grid{grid-template-columns:1fr}.iron-circuit-svg{height:170px}}
+
+/* Trekantdiagram 1: kompakt ramme med større tegneflade */
+.triangle-visual-card{padding:12px 16px}
+.triangle-visual-card .card-head{align-items:center;margin-bottom:0}
+.triangle-visual-card .card-head .step{display:none}
+.triangle-visual-card .card-head h3{margin:0}
+.triangle-visual-card .triangle-explorer-svg{height:auto;min-height:240px}
+.triangle-visual-card .visual-caption{display:none}
