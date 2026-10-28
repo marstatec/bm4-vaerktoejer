@@ -226,25 +226,27 @@ function drawImpedanceTriangle(R,XL,XC,X,Z,phi,components=[],f=50){
     const omega=2*Math.PI*f,parts=seriesComponentParts(components,1,omega),x0=115,W=680,H=310;
     const Rparts=parts.filter(p=>p.type==='R'),Lparts=parts.filter(p=>p.type==='L'),Cparts=parts.filter(p=>p.type==='C'),Rsum=Rparts.reduce((sum,p)=>sum+p.R,0),XLsum=Lparts.reduce((sum,p)=>sum+Math.abs(p.X),0),XCsum=Cparts.reduce((sum,p)=>sum+Math.abs(p.X),0),Xsum=XLsum-XCsum;
     const verticalPath=XLsum+XCsum,s=Math.min(Rsum>0?420/Rsum:Infinity,verticalPath>0?270/verticalPath:Infinity,Z>0?390/Z:Infinity),safeS=Number.isFinite(s)?s:1,y0=verticalPath>0?35+XLsum*safeS:185,rx=x0+Rsum*safeS,finalY=y0-Xsum*safeS;
-    drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,y0-19,'I som reference','vector-label',CURRENT_COLOR,'end');
+    const referenceLength=clamp(rx-x0+110,180,500);
+    drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.7);text(root,x0+referenceLength-8,y0-19,'I som reference','vector-label',CURRENT_COLOR,'end');
     const rLabelY=Xsum<0?y0-14:y0+22;
     let px=x0;Rparts.forEach(part=>{const nx=px+part.R*safeS;arrow(root,px,y0,part.R*safeS,0,part.color,'',.5);text(root,(px+nx)/2,rLabelY,`${part.xPrefix}${part.index}`,'vector-label',part.color,'middle');px=nx;});
     let vy=y0;Lparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy-len;arrow(root,rx,vy,len,90,part.color,'',.5);subscriptText(root,rx+16,(vy+nextY)/2+4,'X',`L${part.index}`,'vector-label',part.color,'start');vy=nextY;});
     Cparts.forEach(part=>{const len=Math.abs(part.X)*safeS,nextY=vy+len;arrow(root,rx,vy,len,-90,part.color,'',.5);subscriptText(root,rx+16,(vy+nextY)/2+4,'X',`C${part.index}`,'vector-label',part.color,'start');vy=nextY;});
-    if(Math.abs(Xsum)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const zEnd=arrow(root,x0,y0,Z*safeS,phi,VOLTAGE_COLOR,'',.8);text(root,(x0+zEnd.x)/2,(y0+zEnd.y)/2+(Xsum>=0?-13:22),'Z','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+56,y0+(phi<0?34:-20),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#83919a','middle');}
+    if(Math.abs(Xsum)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const zEnd=arrow(root,x0,y0,Z*safeS,phi,VOLTAGE_COLOR,'',.8);text(root,(x0+zEnd.x)/2,(y0+zEnd.y)/2+(Xsum>=0?-13:22),'Z','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0-12,y0+(phi<0?19:-8),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#83919a','end');}
     const rows=[...parts.map(part=>({name:`${part.xPrefix}${part.index}`,value:part.type==='R'?part.R:Math.abs(part.X),color:part.color})),{name:'Z',value:Z,color:VOLTAGE_COLOR}],boxX=500,boxY=28,row=18,colGap=90;root.append(svg('rect',{x:boxX-14,y:boxY-18,width:190,height:Math.min(224,36+Math.ceil(rows.length/2)*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,boxX,boxY,'Værdier','parallel-state','#8f9da6');rows.forEach((item,index)=>{const col=index>=Math.ceil(rows.length/2)?1:0,r=col?index-Math.ceil(rows.length/2):index,x=boxX+col*colGap,y=boxY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:item.color}));text(root,x,y,`${item.name} ${da(item.value,1)} Ω`,'vector-label',item.color,'start');});
     text(root,50,330,'R-komponenter ligger på x-aksen; X-komponenter tegnes lodret fra R-summen.','vector-label','#778791');return;
   }
-  baseGrid(root,115,185,680,310);arrow(root,115,185,520,0,CURRENT_COLOR,'',.75);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
+  baseGrid(root,115,185,680,310);
   const scale=Math.min(R>0?380/R:Infinity,Math.abs(X)>0?135/Math.abs(X):Infinity,12);
   const safeScale=Number.isFinite(scale)?scale:1,x0=115,y0=185,rx=x0+R*safeScale,xy=y0-X*safeScale;
+  const referenceLength=clamp(rx-x0+110,180,500);arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.75);text(root,x0+referenceLength-8,y0-19,'I som reference','vector-label',CURRENT_COLOR,'end');
   line(root,x0,y0,rx,y0,'vector','#9b87f5');
   line(root,rx,y0,rx,xy,'vector','#ff9f43');
   const zEnd=arrow(root,x0,y0,Z*safeScale,phi,'#35d3e3','',.85);text(root,zEnd.x+12,zEnd.y+(phi>=0?-11:20),`Z = ${da(Z,1)} Ω`,'vector-label','#35d3e3');
   text(root,(x0+rx)/2,y0+(X<0?-12:22),`R = ${da(R,1)} Ω`,'vector-label','#9b87f5','middle');
   text(root,rx+10,(y0+xy)/2+4,`X = ${da(X,1)} Ω`,'vector-label','#ff9f43');
   line(root,x0,xy,rx,xy,'guide');
-  if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+50,y0+(phi>0?-9:31),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#83919a');}
+  if(Math.abs(phi)>1){const radius=38,sweep=phi>0?0:1,endX=x0+radius*Math.cos(rad(phi)),endY=y0-radius*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+radius} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0-12,y0+(phi<0?19:-8),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#83919a','end');}
   if(Math.abs(X)<.05)text(root,rx+18,y0-10,isResonant?'X = 0  |  resonans':'X = 0  |  resistiv','impedance-zero','#55d6a1');
 }
 
