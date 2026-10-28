@@ -112,7 +112,7 @@ body.light-theme .mini-input-label,body.light-theme .mini-input-label em{color:#
 .iron-reference-svg,.iron-vector-svg{height:300px}
 .iron-hysteresis-card{padding:22px;margin-bottom:18px}
 .iron-hysteresis-layout{display:grid;grid-template-columns:minmax(520px,1fr) minmax(220px,300px);gap:18px;align-items:stretch}
-.iron-hysteresis-svg{height:440px;border:1px solid #263946;border-radius:12px;background:#0d171e}
+.iron-hysteresis-svg{height:400px;border:1px solid #263946;border-radius:12px;background:#0d171e}
 .iron-hysteresis-svg .axis-grid{stroke:#31414c;stroke-width:1.15}
 .iron-hysteresis-info{display:grid;gap:10px;align-content:start}
 .iron-hysteresis-info>div{border-left:2px solid #2d4652;background:#101920;border-radius:0 8px 8px 0;padding:13px}
