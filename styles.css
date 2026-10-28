@@ -109,7 +109,7 @@ body.light-theme .mini-input-label,body.light-theme .mini-input-label em{color:#
 .iron-compact-diagram-card .card-head{align-items:center;margin-bottom:0;min-height:34px}
 .iron-compact-diagram-card .card-head .step{display:none}
 .iron-compact-diagram-card .card-head h3{margin:0}
-.iron-reference-svg,.iron-vector-svg{height:390px}
+.iron-reference-svg,.iron-vector-svg{height:300px}
 .iron-hysteresis-card{padding:22px;margin-bottom:18px}
 .iron-hysteresis-layout{display:grid;grid-template-columns:minmax(520px,1fr) minmax(220px,300px);gap:18px;align-items:stretch}
 .iron-hysteresis-svg{height:440px;border:1px solid #263946;border-radius:12px;background:#0d171e}
