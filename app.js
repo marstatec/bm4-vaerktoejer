@@ -193,23 +193,25 @@ function drawSeriesUIPhasor(U,I,phi){
 
 function drawSeriesVoltageDiagram(root,components,R,X,U,I,phi,f){
   clear(root);const x0=115,y0=185,W=680,H=310,omega=2*Math.PI*f,parts=seriesComponentParts(components,I,omega);
-  drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,520,0,CURRENT_COLOR,'',.7);text(root,646,166,'I som reference','vector-label',CURRENT_COLOR,'end');
+  drawAxisGrid(root,x0,y0,W,H);
   if(seriesVoltageMode==='total'){
     const UR=I*R,UX=I*X,scale=Math.min(Math.abs(UR)>0?360/Math.abs(UR):Infinity,Math.abs(UX)>0?135/Math.abs(UX):Infinity,U>0?330/U:Infinity),s=Number.isFinite(scale)?scale:1,ex=x0+UR*s,ey=y0-UX*s;
+    const referenceLength=clamp(ex-x0+110,180,500);arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.7);text(root,x0+referenceLength-8,y0-19,'I som reference','vector-label',CURRENT_COLOR,'end');
     const rLabelY=UX<0?y0-14:y0+24;
     arrow(root,x0,y0,Math.abs(UR)*s,UR>=0?0:180,'#9b87f5','',.85);subscriptValueText(root,(x0+ex)/2,rLabelY,'U','R',` = ${da(UR,1)} V`,'vector-label','#9b87f5','middle');
     line(root,ex,y0,ex,ey,'vector','#ff9f43');subscriptValueText(root,ex+14,(y0+ey)/2+4,'U','X',` = ${da(UX,1)} V`,'vector-label','#ff9f43');
     const uEnd=arrow(root,x0,y0,U*s,phi,VOLTAGE_COLOR,'',.85);subscriptValueText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','kreds',` = ${da(U,0)} V`,'vector-label',VOLTAGE_COLOR,'middle');
-    if(Math.abs(phi)>.5){const r=42,sweep=phi>0?0:1,endX=x0+r*Math.cos(rad(phi)),endY=y0-r*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58,y0+(phi<0?36:-24),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','middle');}
+    if(Math.abs(phi)>.5){const r=42,sweep=phi>0?0:1,endX=x0+r*Math.cos(rad(phi)),endY=y0-r*Math.sin(rad(phi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0-12,y0+(phi<0?19:-8),`φ = ${da(Math.abs(phi),1)}°`,'vector-label','#82909a','end');}
     return;
   }
   const URparts=parts.filter(p=>p.type==='R'),Lparts=parts.filter(p=>p.type==='L'),Cparts=parts.filter(p=>p.type==='C'),URsum=URparts.reduce((sum,p)=>sum+p.Ux,0),ULsum=Lparts.reduce((sum,p)=>sum+Math.abs(p.Uy),0),UCsum=Cparts.reduce((sum,p)=>sum+Math.abs(p.Uy),0),UX=ULsum-UCsum;
   const s=Math.min(URsum>0?380/URsum:Infinity,Math.max(ULsum,UCsum,Math.abs(UX))>0?130/Math.max(ULsum,UCsum,Math.abs(UX)):Infinity,U>0?330/U:Infinity),safeS=Number.isFinite(s)?s:1,rx=x0+URsum*safeS,finalY=y0-UX*safeS;
+  const referenceLength=clamp(rx-x0+110,180,500);arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.7);text(root,x0+referenceLength-8,y0-19,'I som reference','vector-label',CURRENT_COLOR,'end');
   const rLabelY=UX<0?y0-14:y0+22;
   let px=x0;URparts.forEach(part=>{const nx=px+part.Ux*safeS;arrow(root,px,y0,part.Ux*safeS,0,part.color,'',.5);subscriptText(root,(px+nx)/2,rLabelY,'U',`R${part.index}`,'vector-label',part.color,'middle');px=nx;});
   let vy=y0;Lparts.forEach(part=>{const len=Math.abs(part.Uy)*safeS,nextY=vy-len;arrow(root,rx,vy,len,90,part.color,'',.5);subscriptText(root,rx+18,(vy+nextY)/2+4,'U',`L${part.index}`,'vector-label',part.color,'start');vy=nextY;});
   Cparts.forEach(part=>{const len=Math.abs(part.Uy)*safeS,nextY=vy+len;arrow(root,rx,vy,len,-90,part.color,'',.5);subscriptText(root,rx+18,(vy+nextY)/2+4,'U',`C${part.index}`,'vector-label',part.color,'start');vy=nextY;});
-  if(Math.abs(UX)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const compPhi=deg(Math.atan2(UX,URsum||.000001)),uEnd=arrow(root,x0,y0,U*safeS,compPhi,VOLTAGE_COLOR,'',.8);subscriptText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','samlet','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(compPhi)>.5){const r=42,sweep=compPhi>0?0:1,endX=x0+r*Math.cos(rad(compPhi)),endY=y0-r*Math.sin(rad(compPhi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0+58,y0+(compPhi<0?36:-24),`φ = ${da(Math.abs(compPhi),1)}°`,'vector-label','#82909a','middle');}
+  if(Math.abs(UX)>.0001)line(root,rx,y0,rx,finalY,'vector','#ff9f43');const compPhi=deg(Math.atan2(UX,URsum||.000001)),uEnd=arrow(root,x0,y0,U*safeS,compPhi,VOLTAGE_COLOR,'',.8);subscriptText(root,(x0+uEnd.x)/2,(y0+uEnd.y)/2+(UX>=0?-14:22),'U','samlet','vector-label',VOLTAGE_COLOR,'middle');if(Math.abs(compPhi)>.5){const r=42,sweep=compPhi>0?0:1,endX=x0+r*Math.cos(rad(compPhi)),endY=y0-r*Math.sin(rad(compPhi));root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 ${sweep} ${endX} ${endY}`,class:'arc'}));text(root,x0-12,y0+(compPhi<0?19:-8),`φ = ${da(Math.abs(compPhi),1)}°`,'vector-label','#82909a','end');}
   const rows=[...parts.map(part=>({main:'U',sub:`${part.type}${part.index}`,value:part.type==='R'?part.Ux:Math.abs(part.Uy),color:part.color})),{main:'U',sub:'samlet',value:U,color:VOLTAGE_COLOR}],boxX=500,boxY=28,row=18,colGap=92,split=Math.ceil(rows.length/2);root.append(svg('rect',{x:boxX-14,y:boxY-18,width:206,height:Math.min(146,34+split*row),rx:8,fill:themeSurface(),stroke:'#263946','stroke-width':1}));text(root,boxX,boxY,'Værdier','parallel-state','#8f9da6');rows.forEach((item,index)=>{const col=index>=split?1:0,r=col?index-split:index,x=boxX+col*colGap,y=boxY+23+r*row;root.append(svg('circle',{cx:x-8,cy:y-4,r:3,fill:item.color}));subscriptText(root,x,y,item.main,item.sub,'vector-label',item.color,'start');text(root,x+36,y,`${da(item.value,1)} V`,'vector-label',item.color,'start');});
   text(root,50,330,'R-komponenter ligger på x-aksen; reaktanserne tegnes lodret fra R-summen.','vector-label','#778791');
 }
