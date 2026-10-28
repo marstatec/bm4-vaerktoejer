@@ -385,9 +385,9 @@
               <label class="range-wrap signed-range"><span>Kapacitiv (−) <b id="powerCosLabel">cos φ = 0,82 | induktiv</b> Induktiv (+)</span><input id="powerCosRange" type="range" min="-1" max="1" value="0.82" step="0.01"></label>
               <div class="formula-stack"><p id="powerPFormula">P = U · I · cos φ</p><p id="powerQFormula">Q = U · I · sin φ</p><p id="powerSFormula">S = U · I</p></div>
             </article>
-            <article class="card visual-card">
+            <article class="card visual-card power-triangle-card">
               <div class="card-head"><div><span class="step">EFFEKTDIAGRAM</span><h3>Effekttrekanten</h3></div><span class="angle-pill" id="powerPhi">φ = —</span></div>
-              <svg id="powerTriangle" class="diagram" viewBox="0 0 520 300" role="img" aria-label="Effekttrekant"></svg>
+              <svg id="powerTriangle" class="diagram" viewBox="40 20 445 250" role="img" aria-label="Effekttrekant med aktiv, reaktiv og tilsyneladende effekt"></svg>
             </article>
           </div>
           <div class="result-strip"><div><span>Aktiv effekt P</span><strong id="powerP">—</strong><small>Nyttigt arbejde</small></div><div><span>Reaktiv effekt Q</span><strong id="powerQ">—</strong><small>+ induktiv&nbsp;&nbsp;|&nbsp;&nbsp;− kapacitiv</small></div><div><span>Tilsyneladende S</span><strong id="powerS">—</strong><small>Netbelastning</small></div><div><span>Fasevinkel φ</span><strong id="powerAngle">—</strong><small>+ bagefter&nbsp;&nbsp;|&nbsp;&nbsp;− foran</small></div></div>
@@ -659,7 +659,7 @@
       <p class="diagram-modal-tip">PNG-filen gemmes med høj opløsning og følger det valgte tema, klar til at indsætte i en opgave.</p>
     </div>
   </div>
-  <script src="app.js?v=iron-hysteresis-loop-2"></script>
+  <script src="app.js?v=power-triangle-compact-1"></script>
 </body>
 </html>
 

@@ -4,6 +4,12 @@ body.light-theme .topbar{background:rgba(255,255,255,.94)}body.light-theme .side
 @media print{body{--ink:#13212b;--muted:#4f6170;--faint:#71808b;--panel:#ffffff;--panel2:#f7fafc;--panel3:#edf4f8;--line:#cdd9e2;--cyan:#0088ad;--cyan2:#0b8fad;--orange:#b85f00;--violet:#5d4bc4;--green:#087a55;--red:#c6283a;--current:#c6283a;--navy:#ffffff;--bg:#ffffff;background:#fff;color:#13212b}.sidebar,.top-actions,.menu-button,.diagram-expand{display:none!important}.app-shell{display:block}.topbar{position:static;background:#fff}.content{max-width:none;padding:18px}.card,.result-strip,.formula-library article{box-shadow:none!important}}
 .legend .ref{color:var(--green)}
 .power-wave-card{padding:22px;margin-bottom:18px}.power-wave-card .power-wave{height:300px}.signed-range input{background:linear-gradient(90deg,var(--violet),#3a4650 50%,var(--orange));border-radius:10px}.parallel-resonance{margin-top:18px}
+.power-triangle-card{align-self:start;padding:12px 16px}
+.power-triangle-card .card-head{align-items:center;margin-bottom:0}
+.power-triangle-card .card-head .step{display:none}
+.power-triangle-card .card-head h3{margin:0}
+.power-triangle-card #powerTriangle{height:320px}
+@media(max-width:760px){.power-triangle-card #powerTriangle{height:280px}}
 .voltage-selector{margin-top:10px}.result-strip.seven{grid-template-columns:repeat(7,1fr)}.result-strip.seven>div{padding:15px 11px}.result-strip.seven strong{font-size:15px}
 .field-grid label span>b{font-weight:inherit}
 @media(max-width:1050px){.result-strip.seven{grid-template-columns:repeat(3,1fr)}}
