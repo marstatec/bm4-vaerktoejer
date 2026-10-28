@@ -99,9 +99,17 @@ body.light-theme .mini-input-label,body.light-theme .mini-input-label em{color:#
 .iron-circuit-svg{height:180px}
 .iron-workspace{grid-template-columns:minmax(420px,.85fr) minmax(520px,1.15fr)}
 .iron-results{margin-bottom:18px}
-.iron-diagram-grid{display:grid;grid-template-columns:repeat(3,minmax(320px,1fr));gap:18px;margin-bottom:18px}
-.iron-reference-svg{height:430px}
-.iron-vector-svg{height:430px}
+.iron-diagram-grid{display:grid;grid-template-columns:repeat(3,minmax(300px,1fr));gap:12px;margin-bottom:18px}
+.iron-main-triangle-card{padding:14px 16px}
+.iron-main-triangle-card .card-head{align-items:center;margin-bottom:0}
+.iron-main-triangle-card .card-head .step{display:none}
+.iron-main-triangle-card .high-res-diagram{height:310px}
+.iron-main-triangle-card .triangle-values{padding-top:10px}
+.iron-compact-diagram-card{padding:12px 14px}
+.iron-compact-diagram-card .card-head{align-items:center;margin-bottom:0;min-height:34px}
+.iron-compact-diagram-card .card-head .step{display:none}
+.iron-compact-diagram-card .card-head h3{margin:0}
+.iron-reference-svg,.iron-vector-svg{height:390px}
 .iron-hysteresis-card{padding:22px;margin-bottom:18px}
 .iron-hysteresis-layout{display:grid;grid-template-columns:minmax(520px,1fr) minmax(220px,300px);gap:18px;align-items:stretch}
 .iron-hysteresis-svg{height:440px;border:1px solid #263946;border-radius:12px;background:#0d171e}

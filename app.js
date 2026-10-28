@@ -947,7 +947,8 @@ function drawIronCircuit(root,U,I,RCu,RFe,Xeff,Reff){
 }
 function drawIronTriangle(root,R,X,Z,phi){
   clear(root);const A={x:130,y:255};baseGrid(root,A.x,A.y,630,300);
-  const scale=Math.min(440/Math.max(R,.001),175/Math.max(X,.001)),w=R*scale,h=X*scale,B={x:A.x+w,y:A.y},C={x:B.x,y:A.y-h};
+  const scale=Math.min(440/Math.max(R,.001),190/Math.max(X,.001)),w=R*scale,h=X*scale,B={x:A.x+w,y:A.y},C={x:B.x,y:A.y-h},referenceLength=clamp(w+125,210,440);
+  arrow(root,A.x,A.y,referenceLength,0,CURRENT_COLOR,'',.65);text(root,A.x+referenceLength-8,A.y-18,'I som reference','vector-label',CURRENT_COLOR,'end');
   arrow(root,A.x,A.y,w,0,'#9b87f5','',.9);arrow(root,B.x,B.y,h,90,'#ff9f43','',.9);arrowTo(root,A.x,A.y,C.x,C.y,VOLTAGE_COLOR,'',1);
   root.append(svg('path',{d:`M ${B.x-24} ${B.y} L ${B.x-24} ${B.y-24} L ${B.x} ${B.y-24}`,class:'triangle-right-angle'}));
   const r=44,end={x:A.x+r*Math.cos(rad(phi)),y:A.y-r*Math.sin(rad(phi))};root.append(svg('path',{d:`M ${A.x+r} ${A.y} A ${r} ${r} 0 0 0 ${end.x} ${end.y}`,class:'arc'}));
@@ -963,28 +964,31 @@ function drawIronPowerTriangle(root,PCu,PFe,P,Q,S,phi){
   line(root,splitX,y0-8,splitX,y0+8,'axis');root.append(svg('path',{d:`M ${B.x-24} ${B.y} L ${B.x-24} ${B.y-24} L ${B.x} ${B.y-24}`,class:'triangle-right-angle'}));
   const r=42,end={x:x0+r*Math.cos(rad(phi)),y:y0-r*Math.sin(rad(phi))};root.append(svg('path',{d:`M ${x0+r} ${y0} A ${r} ${r} 0 0 0 ${end.x} ${end.y}`,class:'arc'}));
   text(root,x0+pCuW*.5,y0+26,`P_Cu = ${power(PCu)}`,'vector-label','#9b87f5','middle');text(root,splitX+pFeW*.5,y0+26,`P_Fe = ${power(PFe)}`,'vector-label','#55d6a1','middle');text(root,B.x+18,y0-height*.5+4,`Q = ${power(Q,true)}`,'vector-label','#ff9f43');text(root,x0+base*.5,y0-height*.55,`S = ${apparentPower(S)}`,'vector-label',VOLTAGE_COLOR,'middle');
-  text(root,x0+44,y0-17,`φ = ${da(phi,1)}°`,'vector-label','#aab8c0','middle');text(root,x0+base*.5,y0+51,`P = ${power(P)}`,'triangle-dimension','#71828d','middle');text(root,50,405,'Aktiv effekt ligger på x-aksen; reaktiv effekt tegnes lodret fra P-summen.','vector-label','#778791');
+  text(root,x0+44,y0-17,`φ = ${da(phi,1)}°`,'vector-label','#aab8c0','middle');text(root,x0+base*.5,y0+51,`P = ${power(P)}`,'triangle-dimension','#71828d','middle');
 }
 function drawIronVectorDiagram(root,I,RCu,RFe,Xeff,Reff,Z,phi){
   if(!root)return;clear(root);const x0=115,y0=270,W=680,H=380;
-  drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,330,0,CURRENT_COLOR,'',.7);text(root,470,251,'I som reference','vector-label',CURRENT_COLOR,'end');
+  drawAxisGrid(root,x0,y0,W,H);
   const URCu=I*RCu,URFe=I*RFe,UX=I*Xeff,UZ=I*Z,scale=Math.min((URCu+URFe)>0?430/(URCu+URFe):Infinity,UX>0?235/UX:Infinity,UZ>0?475/UZ:Infinity),s=Number.isFinite(scale)?scale:1;
-  const rcu=Math.max(1,URCu*s),rfe=Math.max(1,URFe*s),rx=x0+rcu+rfe,cuX=x0+rcu,effH=Math.max(1,UX*s),zEnd={x:rx,y:y0-effH};
+  const rcu=Math.max(1,URCu*s),rfe=Math.max(1,URFe*s),rx=x0+rcu+rfe,cuX=x0+rcu,effH=Math.max(1,UX*s),zEnd={x:rx,y:y0-effH},referenceLength=clamp(rx-x0+125,210,390),alpha=deg(Math.atan2(RFe,Xeff||.000001));
+  arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.7);text(root,x0+referenceLength-8,y0-18,'I som reference','vector-label',CURRENT_COLOR,'end');
   arrow(root,x0,y0,rcu,0,'#9b87f5','',.65);arrow(root,cuX,y0,rfe,0,'#55d6a1','',.65);arrowTo(root,cuX,y0,zEnd.x,zEnd.y,'#d6e1e5','',.75);arrow(root,rx,y0,effH,90,'#ff9f43','',.75);arrowTo(root,x0,y0,zEnd.x,zEnd.y,VOLTAGE_COLOR,'',.85);
   root.append(svg('path',{d:`M ${x0+42} ${y0} A 42 42 0 0 0 ${x0+42*Math.cos(rad(phi))} ${y0-42*Math.sin(rad(phi))}`,class:'arc'}));
+  const fluxLength=clamp(Math.hypot(rx-x0,effH)*.58,115,155),fluxEnd=arrow(root,x0,y0,fluxLength,-alpha,'#f7c948','',.82),alphaRadius=36,alphaEndX=x0+alphaRadius*Math.cos(rad(alpha)),alphaEndY=y0+alphaRadius*Math.sin(rad(alpha));
+  root.append(svg('path',{d:`M ${x0+alphaRadius} ${y0} A ${alphaRadius} ${alphaRadius} 0 0 1 ${alphaEndX} ${alphaEndY}`,class:'arc'}));
+  text(root,fluxEnd.x+10,fluxEnd.y+5,'Φ','vector-label','#f7c948');text(root,x0+50,y0+47,`α = ${da(alpha,1)}°`,'vector-label','#f7c948','middle');
   text(root,x0+rcu*.5,y0+24,'I·R_Cu','vector-label','#9b87f5','middle');text(root,cuX+rfe*.5,y0+24,'I·R_Fe','vector-label','#55d6a1','middle');text(root,cuX+(rx-cuX)*.38,y0-effH*.52,'I·X_L','vector-label','#d6e1e5','middle');text(root,rx+15,y0-effH*.5+4,'I·X_L,eff','vector-label','#ff9f43');text(root,x0+(rx-x0)*.42,y0-effH*.58,'I·Z','vector-label',VOLTAGE_COLOR,'middle');text(root,x0+34,y0-13,'φ','vector-label','#aab8c0','middle');
-  text(root,50,405,'R_Cu og R_Fe ligger i fase med strømmen; X_L går fra R_Cu-punktet til enden af Z.','vector-label','#778791');
 }
 function drawIronImpedanceDetail(root,RCu,RFe,Xeff,Reff,Z,phi){
   if(!root)return;clear(root);const x0=115,y0=270,W=680,H=380;
-  drawAxisGrid(root,x0,y0,W,H);arrow(root,x0,y0,330,0,CURRENT_COLOR,'',.65);text(root,470,251,'I som reference','vector-label',CURRENT_COLOR,'end');
+  drawAxisGrid(root,x0,y0,W,H);
   const scale=Math.min(Reff>0?430/Reff:Infinity,Xeff>0?235/Xeff:Infinity,Z>0?475/Z:Infinity),s=Number.isFinite(scale)?scale:1;
-  const rcu=Math.max(1,RCu*s),rfe=Math.max(1,RFe*s),rx=x0+rcu+rfe,cuX=x0+rcu,effH=Math.max(1,Xeff*s),zEnd={x:rx,y:y0-effH};
+  const rcu=Math.max(1,RCu*s),rfe=Math.max(1,RFe*s),rx=x0+rcu+rfe,cuX=x0+rcu,effH=Math.max(1,Xeff*s),zEnd={x:rx,y:y0-effH},referenceLength=clamp(rx-x0+125,210,390);
+  arrow(root,x0,y0,referenceLength,0,CURRENT_COLOR,'',.65);text(root,x0+referenceLength-8,y0-18,'I som reference','vector-label',CURRENT_COLOR,'end');
   arrow(root,x0,y0,rcu,0,'#9b87f5','',.65);arrow(root,cuX,y0,rfe,0,'#55d6a1','',.65);arrowTo(root,cuX,y0,zEnd.x,zEnd.y,'#d6e1e5','',.75);arrow(root,rx,y0,effH,90,'#ff9f43','',.75);arrowTo(root,x0,y0,zEnd.x,zEnd.y,VOLTAGE_COLOR,'',.85);
   root.append(svg('path',{d:`M ${rx-24} ${y0} L ${rx-24} ${y0-24} L ${rx} ${y0-24}`,class:'triangle-right-angle'}));root.append(svg('path',{d:`M ${x0+42} ${y0} A 42 42 0 0 0 ${x0+42*Math.cos(rad(phi))} ${y0-42*Math.sin(rad(phi))}`,class:'arc'}));
   root.append(svg('path',{d:`M ${x0} ${y0+43} C ${x0+40} ${y0+61}, ${rx-40} ${y0+61}, ${rx} ${y0+43}`,class:'guide'}));
   text(root,x0+rcu*.5,y0+24,'R_Cu','vector-label','#9b87f5','middle');text(root,cuX+rfe*.5,y0+24,'R_Fe','vector-label','#55d6a1','middle');text(root,cuX+(rx-cuX)*.38,y0-effH*.52,'X_L','vector-label','#d6e1e5','middle');text(root,rx+15,y0-effH*.5+4,`X_L,eff = ${da(Xeff,2)} Ω`,'vector-label','#ff9f43');text(root,x0+(rx-x0)*.48,y0-effH*.58,`Z = ${da(Z,2)} Ω`,'vector-label',VOLTAGE_COLOR,'middle');text(root,x0+34,y0-13,'φ','vector-label','#aab8c0','middle');text(root,x0+(rx-x0)*.5,y0+72,`R_eff = ${da(Reff,2)} Ω`,'vector-label','#d6e1e5','middle');
-  text(root,50,405,'R_eff = R_Cu + R_Fe på x-aksen; X_L går fra R_Cu-punktet til enden af Z.','vector-label','#778791');
 }
 function drawIronHysteresis(root){
   clear(root);const cx=448,cy=222,xScale=250,yScale=132,toX=H=>cx+H/2200*xScale,toY=B=>cy-B/1.5*yScale;
